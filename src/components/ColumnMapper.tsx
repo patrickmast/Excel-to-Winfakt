@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Input } from './ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { ScrollArea } from './ui/scroll-area';
+import { Input } from './ui/input';
 import { ArrowRight } from 'lucide-react';
 
 interface ColumnMapperProps {
@@ -15,16 +14,24 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [sourceSearch, setSourceSearch] = useState('');
   const [targetSearch, setTargetSearch] = useState('');
+  const [selectedSourceColumn, setSelectedSourceColumn] = useState<string | null>(null);
 
   useEffect(() => {
     onMappingChange(mapping);
   }, [mapping, onMappingChange]);
 
-  const handleMappingChange = (sourceColumn: string, targetColumn: string) => {
-    setMapping(prev => ({
-      ...prev,
-      [sourceColumn]: targetColumn
-    }));
+  const handleSourceColumnClick = (column: string) => {
+    setSelectedSourceColumn(column);
+  };
+
+  const handleTargetColumnClick = (targetColumn: string) => {
+    if (selectedSourceColumn) {
+      setMapping(prev => ({
+        ...prev,
+        [selectedSourceColumn]: targetColumn
+      }));
+      setSelectedSourceColumn(null);
+    }
   };
 
   const filteredSourceColumns = sourceColumns.filter(column =>
@@ -83,26 +90,22 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
               className="mb-4"
             />
             <ScrollArea className="h-[400px]">
-              <div className="space-y-4 pr-4">
+              <div className="space-y-2 pr-4">
                 {filteredSourceColumns.map(column => (
-                  <div key={column} className="flex items-center space-x-4">
-                    <span className="flex-1 truncate text-sm">{column}</span>
-                    <Select
-                      value={mapping[column] || 'none'}
-                      onValueChange={(value) => handleMappingChange(column, value === 'none' ? '' : value)}
-                    >
-                      <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="Map to..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        {targetColumns.map(targetColumn => (
-                          <SelectItem key={targetColumn} value={targetColumn}>
-                            {targetColumn}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div
+                    key={column}
+                    onClick={() => handleSourceColumnClick(column)}
+                    className={`p-3 rounded-md cursor-pointer transition-colors ${
+                      selectedSourceColumn === column
+                        ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
+                        : 'hover:bg-secondary'
+                    } ${
+                      mapping[column]
+                        ? 'bg-primary/10 text-primary pointer-events-none'
+                        : ''
+                    }`}
+                  >
+                    <span className="text-sm">{column}</span>
                   </div>
                 ))}
               </div>
@@ -124,13 +127,16 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
                 {filteredTargetColumns.map(column => (
                   <div
                     key={column}
-                    className={`p-2 rounded-md text-sm ${
+                    onClick={() => handleTargetColumnClick(column)}
+                    className={`p-3 rounded-md cursor-pointer transition-colors ${
                       Object.values(mapping).includes(column)
-                        ? 'bg-primary/10 text-primary'
+                        ? 'bg-primary/10 text-primary pointer-events-none'
+                        : selectedSourceColumn
+                        ? 'hover:bg-secondary'
                         : 'text-muted-foreground'
                     }`}
                   >
-                    {column}
+                    <span className="text-sm">{column}</span>
                   </div>
                 ))}
               </div>
