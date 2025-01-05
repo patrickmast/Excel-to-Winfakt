@@ -70,40 +70,42 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
   const connectedColumns = Object.entries(mapping).filter(([_, target]) => target !== '');
 
   return (
-    <Card className="w-full">
-      <CardContent className="p-6 space-y-8">
-        <div className="flex-1">
-          <ConnectedColumns 
-            connectedColumns={connectedColumns} 
-            onDisconnect={handleDisconnect}
-            onExport={() => onExport(mapping)}
-          />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-8">
-          <ColumnList
-            title="Source file columns"
-            columns={sourceColumns}
-            searchValue={sourceSearch}
-            onSearchChange={setSourceSearch}
-            selectedColumn={selectedSourceColumn}
-            onColumnClick={handleSourceColumnClick}
-            isColumnMapped={(column) => column in mapping}
-            searchPlaceholder="Search source columns..."
-          />
-          <ColumnList
-            title="Winfakt columns"
-            columns={targetColumns}
-            searchValue={targetSearch}
-            onSearchChange={setTargetSearch}
-            selectedColumn={selectedTargetColumn}
-            onColumnClick={handleTargetColumnClick}
-            isColumnMapped={(column) => Object.values(mapping).includes(column)}
-            searchPlaceholder="Search Winfakt columns..."
-          />
-        </div>
-      </CardContent>
-    </Card>
+    <div className="space-y-8">
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <ConnectedColumns 
+          connectedColumns={connectedColumns} 
+          onDisconnect={handleDisconnect}
+          onExport={() => onExport(mapping)}
+        />
+      </div>
+      
+      <Card>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-2 gap-8">
+            <ColumnList
+              title="Source file columns"
+              columns={sourceColumns}
+              searchValue={sourceSearch}
+              onSearchChange={setSourceSearch}
+              selectedColumn={selectedSourceColumn}
+              onColumnClick={handleSourceColumnClick}
+              isColumnMapped={(column) => column in mapping}
+              searchPlaceholder="Search source columns..."
+            />
+            <ColumnList
+              title="Winfakt columns"
+              columns={targetColumns}
+              searchValue={targetSearch}
+              onSearchChange={setTargetSearch}
+              selectedColumn={selectedTargetColumn}
+              onColumnClick={handleTargetColumnClick}
+              isColumnMapped={(column) => Object.values(mapping).includes(column)}
+              searchPlaceholder="Search Winfakt columns..."
+            />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
