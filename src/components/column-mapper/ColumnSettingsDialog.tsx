@@ -87,7 +87,7 @@ const ColumnSettingsDialog = ({
                 Insert Column
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent align="start" side="top" className="max-h-[300px] overflow-y-auto">
               <DropdownMenuLabel>Available Columns</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {sourceColumns.map((col) => (
