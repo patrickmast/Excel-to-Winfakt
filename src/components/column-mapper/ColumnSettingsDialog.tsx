@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { HelpCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,15 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 
 interface ColumnSettingsDialogProps {
@@ -46,7 +36,6 @@ const ColumnSettingsDialog = ({
   sourceColumns = [],
 }: ColumnSettingsDialogProps) => {
   const [code, setCode] = useState(initialCode);
-  const [showHelp, setShowHelp] = useState(false);
 
   const handleSave = () => {
     onSave(code);
@@ -57,8 +46,8 @@ const ColumnSettingsDialog = ({
     const text = `row["${columnName}"]`;
     navigator.clipboard.writeText(text).then(() => {
       toast({
-        title: "Copied to clipboard",
-        description: `${text} has been copied to your clipboard.`,
+        title: "Column reference copied",
+        description: `You can now paste ${text} in your transformation code.`,
       });
     }).catch((err) => {
       console.error('Failed to copy text: ', err);
@@ -71,96 +60,55 @@ const ColumnSettingsDialog = ({
   };
 
   return (
-    <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle>Settings for {columnName}</DialogTitle>
-              <div className="flex gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      Insert Column
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuLabel>Available Columns</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {sourceColumns.map((col) => (
-                      <DropdownMenuItem
-                        key={col}
-                        onClick={() => copyToClipboard(col)}
-                      >
-                        {col}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowHelp(true)}
-                  className="h-8 w-8"
-                >
-                  <HelpCircle className="h-5 w-5" />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <div className="flex items-center justify-between">
+            <DialogTitle>Settings for {columnName}</DialogTitle>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  Insert Column
                 </Button>
-              </div>
-            </div>
-            <DialogDescription>
-              Enter JavaScript code to transform the value. Use 'value' for the current column's value,
-              and select a column from the menu to insert it in your code.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Textarea
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="font-mono"
-                placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
-                rows={5}
-              />
-            </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Available Columns</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {sourceColumns.map((col) => (
+                  <DropdownMenuItem
+                    key={col}
+                    onClick={() => copyToClipboard(col)}
+                  >
+                    {col}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>Save</Button>
+          <DialogDescription>
+            Enter JavaScript code to transform the value. Use 'value' for the current column's value,
+            and select a column from the menu to insert it in your code.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="space-y-2">
+            <Textarea
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className="font-mono"
+              placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
+              rows={5}
+            />
           </div>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog open={showHelp} onOpenChange={setShowHelp}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>How to use transformations</AlertDialogTitle>
-            <AlertDialogDescription>
-              <div className="space-y-4">
-                <p>You can use these variables in your transformation code:</p>
-                <div className="space-y-2">
-                  <div className="flex items-start space-x-2">
-                    <code className="bg-slate-100 px-1 py-0.5 rounded">value</code>
-                    <span className="text-slate-500">current column value</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <code className="bg-slate-100 px-1 py-0.5 rounded">row["column_name"]</code>
-                    <span className="text-slate-500">value from another column</span>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground mt-4">
-                  Example: <code className="bg-slate-100 px-1 py-0.5 rounded">value.toUpperCase() + ' ' + row['other_column']</code>
-                </p>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Close</AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+        </div>
+        <div className="flex justify-end space-x-2">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave}>Save</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
