@@ -1,13 +1,12 @@
 import Papa from 'papaparse';
 
 export const downloadCSV = (data: any[], filename: string) => {
-  // Transform the data to handle quotes in string values without wrapping
+  // Transform the data to handle quotes without wrapping
   const escapedData = data.map(row => {
     const newRow: Record<string, any> = {};
     Object.entries(row).forEach(([key, value]) => {
-      // Only handle quotes if the value is a string
       if (typeof value === 'string') {
-        // Replace quotes with escaped quotes, without adding wrapping quotes
+        // Replace quotes with escaped quotes, no wrapping
         newRow[key] = value.replace(/"/g, '\\"');
       } else {
         newRow[key] = value;
@@ -16,22 +15,16 @@ export const downloadCSV = (data: any[], filename: string) => {
     return newRow;
   });
   
-  // Create a custom stringify function that prevents any wrapping quotes
-  const customStringify = (value: any) => {
-    return value?.toString() || '';
-  };
-  
   const csv = Papa.unparse(escapedData, {
     delimiter: ';',
     quotes: false,
     escapeFormulae: false,
-    transform: customStringify
+    transform: (value) => value === null || value === undefined ? '' : String(value)
   });
   
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   
-  // Check if the browser supports the msSaveBlob method (IE & Edge Legacy)
   if (navigator.hasOwnProperty('msSaveBlob')) {
     (navigator as any).msSaveBlob(blob, filename);
   } else {
