@@ -68,21 +68,21 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
     <Card className="w-full">
       <CardContent className="p-6 space-y-8">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">Connected columns</h3>
+          <div className="flex-1">
+            <ConnectedColumns 
+              connectedColumns={connectedColumns} 
+              onDisconnect={handleDisconnect}
+            />
+          </div>
           {connectedColumns.length > 0 && (
             <Button 
               onClick={() => onExport(mapping)}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 ml-4"
             >
               Export CSV
             </Button>
           )}
         </div>
-        
-        <ConnectedColumns 
-          connectedColumns={connectedColumns} 
-          onDisconnect={handleDisconnect}
-        />
         
         <div className="grid grid-cols-2 gap-8">
           <ColumnList

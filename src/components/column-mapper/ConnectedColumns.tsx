@@ -11,9 +11,9 @@ const ConnectedColumns = ({ connectedColumns, onDisconnect }: ConnectedColumnsPr
 
   return (
     <div>
-      <CardHeader className="px-0 pt-0">
-        <CardTitle>Connected columns</CardTitle>
-      </CardHeader>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold">Connected columns</h3>
+      </div>
       <div className="w-full space-y-2">
         {connectedColumns.map(([source, target]) => (
           <div 
