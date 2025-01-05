@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 
 interface ColumnSettingsDialogProps {
@@ -68,7 +69,7 @@ const ColumnSettingsDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
           <DialogTitle>Settings for {columnName}</DialogTitle>
           <DialogDescription>
@@ -76,17 +77,56 @@ const ColumnSettingsDialog = ({
             and select a column from the menu to insert it in your code.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="space-y-2">
-            <Textarea
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="font-mono"
-              placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
-              rows={5}
-            />
-          </div>
-        </div>
+        <Tabs defaultValue="expression" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="expression">Expression</TabsTrigger>
+            <TabsTrigger value="functions">Functions</TabsTrigger>
+          </TabsList>
+          <TabsContent value="expression">
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Textarea
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  className="font-mono"
+                  placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
+                  rows={5}
+                />
+              </div>
+            </div>
+          </TabsContent>
+          <TabsContent value="functions" className="space-y-4">
+            <div className="space-y-4">
+              <div className="bg-muted rounded-lg p-4">
+                <h4 className="font-semibold mb-2">String Operations</h4>
+                <ul className="space-y-2 text-sm">
+                  <li><code>value.toUpperCase()</code> - Convert to uppercase</li>
+                  <li><code>value.toLowerCase()</code> - Convert to lowercase</li>
+                  <li><code>value.trim()</code> - Remove whitespace from both ends</li>
+                  <li><code>value.substring(start, end)</code> - Extract part of string</li>
+                  <li><code>value.replace(search, replace)</code> - Replace text</li>
+                </ul>
+              </div>
+              <div className="bg-muted rounded-lg p-4">
+                <h4 className="font-semibold mb-2">Number Operations</h4>
+                <ul className="space-y-2 text-sm">
+                  <li><code>parseFloat(value)</code> - Convert to decimal number</li>
+                  <li><code>parseInt(value)</code> - Convert to integer</li>
+                  <li><code>Number(value).toFixed(2)</code> - Format with 2 decimals</li>
+                  <li><code>Math.round(value)</code> - Round to nearest integer</li>
+                  <li><code>Math.abs(value)</code> - Get absolute value</li>
+                </ul>
+              </div>
+              <div className="bg-muted rounded-lg p-4">
+                <h4 className="font-semibold mb-2">Date Operations</h4>
+                <ul className="space-y-2 text-sm">
+                  <li><code>new Date(value).toLocaleDateString()</code> - Format as date</li>
+                  <li><code>new Date(value).toISOString()</code> - Convert to ISO format</li>
+                </ul>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
         <div className="flex justify-between space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
