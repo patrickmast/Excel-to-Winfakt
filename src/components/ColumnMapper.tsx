@@ -8,9 +8,10 @@ interface ColumnMapperProps {
   sourceColumns: string[];
   targetColumns: string[];
   onMappingChange: (mapping: Record<string, string>) => void;
+  onExport: (mapping: Record<string, string>) => void;
 }
 
-const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnMapperProps) => {
+const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport }: ColumnMapperProps) => {
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [sourceSearch, setSourceSearch] = useState('');
   const [targetSearch, setTargetSearch] = useState('');
@@ -70,7 +71,7 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
           <h3 className="text-lg font-semibold">Connected columns</h3>
           {connectedColumns.length > 0 && (
             <Button 
-              onClick={() => onMappingChange(mapping)}
+              onClick={() => onExport(mapping)}
               className="bg-blue-600 hover:bg-blue-700"
             >
               Export CSV

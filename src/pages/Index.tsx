@@ -21,11 +21,9 @@ const Index = () => {
 
   const handleMappingChange = (mapping: Record<string, string>) => {
     setColumnMapping(mapping);
-    
-    if (Object.keys(mapping).length === 0) {
-      return;
-    }
+  };
 
+  const handleExport = (mapping: Record<string, string>) => {
     const mappedData = sourceData.map(row => {
       const newRow: Record<string, any> = {};
       Object.entries(mapping).forEach(([source, target]) => {
@@ -55,6 +53,7 @@ const Index = () => {
             sourceColumns={sourceColumns}
             targetColumns={TARGET_COLUMNS}
             onMappingChange={handleMappingChange}
+            onExport={handleExport}
           />
         )}
       </div>
