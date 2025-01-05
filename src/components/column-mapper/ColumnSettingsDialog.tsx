@@ -69,7 +69,7 @@ const ColumnSettingsDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[625px]">
+      <DialogContent className="sm:max-w-[625px] h-[600px] flex flex-col">
         <DialogHeader>
           <DialogTitle>Settings for {columnName}</DialogTitle>
           <DialogDescription>
@@ -77,25 +77,32 @@ const ColumnSettingsDialog = ({
             and select a column from the menu to insert it in your code.
           </DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue="expression" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="expression">Expression</TabsTrigger>
-            <TabsTrigger value="functions">Functions</TabsTrigger>
+        <Tabs defaultValue="expression" className="flex-1 flex flex-col">
+          <TabsList className="border-b border-border h-8 justify-start space-x-8 bg-transparent p-0">
+            <TabsTrigger 
+              value="expression" 
+              className="relative h-8 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 pt-2 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground"
+            >
+              Expression
+            </TabsTrigger>
+            <TabsTrigger 
+              value="functions"
+              className="relative h-8 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 pt-2 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground"
+            >
+              Functions
+            </TabsTrigger>
           </TabsList>
-          <TabsContent value="expression">
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Textarea
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  className="font-mono"
-                  placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
-                  rows={5}
-                />
-              </div>
+          <TabsContent value="expression" className="flex-1 mt-0">
+            <div className="h-full flex flex-col">
+              <Textarea
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className="flex-1 font-mono resize-none"
+                placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
+              />
             </div>
           </TabsContent>
-          <TabsContent value="functions" className="space-y-4">
+          <TabsContent value="functions" className="flex-1 mt-0 overflow-auto">
             <div className="space-y-4">
               <div className="bg-muted rounded-lg p-4">
                 <h4 className="font-semibold mb-2">String Operations</h4>
@@ -127,7 +134,7 @@ const ColumnSettingsDialog = ({
             </div>
           </TabsContent>
         </Tabs>
-        <div className="flex justify-between space-x-2">
+        <div className="flex justify-between space-x-2 mt-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
