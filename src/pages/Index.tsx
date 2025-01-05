@@ -2,11 +2,21 @@ import { useState } from 'react';
 import ColumnMapper from '../components/ColumnMapper';
 import { useToast } from '../components/ui/use-toast';
 import { downloadCSV } from '../utils/csvUtils';
+import { Menu, Settings, Info } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
   const [sourceData, setSourceData] = useState<any[]>([]);
   const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const { toast } = useToast();
 
   const handleMappingChange = (mapping: Record<string, string>) => {
@@ -31,10 +41,37 @@ const Index = () => {
     });
   };
 
+  const showVersionInfo = () => {
+    toast({
+      title: "Version Info",
+      description: "CSV Transformer v1.0.0",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">CSV/Excel Converter</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">CSV/Excel Converter</h1>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={showVersionInfo}>
+                <Info className="mr-2 h-4 w-4" />
+                <span>Info</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        
         <ColumnMapper 
           onMappingChange={handleMappingChange}
           onExport={handleExport}
@@ -43,6 +80,15 @@ const Index = () => {
           activeColumnSet={activeColumnSet}
           onColumnSetChange={setActiveColumnSet}
         />
+
+        <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Settings</DialogTitle>
+            </DialogHeader>
+            {/* Settings content will go here */}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
