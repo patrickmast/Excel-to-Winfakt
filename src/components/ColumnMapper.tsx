@@ -31,6 +31,7 @@ const ColumnMapper = ({
   onColumnSetChange 
 }: ColumnMapperProps) => {
   const [mapping, setMapping] = useState<Record<string, string>>({});
+  const [columnTransforms, setColumnTransforms] = useState<Record<string, string>>({});
   const [sourceSearch, setSourceSearch] = useState('');
   const [targetSearch, setTargetSearch] = useState('');
   const [selectedSourceColumn, setSelectedSourceColumn] = useState<string | null>(null);
@@ -45,6 +46,7 @@ const ColumnMapper = ({
   // Reset mapping when column set changes
   useEffect(() => {
     setMapping({});
+    setColumnTransforms({});
   }, [activeColumnSet]);
 
   const handleSourceColumnClick = (column: string) => {
@@ -93,11 +95,46 @@ const ColumnMapper = ({
       delete newMapping[sourceColumn];
       return newMapping;
     });
+    setColumnTransforms(prev => {
+      const newTransforms = { ...prev };
+      delete newTransforms[sourceColumn];
+      return newTransforms;
+    });
   };
 
   const handleFileData = (columns: string[], data: any[]) => {
     setSourceColumns(columns);
     onDataLoaded(data);
+  };
+
+  const handleExport = () => {
+    const transformedData = sourceData.map(row => {
+      const newRow: Record<string, any> = {};
+      Object.entries(mapping).forEach(([source, target]) => {
+        const sourceColumn = source.split('_')[0];
+        let value = row[sourceColumn];
+        
+        // Apply transform if it exists
+        if (columnTransforms[sourceColumn]) {
+          try {
+            // Create a new Function to evaluate the transform code
+            const transform = new Function('value', `return ${columnTransforms[sourceColumn]}`);
+            value = transform(value);
+          } catch (error) {
+            console.error(`Error transforming column ${sourceColumn}:`, error);
+          }
+        }
+        
+        newRow[target] = value;
+      });
+      return newRow;
+    });
+    
+    downloadCSV(transformedData, 'converted.csv');
+    toast({
+      title: "Export successful",
+      description: "Your file has been converted and downloaded",
+    });
   };
 
   const connectedColumns = Object.entries(mapping).map(([key, target]) => {
@@ -113,7 +150,14 @@ const ColumnMapper = ({
         <ConnectedColumns 
           connectedColumns={connectedColumns} 
           onDisconnect={handleDisconnect}
-          onExport={() => onExport(mapping)}
+          onExport={handleExport}
+          onUpdateTransform={(column, code) => {
+            setColumnTransforms(prev => ({
+              ...prev,
+              [column]: code
+            }));
+          }}
+          columnTransforms={columnTransforms}
         />
       </div>
       
