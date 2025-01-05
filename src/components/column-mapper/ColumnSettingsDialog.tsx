@@ -18,8 +18,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "@/hooks/use-toast";
 import { PlayIcon } from 'lucide-react';
+import TestResultDisplay from './TestResultDisplay';
 
 const helperFunctionsMarkdown = `String Operations
 value.toUpperCase()        // Convert to uppercase
@@ -58,7 +58,9 @@ const ColumnSettingsDialog = ({
 }: ColumnSettingsDialogProps) => {
   const [expressionCode, setExpressionCode] = useState(initialCode);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'expression' | 'functions'>('expression');
+  const [activeTab, setActiveTab] = useState<'expression' | 'result' | 'functions'>('expression');
+  const [testResult, setTestResult] = useState<string | null>(null);
+  const [testError, setTestError] = useState<string | null>(null);
 
   const handleSave = () => {
     onSave(expressionCode);
@@ -67,10 +69,13 @@ const ColumnSettingsDialog = ({
 
   const testExpression = () => {
     try {
+      // Reset previous results
+      setTestResult(null);
+      setTestError(null);
+
       // Create a sample row object with dummy data for testing
       const row: Record<string, any> = {};
       sourceColumns.forEach(col => {
-        // Provide type-specific sample data
         if (col.toLowerCase().includes('date')) {
           row[col] = new Date().toISOString();
         } else if (col.toLowerCase().includes('price') || col.toLowerCase().includes('amount')) {
@@ -88,35 +93,21 @@ const ColumnSettingsDialog = ({
       // Evaluate the expression
       // eslint-disable-next-line no-new-func
       const result = new Function('row', 'value', `return ${expressionCode}`)(row, value);
-
-      toast({
-        title: "Expression is valid!",
-        description: `Test result: ${result}`,
-      });
+      
+      setTestResult(String(result));
+      setActiveTab('result');
     } catch (error) {
-      toast({
-        title: "Invalid expression",
-        description: error instanceof Error ? error.message : "Please check your expression syntax",
-        variant: "destructive",
-      });
+      setTestError(error instanceof Error ? error.message : "An error occurred while evaluating the expression");
+      setActiveTab('result');
     }
   };
 
   const copyToClipboard = (columnName: string) => {
     const text = `row["${columnName}"]`;
     navigator.clipboard.writeText(text).then(() => {
-      toast({
-        title: "Column reference copied",
-        description: `You can now paste ${text} in your transformation code.`,
-      });
       setSearchTerm('');
     }).catch((err) => {
       console.error('Failed to copy text: ', err);
-      toast({
-        title: "Error",
-        description: "Failed to copy to clipboard",
-        variant: "destructive",
-      });
     });
   };
 
@@ -138,7 +129,7 @@ const ColumnSettingsDialog = ({
           defaultValue="expression" 
           className="flex-1 flex flex-col"
           value={activeTab}
-          onValueChange={(value) => setActiveTab(value as 'expression' | 'functions')}
+          onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions')}
         >
           <TabsList className="h-8 justify-start space-x-8 bg-transparent p-0 pl-1">
             <TabsTrigger 
@@ -146,6 +137,12 @@ const ColumnSettingsDialog = ({
               className="relative h-8 rounded-none bg-transparent px-0 pb-1 pt-0 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:font-bold data-[state=active]:text-foreground"
             >
               Expression
+            </TabsTrigger>
+            <TabsTrigger 
+              value="result"
+              className="relative h-8 rounded-none bg-transparent px-0 pb-1 pt-0 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:font-bold data-[state=active]:text-foreground"
+            >
+              Result
             </TabsTrigger>
             <TabsTrigger 
               value="functions"
@@ -163,6 +160,9 @@ const ColumnSettingsDialog = ({
                 placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
               />
             </div>
+          </TabsContent>
+          <TabsContent value="result" className="flex-1 mt-0">
+            <TestResultDisplay result={testResult} error={testError} />
           </TabsContent>
           <TabsContent value="functions" className="flex-1 mt-0">
             <div className="h-full flex flex-col">
