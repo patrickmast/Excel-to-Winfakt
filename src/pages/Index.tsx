@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
@@ -85,6 +85,9 @@ const Index = () => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Settings</DialogTitle>
+              <DialogDescription>
+                Configure your application settings
+              </DialogDescription>
             </DialogHeader>
             {/* Settings content will go here */}
           </DialogContent>
