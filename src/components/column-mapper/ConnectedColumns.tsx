@@ -9,8 +9,8 @@ interface ConnectedColumnsProps {
 
 const ConnectedColumns = ({ connectedColumns, onDisconnect, onExport }: ConnectedColumnsProps) => {
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between h-[36px]">
         <h3 className="text-xl font-semibold">Connected columns</h3>
         {onExport && (
           <Button 
