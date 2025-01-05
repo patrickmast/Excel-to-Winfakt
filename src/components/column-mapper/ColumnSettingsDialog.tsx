@@ -104,7 +104,7 @@ const ColumnSettingsDialog = ({
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as 'expression' | 'functions')}
         >
-          <TabsList className="h-8 justify-start space-x-8 bg-transparent p-0">
+          <TabsList className="h-8 justify-start space-x-8 bg-transparent p-0 pl-1">
             <TabsTrigger 
               value="expression" 
               className="relative h-8 rounded-none bg-transparent px-0 pb-1 pt-0 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:font-bold data-[state=active]:text-foreground"
