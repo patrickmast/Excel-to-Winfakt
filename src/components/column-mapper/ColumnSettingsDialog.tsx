@@ -51,6 +51,7 @@ const ColumnSettingsDialog = ({
         title: "Column reference copied",
         description: `You can now paste ${text} in your transformation code.`,
       });
+      setSearchTerm(''); // Reset search term after copying
     }).catch((err) => {
       console.error('Failed to copy text: ', err);
       toast({
