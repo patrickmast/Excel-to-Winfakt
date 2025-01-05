@@ -107,13 +107,13 @@ const ColumnSettingsDialog = ({
           <TabsList className="border-b border-border h-8 justify-start space-x-8 bg-transparent p-0">
             <TabsTrigger 
               value="expression" 
-              className="relative h-8 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 pt-2 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground"
+              className="relative h-8 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-1 pt-0 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground"
             >
               Expression
             </TabsTrigger>
             <TabsTrigger 
               value="functions"
-              className="relative h-8 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 pt-2 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground"
+              className="relative h-8 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-1 pt-0 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground"
             >
               Functions
             </TabsTrigger>
