@@ -1,11 +1,12 @@
 import { CardHeader, CardTitle } from '../ui/card';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 
 interface ConnectedColumnsProps {
   connectedColumns: [string, string][];
+  onDisconnect?: (source: string) => void;
 }
 
-const ConnectedColumns = ({ connectedColumns }: ConnectedColumnsProps) => {
+const ConnectedColumns = ({ connectedColumns, onDisconnect }: ConnectedColumnsProps) => {
   if (connectedColumns.length === 0) return null;
 
   return (
@@ -24,8 +25,9 @@ const ConnectedColumns = ({ connectedColumns }: ConnectedColumnsProps) => {
                 <p className="truncate text-sm font-medium">{source}</p>
               </div>
             </div>
-            <div className="flex-shrink-0">
-              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            <div className="flex-shrink-0 group cursor-pointer" onClick={() => onDisconnect?.(source)}>
+              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:hidden" />
+              <X className="h-4 w-4 text-red-500 hidden group-hover:block" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="bg-[#F0FEF5] p-4 rounded-md border border-[#BBF7D0]">

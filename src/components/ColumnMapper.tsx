@@ -52,12 +52,23 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
     }
   };
 
+  const handleDisconnect = (sourceColumn: string) => {
+    setMapping(prev => {
+      const newMapping = { ...prev };
+      delete newMapping[sourceColumn];
+      return newMapping;
+    });
+  };
+
   const connectedColumns = Object.entries(mapping).filter(([_, target]) => target !== '');
 
   return (
     <Card className="w-full">
       <CardContent className="p-6 space-y-8">
-        <ConnectedColumns connectedColumns={connectedColumns} />
+        <ConnectedColumns 
+          connectedColumns={connectedColumns} 
+          onDisconnect={handleDisconnect}
+        />
         
         <div className="grid grid-cols-2 gap-8">
           <ColumnList
