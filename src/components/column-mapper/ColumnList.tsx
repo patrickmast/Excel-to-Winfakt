@@ -48,7 +48,7 @@ const ColumnList = ({
                 ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
                 : 'bg-[#F9FAFB] hover:bg-white hover:border-[#BBF7D0] border border-[#E5E7EB]'
             } ${
-              isColumnMapped(column)
+              title !== "Source file columns" && isColumnMapped(column)
                 ? 'bg-primary/10 text-primary pointer-events-none'
                 : ''
             }`}
