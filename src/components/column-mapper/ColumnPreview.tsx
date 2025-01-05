@@ -35,7 +35,7 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
       <div className="flex justify-between items-center w-full">
         <div className="flex items-center justify-between flex-1 min-w-0">
           <span className="text-sm truncate">{columnName}</span>
-          {previewValue && showPreview && (
+          {previewValue && (
             <span className="text-xs text-gray-500 ml-2 truncate max-w-[50%]">
               {previewValue}
             </span>
