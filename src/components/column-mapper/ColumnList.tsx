@@ -22,9 +22,10 @@ const ColumnList = ({
   isColumnMapped,
   searchPlaceholder,
 }: ColumnListProps) => {
-  const filteredColumns = columns.filter(column =>
-    column.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  // First filter out mapped columns (for Winfakt columns only), then apply search filter
+  const filteredColumns = columns
+    .filter(column => title === "Source file columns" || !isColumnMapped(column))
+    .filter(column => column.toLowerCase().includes(searchValue.toLowerCase()));
 
   return (
     <div>
@@ -47,10 +48,6 @@ const ColumnList = ({
               selectedColumn === column
                 ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
                 : 'bg-[#F9FAFB] hover:bg-white hover:border-[#BBF7D0] border border-[#E5E7EB]'
-            } ${
-              title !== "Source file columns" && isColumnMapped(column)
-                ? 'bg-primary/10 text-primary pointer-events-none'
-                : ''
             }`}
           >
             <span className="text-sm">{column}</span>
