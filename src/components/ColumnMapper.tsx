@@ -98,7 +98,7 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
                     className={`p-3 rounded-md cursor-pointer transition-colors ${
                       selectedSourceColumn === column
                         ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
-                        : 'hover:bg-secondary'
+                        : 'bg-white border border-[#E5E7EB] hover:bg-secondary'
                     } ${
                       mapping[column]
                         ? 'bg-primary/10 text-primary pointer-events-none'
@@ -132,8 +132,8 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
                       Object.values(mapping).includes(column)
                         ? 'bg-primary/10 text-primary pointer-events-none'
                         : selectedSourceColumn
-                        ? 'hover:bg-secondary'
-                        : 'text-muted-foreground'
+                        ? 'bg-white border border-[#E5E7EB] hover:bg-secondary'
+                        : 'bg-white border border-[#E5E7EB] text-muted-foreground'
                     }`}
                   >
                     <span className="text-sm">{column}</span>
