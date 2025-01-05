@@ -33,6 +33,9 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
         }));
         setSelectedSourceColumn(null);
         setSelectedTargetColumn(null);
+        // Reset search fields after connecting columns
+        setSourceSearch('');
+        setTargetSearch('');
       }
     }
   };
@@ -49,6 +52,9 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
         }));
         setSelectedSourceColumn(null);
         setSelectedTargetColumn(null);
+        // Reset search fields after connecting columns
+        setSourceSearch('');
+        setTargetSearch('');
       }
     }
   };
