@@ -6,7 +6,7 @@ export const downloadCSV = (data: any[], filename: string) => {
     const newRow: Record<string, any> = {};
     Object.entries(row).forEach(([key, value]) => {
       // Only escape if the value is a string
-      newRow[key] = typeof value === 'string' ? value.replace(/"/g, '""') : value;
+      newRow[key] = typeof value === 'string' ? value.replace(/"/g, '\\"') : value;
     });
     return newRow;
   });
