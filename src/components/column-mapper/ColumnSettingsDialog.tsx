@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from 'lucide-react';
-import TestResultDisplay from './TestResultDisplay';
 import ExpressionEditor from './ExpressionEditor';
 import HelperFunctions from './HelperFunctions';
 import ColumnSelector from './ColumnSelector';
@@ -106,12 +105,17 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
             <ExpressionEditor 
               value={expressionCode}
               onChange={setExpressionCode}
-              result={testResult}
-              error={testError}
+              result={null}
+              error={null}
             />
           </TabsContent>
           <TabsContent value="result" className="flex-1 mt-0">
-            <TestResultDisplay result={testResult} error={testError} />
+            <ExpressionEditor 
+              value={expressionCode}
+              onChange={setExpressionCode}
+              result={testResult}
+              error={testError}
+            />
           </TabsContent>
           <TabsContent value="functions" className="flex-1 mt-0">
             <HelperFunctions />
