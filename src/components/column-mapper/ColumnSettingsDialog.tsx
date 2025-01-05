@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ interface ColumnSettingsDialogProps {
   columnName: string;
   onSave: (code: string) => void;
   initialCode?: string;
+  sourceColumns: string[];
 }
 
 const ColumnSettingsDialog = ({
@@ -22,6 +24,7 @@ const ColumnSettingsDialog = ({
   columnName,
   onSave,
   initialCode = '',
+  sourceColumns = [],
 }: ColumnSettingsDialogProps) => {
   const [code, setCode] = useState(initialCode);
 
@@ -35,17 +38,31 @@ const ColumnSettingsDialog = ({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Settings for {columnName}</DialogTitle>
+          <DialogDescription>
+            Enter JavaScript code to transform the value. Use 'value' for the current column's value,
+            and 'row["column_name"]' to access other columns.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              Enter JavaScript code to transform the value. Use 'value' as the input variable.
+              Available columns:
             </p>
+            <div className="text-sm space-y-1 mb-4">
+              <code className="bg-slate-100 px-1 py-0.5 rounded">value</code>
+              <span className="text-slate-500"> - current column value</span>
+              {sourceColumns.map((col) => (
+                <div key={col}>
+                  <code className="bg-slate-100 px-1 py-0.5 rounded">row["{col}"]</code>
+                  <span className="text-slate-500"> - value from {col}</span>
+                </div>
+              ))}
+            </div>
             <Textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
               className="font-mono"
-              placeholder="Example: value.toUpperCase()"
+              placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
               rows={5}
             />
           </div>

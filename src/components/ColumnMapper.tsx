@@ -108,8 +108,9 @@ const ColumnMapper = ({
         // Apply transform if it exists
         if (state.columnTransforms[sourceColumn]) {
           try {
-            const transform = new Function('value', `return ${state.columnTransforms[sourceColumn]}`);
-            value = transform(value);
+            // Create a function that has access to all columns in the row
+            const transform = new Function('value', 'row', `return ${state.columnTransforms[sourceColumn]}`);
+            value = transform(value, row);
           } catch (error) {
             console.error(`Error transforming column ${sourceColumn}:`, error);
           }
@@ -150,6 +151,7 @@ const ColumnMapper = ({
             });
           }}
           columnTransforms={state.columnTransforms}
+          sourceColumns={state.sourceColumns}
         />
       </div>
       

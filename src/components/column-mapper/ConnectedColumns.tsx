@@ -9,6 +9,7 @@ interface ConnectedColumnsProps {
   onExport?: () => void;
   onUpdateTransform?: (column: string, code: string) => void;
   columnTransforms?: Record<string, string>;
+  sourceColumns: string[];
 }
 
 const ConnectedColumns = ({ 
@@ -16,7 +17,8 @@ const ConnectedColumns = ({
   onDisconnect, 
   onExport,
   onUpdateTransform,
-  columnTransforms = {}
+  columnTransforms = {},
+  sourceColumns = []
 }: ConnectedColumnsProps) => {
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
 
@@ -75,6 +77,7 @@ const ConnectedColumns = ({
             onUpdateTransform?.(selectedColumn, code);
             setSelectedColumn(null);
           }}
+          sourceColumns={sourceColumns}
         />
       )}
     </div>
