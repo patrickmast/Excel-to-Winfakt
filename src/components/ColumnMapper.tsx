@@ -21,7 +21,12 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
   }, [mapping, onMappingChange]);
 
   const handleSourceColumnClick = (column: string) => {
-    setSelectedSourceColumn(column);
+    // If the clicked column is already selected, deselect it
+    if (selectedSourceColumn === column) {
+      setSelectedSourceColumn(null);
+    } else {
+      setSelectedSourceColumn(column);
+    }
   };
 
   const handleTargetColumnClick = (targetColumn: string) => {
@@ -87,7 +92,7 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
               placeholder="Search source columns..."
               value={sourceSearch}
               onChange={(e) => setSourceSearch(e.target.value)}
-              className="mb-4"
+              className="mb-4 w-full pr-4"
             />
             <ScrollArea className="h-[400px]">
               <div className="space-y-2 pr-4">
@@ -120,7 +125,7 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
               placeholder="Search Winfakt columns..."
               value={targetSearch}
               onChange={(e) => setTargetSearch(e.target.value)}
-              className="mb-4"
+              className="mb-4 w-full pr-4"
             />
             <ScrollArea className="h-[400px]">
               <div className="space-y-2 pr-4">
