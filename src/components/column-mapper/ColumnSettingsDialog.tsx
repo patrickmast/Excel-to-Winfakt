@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,34 @@ interface ColumnSettingsDialogProps {
   sourceColumns: string[];
 }
 
+const helperFunctionsMarkdown = `
+# Available Helper Functions
+
+## String Operations
+\`\`\`javascript
+value.toUpperCase()        // Convert to uppercase
+value.toLowerCase()        // Convert to lowercase
+value.trim()              // Remove whitespace from both ends
+value.substring(start, end) // Extract part of string
+value.replace(search, replace) // Replace text
+\`\`\`
+
+## Number Operations
+\`\`\`javascript
+parseFloat(value)         // Convert to decimal number
+parseInt(value)           // Convert to integer
+Number(value).toFixed(2)  // Format with 2 decimals
+Math.round(value)         // Round to nearest integer
+Math.abs(value)          // Get absolute value
+\`\`\`
+
+## Date Operations
+\`\`\`javascript
+new Date(value).toLocaleDateString() // Format as date
+new Date(value).toISOString()        // Convert to ISO format
+\`\`\`
+`;
+
 const ColumnSettingsDialog = ({
   isOpen,
   onClose,
@@ -39,6 +68,7 @@ const ColumnSettingsDialog = ({
 }: ColumnSettingsDialogProps) => {
   const [code, setCode] = useState(initialCode);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState<'expression' | 'functions'>('expression');
 
   const handleSave = () => {
     onSave(code);
@@ -77,7 +107,16 @@ const ColumnSettingsDialog = ({
             and select a column from the menu to insert it in your code.
           </DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue="expression" className="flex-1 flex flex-col">
+        <Tabs 
+          defaultValue="expression" 
+          className="flex-1 flex flex-col"
+          onValueChange={(value) => {
+            setActiveTab(value as 'expression' | 'functions');
+            if (value === 'functions') {
+              setCode(helperFunctionsMarkdown);
+            }
+          }}
+        >
           <TabsList className="border-b border-border h-8 justify-start space-x-8 bg-transparent p-0">
             <TabsTrigger 
               value="expression" 
@@ -104,35 +143,9 @@ const ColumnSettingsDialog = ({
           </TabsContent>
           <TabsContent value="functions" className="flex-1 mt-0">
             <div className="h-full overflow-y-auto pr-2">
-              <div className="space-y-4">
-                <div className="bg-muted rounded-lg p-4">
-                  <h4 className="font-semibold mb-2">String Operations</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li><code>value.toUpperCase()</code> - Convert to uppercase</li>
-                    <li><code>value.toLowerCase()</code> - Convert to lowercase</li>
-                    <li><code>value.trim()</code> - Remove whitespace from both ends</li>
-                    <li><code>value.substring(start, end)</code> - Extract part of string</li>
-                    <li><code>value.replace(search, replace)</code> - Replace text</li>
-                  </ul>
-                </div>
-                <div className="bg-muted rounded-lg p-4">
-                  <h4 className="font-semibold mb-2">Number Operations</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li><code>parseFloat(value)</code> - Convert to decimal number</li>
-                    <li><code>parseInt(value)</code> - Convert to integer</li>
-                    <li><code>Number(value).toFixed(2)</code> - Format with 2 decimals</li>
-                    <li><code>Math.round(value)</code> - Round to nearest integer</li>
-                    <li><code>Math.abs(value)</code> - Get absolute value</li>
-                  </ul>
-                </div>
-                <div className="bg-muted rounded-lg p-4">
-                  <h4 className="font-semibold mb-2">Date Operations</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li><code>new Date(value).toLocaleDateString()</code> - Format as date</li>
-                    <li><code>new Date(value).toISOString()</code> - Convert to ISO format</li>
-                  </ul>
-                </div>
-              </div>
+              <ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert">
+                {code}
+              </ReactMarkdown>
             </div>
           </TabsContent>
         </Tabs>
