@@ -90,8 +90,8 @@ const Index = () => {
           onColumnSetChange={setActiveColumnSet}
         />
 
-        <AlertDialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-          <AlertDialogContent>
+        <AlertDialog>
+          <AlertDialogContent className={settingsOpen ? 'block' : 'hidden'}>
             <AlertDialogHeader>
               <AlertDialogTitle>Settings</AlertDialogTitle>
               <AlertDialogDescription>
@@ -100,7 +100,9 @@ const Index = () => {
             </AlertDialogHeader>
             {/* Settings content will go here */}
             <AlertDialogFooter>
-              <AlertDialogCancel>Close</AlertDialogCancel>
+              <AlertDialogCancel onClick={() => setSettingsOpen(false)}>
+                Close
+              </AlertDialogCancel>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
