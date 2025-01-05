@@ -1,4 +1,3 @@
-import { ScrollArea } from '../ui/scroll-area';
 import { CardHeader, CardTitle } from '../ui/card';
 import { ArrowRight } from 'lucide-react';
 
@@ -14,30 +13,28 @@ const ConnectedColumns = ({ connectedColumns }: ConnectedColumnsProps) => {
       <CardHeader className="px-0 pt-0">
         <CardTitle>Connected columns</CardTitle>
       </CardHeader>
-      <ScrollArea className="h-[200px] w-full rounded-md border">
-        <div className="p-4 space-y-2">
-          {connectedColumns.map(([source, target]) => (
-            <div 
-              key={source} 
-              className="flex items-center gap-4"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="bg-secondary/50 p-4 rounded-md border border-border">
-                  <p className="truncate text-sm font-medium">{source}</p>
-                </div>
-              </div>
-              <div className="flex-shrink-0">
-                <ArrowRight className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="bg-secondary/50 p-4 rounded-md border border-border">
-                  <p className="truncate text-sm font-medium">{target}</p>
-                </div>
+      <div className="w-full space-y-2">
+        {connectedColumns.map(([source, target]) => (
+          <div 
+            key={source} 
+            className="flex items-center gap-4"
+          >
+            <div className="flex-1 min-w-0">
+              <div className="bg-accent p-4 rounded-md border border-border">
+                <p className="truncate text-sm font-medium">{source}</p>
               </div>
             </div>
-          ))}
-        </div>
-      </ScrollArea>
+            <div className="flex-shrink-0">
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="bg-accent p-4 rounded-md border border-border">
+                <p className="truncate text-sm font-medium">{target}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
