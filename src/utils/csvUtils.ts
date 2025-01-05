@@ -1,13 +1,13 @@
 import Papa from 'papaparse';
 
 export const downloadCSV = (data: any[], filename: string) => {
-  // Transform the data to escape quotes in all string values
+  // Transform the data to handle quotes in string values without wrapping
   const escapedData = data.map(row => {
     const newRow: Record<string, any> = {};
     Object.entries(row).forEach(([key, value]) => {
-      // Only escape if the value is a string
+      // Only handle quotes if the value is a string
       if (typeof value === 'string') {
-        // Replace quotes with escaped quotes
+        // Replace quotes with escaped quotes, without adding wrapping quotes
         newRow[key] = value.replace(/"/g, '\\"');
       } else {
         newRow[key] = value;
@@ -16,18 +16,15 @@ export const downloadCSV = (data: any[], filename: string) => {
     return newRow;
   });
   
-  // Create a custom stringify function to avoid wrapping in quotes
+  // Create a custom stringify function that prevents any wrapping quotes
   const customStringify = (value: any) => {
-    if (typeof value === 'string') {
-      return value; // Don't wrap in quotes, already escaped above
-    }
-    return value;
+    return value?.toString() || '';
   };
   
   const csv = Papa.unparse(escapedData, {
     delimiter: ';',
-    quotes: false, // This ensures Papa doesn't wrap fields in quotes
-    escapeFormulae: false, // Prevent escaping of = signs
+    quotes: false,
+    escapeFormulae: false,
     transform: customStringify
   });
   
