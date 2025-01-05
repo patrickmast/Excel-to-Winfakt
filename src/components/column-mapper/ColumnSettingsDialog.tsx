@@ -98,7 +98,9 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
         >
           <TabsList className="h-8 justify-start space-x-8 bg-transparent p-0 pl-1">
             <TabsTrigger value="expression">Expression</TabsTrigger>
-            <TabsTrigger value="result">Result</TabsTrigger>
+            <TabsTrigger value="result" onClick={testExpression} className="flex items-center gap-2">
+              Result <PlayIcon className="h-4 w-4" />
+            </TabsTrigger>
             <TabsTrigger value="functions">Functions</TabsTrigger>
           </TabsList>
           <TabsContent value="expression" className="flex-1 mt-0">
@@ -129,14 +131,6 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
               onSearchChange={setSearchTerm}
               onColumnSelect={copyToClipboard}
             />
-            <Button 
-              variant="outline" 
-              onClick={testExpression}
-              className="gap-2"
-            >
-              <PlayIcon className="h-4 w-4" />
-              Test
-            </Button>
           </div>
           <div className="flex space-x-2">
             <Button variant="outline" onClick={onClose}>
