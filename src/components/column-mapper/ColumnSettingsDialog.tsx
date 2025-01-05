@@ -6,38 +6,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from 'lucide-react';
 import TestResultDisplay from './TestResultDisplay';
-
-const helperFunctionsMarkdown = `String Operations
-value.toUpperCase()        // Convert to uppercase
-value.toLowerCase()        // Convert to lowercase
-value.trim()              // Remove whitespace from both ends
-value.substring(start, end) // Extract part of string
-value.replace(search, replace) // Replace text
-
-Number Operations
-parseFloat(value)         // Convert to decimal number
-parseInt(value)           // Convert to integer
-Number(value).toFixed(2)  // Format with 2 decimals
-Math.round(value)         // Round to nearest integer
-Math.abs(value)          // Get absolute value
-
-Date Operations
-new Date(value).toLocaleDateString() // Format as date
-new Date(value).toISOString()        // Convert to ISO format`;
+import ExpressionEditor from './ExpressionEditor';
+import HelperFunctions from './HelperFunctions';
+import ColumnSelector from './ColumnSelector';
 
 interface ColumnSettingsDialogProps {
   isOpen: boolean;
@@ -48,14 +23,14 @@ interface ColumnSettingsDialogProps {
   sourceColumns: string[];
 }
 
-const ColumnSettingsDialog = ({
+const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
   isOpen,
   onClose,
   columnName,
   onSave,
   initialCode = '',
   sourceColumns = [],
-}: ColumnSettingsDialogProps) => {
+}) => {
   const [expressionCode, setExpressionCode] = useState(initialCode);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'expression' | 'result' | 'functions'>('expression');
@@ -69,11 +44,9 @@ const ColumnSettingsDialog = ({
 
   const testExpression = () => {
     try {
-      // Reset previous results
       setTestResult(null);
       setTestError(null);
 
-      // Create a sample row object with dummy data for testing
       const row: Record<string, any> = {};
       sourceColumns.forEach(col => {
         if (col.toLowerCase().includes('date')) {
@@ -87,10 +60,7 @@ const ColumnSettingsDialog = ({
         }
       });
 
-      // Create value variable as it's used in expressions
       const value = row[columnName] || 'Sample Value';
-
-      // Evaluate the expression
       // eslint-disable-next-line no-new-func
       const result = new Function('row', 'value', `return ${expressionCode}`)(row, value);
       
@@ -111,10 +81,6 @@ const ColumnSettingsDialog = ({
     });
   };
 
-  const filteredColumns = sourceColumns.filter(col => 
-    col.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[625px] h-[600px] flex flex-col">
@@ -132,75 +98,31 @@ const ColumnSettingsDialog = ({
           onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions')}
         >
           <TabsList className="h-8 justify-start space-x-8 bg-transparent p-0 pl-1">
-            <TabsTrigger 
-              value="expression" 
-              className="relative h-8 rounded-none bg-transparent px-0 pb-1 pt-0 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:font-bold data-[state=active]:text-foreground"
-            >
-              Expression
-            </TabsTrigger>
-            <TabsTrigger 
-              value="result"
-              className="relative h-8 rounded-none bg-transparent px-0 pb-1 pt-0 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:font-bold data-[state=active]:text-foreground"
-            >
-              Result
-            </TabsTrigger>
-            <TabsTrigger 
-              value="functions"
-              className="relative h-8 rounded-none bg-transparent px-0 pb-1 pt-0 font-semibold text-muted-foreground hover:text-foreground data-[state=active]:font-bold data-[state=active]:text-foreground"
-            >
-              Functions
-            </TabsTrigger>
+            <TabsTrigger value="expression">Expression</TabsTrigger>
+            <TabsTrigger value="result">Result</TabsTrigger>
+            <TabsTrigger value="functions">Functions</TabsTrigger>
           </TabsList>
           <TabsContent value="expression" className="flex-1 mt-0">
-            <div className="h-full flex flex-col">
-              <Textarea
-                value={expressionCode}
-                onChange={(e) => setExpressionCode(e.target.value)}
-                className="flex-1 font-mono resize-none"
-                placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
-              />
-            </div>
+            <ExpressionEditor 
+              value={expressionCode}
+              onChange={setExpressionCode}
+            />
           </TabsContent>
           <TabsContent value="result" className="flex-1 mt-0">
             <TestResultDisplay result={testResult} error={testError} />
           </TabsContent>
           <TabsContent value="functions" className="flex-1 mt-0">
-            <div className="h-full flex flex-col">
-              <Textarea
-                value={helperFunctionsMarkdown}
-                className="flex-1 font-mono resize-none"
-                readOnly
-              />
-            </div>
+            <HelperFunctions />
           </TabsContent>
         </Tabs>
         <div className="flex justify-between space-x-2 mt-2">
           <div className="flex space-x-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  Insert Column
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" side="top" className="max-h-[300px] overflow-y-auto">
-                <DropdownMenuLabel>Available Columns</DropdownMenuLabel>
-                <Input
-                  placeholder="Search source columns"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="mx-1 my-1 w-[calc(100%-8px)]"
-                />
-                <DropdownMenuSeparator />
-                {filteredColumns.map((col) => (
-                  <DropdownMenuItem
-                    key={col}
-                    onClick={() => copyToClipboard(col)}
-                  >
-                    {col}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <ColumnSelector
+              sourceColumns={sourceColumns}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              onColumnSelect={copyToClipboard}
+            />
             <Button 
               variant="outline" 
               onClick={testExpression}
