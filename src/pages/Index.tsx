@@ -17,6 +17,9 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogCancel,
+  AlertDialogTrigger,
+  AlertDialogPortal,
+  AlertDialogOverlay,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
 
@@ -90,19 +93,22 @@ const Index = () => {
         />
 
         <AlertDialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Settings</AlertDialogTitle>
-              <AlertDialogDescription>
-                Configure your application settings
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>
-                Close
-              </AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
+          <AlertDialogPortal>
+            <AlertDialogOverlay className="bg-black/80" />
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Settings</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Configure your application settings
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>
+                  Close
+                </AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogPortal>
         </AlertDialog>
       </div>
     </div>
