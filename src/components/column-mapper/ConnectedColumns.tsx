@@ -57,7 +57,10 @@ const ConnectedColumns = ({
                   </button>
                 </div>
               </div>
-              <div className="flex-shrink-0 group cursor-pointer" onClick={() => onDisconnect?.(source)}>
+              <div 
+                className="flex-shrink-0 group cursor-pointer p-2 hover:bg-red-50 rounded-full transition-colors"
+                onClick={() => onDisconnect?.(source)}
+              >
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:hidden" />
                 <X className="h-4 w-4 text-red-500 hidden group-hover:block" />
               </div>
