@@ -71,7 +71,7 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
 
   return (
     <div className="space-y-8">
-      <div className={`bg-white rounded-lg border border-gray-200 ${connectedColumns.length === 0 ? 'py-4 px-6' : 'p-6'}`}>
+      <div className={`bg-white rounded-lg border border-gray-200 ${connectedColumns.length === 0 ? 'py-4 px-6' : ''}`}>
         <ConnectedColumns 
           connectedColumns={connectedColumns} 
           onDisconnect={handleDisconnect}
