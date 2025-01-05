@@ -46,7 +46,7 @@ const ColumnList = ({
             className={`p-3 rounded-md cursor-pointer transition-colors ${
               selectedColumn === column
                 ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
-                : 'bg-[#F9FAFB] hover:bg-[#F3F4F6] border border-[#E5E7EB]'
+                : 'bg-[#F9FAFB] hover:bg-[#F3F4F6] hover:border-[#BBF7D0] border border-[#E5E7EB]'
             } ${
               isColumnMapped(column)
                 ? 'bg-primary/10 text-primary pointer-events-none'
