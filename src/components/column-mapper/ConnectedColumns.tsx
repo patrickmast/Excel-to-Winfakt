@@ -20,7 +20,7 @@ const ConnectedColumns = ({ connectedColumns }: ConnectedColumnsProps) => {
             className="flex items-center gap-4"
           >
             <div className="flex-1 min-w-0">
-              <div className="bg-accent p-4 rounded-md border border-border">
+              <div className="bg-[#F0FEF5] p-4 rounded-md border border-[#BBF7D0]">
                 <p className="truncate text-sm font-medium">{source}</p>
               </div>
             </div>
@@ -28,7 +28,7 @@ const ConnectedColumns = ({ connectedColumns }: ConnectedColumnsProps) => {
               <ArrowRight className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="bg-accent p-4 rounded-md border border-border">
+              <div className="bg-[#F0FEF5] p-4 rounded-md border border-[#BBF7D0]">
                 <p className="truncate text-sm font-medium">{target}</p>
               </div>
             </div>
