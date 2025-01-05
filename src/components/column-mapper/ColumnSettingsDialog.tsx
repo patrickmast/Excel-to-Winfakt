@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +37,7 @@ const ColumnSettingsDialog = ({
   sourceColumns = [],
 }: ColumnSettingsDialogProps) => {
   const [code, setCode] = useState(initialCode);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleSave = () => {
     onSave(code);
@@ -58,6 +60,10 @@ const ColumnSettingsDialog = ({
       });
     });
   };
+
+  const filteredColumns = sourceColumns.filter(col => 
+    col.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -89,8 +95,14 @@ const ColumnSettingsDialog = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" side="top" className="max-h-[300px] overflow-y-auto">
               <DropdownMenuLabel>Available Columns</DropdownMenuLabel>
+              <Input
+                placeholder="Search source columns"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="mx-1 my-1 w-[calc(100%-8px)]"
+              />
               <DropdownMenuSeparator />
-              {sourceColumns.map((col) => (
+              {filteredColumns.map((col) => (
                 <DropdownMenuItem
                   key={col}
                   onClick={() => copyToClipboard(col)}
