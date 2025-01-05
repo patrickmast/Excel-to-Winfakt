@@ -1,7 +1,17 @@
 import Papa from 'papaparse';
 
 export const downloadCSV = (data: any[], filename: string) => {
-  const csv = Papa.unparse(data, {
+  // Transform the data to escape quotes in all string values
+  const escapedData = data.map(row => {
+    const newRow: Record<string, any> = {};
+    Object.entries(row).forEach(([key, value]) => {
+      // Only escape if the value is a string
+      newRow[key] = typeof value === 'string' ? value.replace(/"/g, '""') : value;
+    });
+    return newRow;
+  });
+  
+  const csv = Papa.unparse(escapedData, {
     delimiter: ';'
   });
   
