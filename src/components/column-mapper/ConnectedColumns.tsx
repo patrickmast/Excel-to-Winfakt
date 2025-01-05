@@ -38,6 +38,7 @@ const ConnectedColumns = ({
     const firstRow = sourceData[0];
     let value = firstRow[column];
 
+    // Apply transform only for connected columns
     if (columnTransforms[column]) {
       try {
         const transform = new Function('value', 'row', `return ${columnTransforms[column]}`);

@@ -30,21 +30,9 @@ const ColumnList = ({
 }: ColumnListProps) => {
   const getPreviewValue = (column: string): string | null => {
     if (!sourceData.length) return null;
-
     const firstRow = sourceData[0];
-    let value = firstRow[column];
-
-    if (columnTransforms[column]) {
-      try {
-        const transform = new Function('value', 'row', `return ${columnTransforms[column]}`);
-        value = transform(value, firstRow);
-      } catch (error) {
-        console.error(`Error computing preview for ${column}:`, error);
-        value = 'Error in transform';
-      }
-    }
-
-    return value !== undefined ? String(value) : null;
+    // For source columns list, always show the original value
+    return firstRow[column] !== undefined ? String(firstRow[column]) : null;
   };
 
   // First filter out mapped columns (for Winfakt columns only), then apply search filter
