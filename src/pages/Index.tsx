@@ -15,6 +15,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
 
@@ -96,6 +98,9 @@ const Index = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             {/* Settings content will go here */}
+            <AlertDialogFooter>
+              <AlertDialogCancel>Close</AlertDialogCancel>
+            </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </div>
