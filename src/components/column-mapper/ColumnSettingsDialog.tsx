@@ -52,7 +52,7 @@ const ColumnSettingsDialog = ({
         title: "Column reference copied",
         description: `You can now paste ${text} in your transformation code.`,
       });
-      setSearchTerm(''); // Reset search term after copying
+      setSearchTerm('');
     }).catch((err) => {
       console.error('Failed to copy text: ', err);
       toast({
@@ -102,34 +102,36 @@ const ColumnSettingsDialog = ({
               />
             </div>
           </TabsContent>
-          <TabsContent value="functions" className="flex-1 mt-0 overflow-y-auto">
-            <div className="space-y-4">
-              <div className="bg-muted rounded-lg p-4">
-                <h4 className="font-semibold mb-2">String Operations</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><code>value.toUpperCase()</code> - Convert to uppercase</li>
-                  <li><code>value.toLowerCase()</code> - Convert to lowercase</li>
-                  <li><code>value.trim()</code> - Remove whitespace from both ends</li>
-                  <li><code>value.substring(start, end)</code> - Extract part of string</li>
-                  <li><code>value.replace(search, replace)</code> - Replace text</li>
-                </ul>
-              </div>
-              <div className="bg-muted rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Number Operations</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><code>parseFloat(value)</code> - Convert to decimal number</li>
-                  <li><code>parseInt(value)</code> - Convert to integer</li>
-                  <li><code>Number(value).toFixed(2)</code> - Format with 2 decimals</li>
-                  <li><code>Math.round(value)</code> - Round to nearest integer</li>
-                  <li><code>Math.abs(value)</code> - Get absolute value</li>
-                </ul>
-              </div>
-              <div className="bg-muted rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Date Operations</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><code>new Date(value).toLocaleDateString()</code> - Format as date</li>
-                  <li><code>new Date(value).toISOString()</code> - Convert to ISO format</li>
-                </ul>
+          <TabsContent value="functions" className="flex-1 mt-0">
+            <div className="h-full overflow-y-auto pr-2">
+              <div className="space-y-4">
+                <div className="bg-muted rounded-lg p-4">
+                  <h4 className="font-semibold mb-2">String Operations</h4>
+                  <ul className="space-y-2 text-sm">
+                    <li><code>value.toUpperCase()</code> - Convert to uppercase</li>
+                    <li><code>value.toLowerCase()</code> - Convert to lowercase</li>
+                    <li><code>value.trim()</code> - Remove whitespace from both ends</li>
+                    <li><code>value.substring(start, end)</code> - Extract part of string</li>
+                    <li><code>value.replace(search, replace)</code> - Replace text</li>
+                  </ul>
+                </div>
+                <div className="bg-muted rounded-lg p-4">
+                  <h4 className="font-semibold mb-2">Number Operations</h4>
+                  <ul className="space-y-2 text-sm">
+                    <li><code>parseFloat(value)</code> - Convert to decimal number</li>
+                    <li><code>parseInt(value)</code> - Convert to integer</li>
+                    <li><code>Number(value).toFixed(2)</code> - Format with 2 decimals</li>
+                    <li><code>Math.round(value)</code> - Round to nearest integer</li>
+                    <li><code>Math.abs(value)</code> - Get absolute value</li>
+                  </ul>
+                </div>
+                <div className="bg-muted rounded-lg p-4">
+                  <h4 className="font-semibold mb-2">Date Operations</h4>
+                  <ul className="space-y-2 text-sm">
+                    <li><code>new Date(value).toLocaleDateString()</code> - Format as date</li>
+                    <li><code>new Date(value).toISOString()</code> - Convert to ISO format</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </TabsContent>
