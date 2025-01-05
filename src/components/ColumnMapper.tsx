@@ -165,7 +165,7 @@ const ColumnMapper = ({
                   <FileUpload onDataLoaded={handleFileData}>
                     <Button variant="outline" size="default" className="ml-2 h-10">
                       <Upload className="h-4 w-4 mr-2" />
-                      Upload file
+                      Select file
                     </Button>
                   </FileUpload>
                 </div>
