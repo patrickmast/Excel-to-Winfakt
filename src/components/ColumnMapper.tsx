@@ -31,14 +31,14 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
               <div key={column} className="flex items-center space-x-4">
                 <span className="flex-1 truncate text-sm">{column}</span>
                 <Select
-                  value={mapping[column] || ''}
-                  onValueChange={(value) => handleMappingChange(column, value)}
+                  value={mapping[column] || 'none'}
+                  onValueChange={(value) => handleMappingChange(column, value === 'none' ? '' : value)}
                 >
                   <SelectTrigger className="w-[300px]">
                     <SelectValue placeholder="Map to..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {targetColumns.map(targetColumn => (
                       <SelectItem key={targetColumn} value={targetColumn}>
                         {targetColumn}
