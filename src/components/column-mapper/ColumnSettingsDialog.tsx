@@ -83,7 +83,7 @@ const ColumnSettingsDialog = ({
         <div className="flex justify-between space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="outline">
                 Insert Column
               </Button>
             </DropdownMenuTrigger>
