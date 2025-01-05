@@ -18,7 +18,8 @@ export const downloadCSV = (data: any[], filename: string) => {
   
   const csv = Papa.unparse(escapedData, {
     delimiter: ';',
-    quotes: false // This ensures Papa doesn't wrap fields in quotes
+    quotes: false, // This ensures Papa doesn't wrap fields in quotes
+    escapeFormulae: false // Prevent escaping of = signs
   });
   
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
