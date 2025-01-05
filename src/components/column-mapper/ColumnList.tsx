@@ -37,7 +37,7 @@ const ColumnList = ({
         placeholder={searchPlaceholder}
         value={searchValue}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="mb-4 w-full pr-4"
+        className="mb-4 w-full"
       />
       <ScrollArea className="h-[400px]">
         <div className="space-y-2 pr-4">
