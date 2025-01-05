@@ -1,5 +1,5 @@
-import { Input } from '../ui/input';
-import { CardHeader, CardTitle } from '../ui/card';
+import { Input } from '@/components/ui/input';
+import { CardHeader, CardTitle } from '@/components/ui/card';
 
 interface ColumnListProps {
   title: string;
