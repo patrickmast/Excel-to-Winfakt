@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { ScrollArea } from './ui/scroll-area';
-import { Input } from './ui/input';
-import { ArrowRight } from 'lucide-react';
+import { Card, CardContent } from './ui/card';
+import ConnectedColumns from './column-mapper/ConnectedColumns';
+import ColumnList from './column-mapper/ColumnList';
 
 interface ColumnMapperProps {
   sourceColumns: string[];
@@ -53,116 +52,34 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
     }
   };
 
-  const filteredSourceColumns = sourceColumns.filter(column =>
-    column.toLowerCase().includes(sourceSearch.toLowerCase())
-  );
-
-  const filteredTargetColumns = targetColumns.filter(column =>
-    column.toLowerCase().includes(targetSearch.toLowerCase())
-  );
-
   const connectedColumns = Object.entries(mapping).filter(([_, target]) => target !== '');
 
   return (
     <Card className="w-full">
       <CardContent className="p-6 space-y-8">
-        {/* Connected Columns Section */}
-        {connectedColumns.length > 0 && (
-          <div>
-            <CardHeader className="px-0 pt-0">
-              <CardTitle>Connected columns</CardTitle>
-            </CardHeader>
-            <ScrollArea className="h-[200px] w-full rounded-md border">
-              <div className="p-4 space-y-2">
-                {connectedColumns.map(([source, target]) => (
-                  <div 
-                    key={source} 
-                    className="flex items-center gap-4 bg-secondary/50 p-4 rounded-md border border-border"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="truncate text-sm font-medium">{source}</p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="truncate text-sm font-medium">{target}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
-        )}
-
-        {/* Column Mapping Section */}
+        <ConnectedColumns connectedColumns={connectedColumns} />
+        
         <div className="grid grid-cols-2 gap-8">
-          <div>
-            <CardHeader className="px-0 pt-0">
-              <CardTitle>Source file columns</CardTitle>
-            </CardHeader>
-            <Input
-              type="text"
-              placeholder="Search source columns..."
-              value={sourceSearch}
-              onChange={(e) => setSourceSearch(e.target.value)}
-              className="mb-4 w-full pr-4"
-            />
-            <ScrollArea className="h-[400px]">
-              <div className="space-y-2 pr-4">
-                {filteredSourceColumns.map(column => (
-                  <div
-                    key={column}
-                    onClick={() => handleSourceColumnClick(column)}
-                    className={`p-3 rounded-md cursor-pointer transition-colors ${
-                      selectedSourceColumn === column
-                        ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
-                        : 'bg-[#F9FAFB] hover:bg-[#F3F4F6] border border-[#E5E7EB]'
-                    } ${
-                      mapping[column]
-                        ? 'bg-primary/10 text-primary pointer-events-none'
-                        : ''
-                    }`}
-                  >
-                    <span className="text-sm">{column}</span>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
-          <div>
-            <CardHeader className="px-0 pt-0">
-              <CardTitle>Winfakt columns</CardTitle>
-            </CardHeader>
-            <Input
-              type="text"
-              placeholder="Search Winfakt columns..."
-              value={targetSearch}
-              onChange={(e) => setTargetSearch(e.target.value)}
-              className="mb-4 w-full pr-4"
-            />
-            <ScrollArea className="h-[400px]">
-              <div className="space-y-2 pr-4">
-                {filteredTargetColumns.map(column => (
-                  <div
-                    key={column}
-                    onClick={() => handleTargetColumnClick(column)}
-                    className={`p-3 rounded-md cursor-pointer transition-colors ${
-                      selectedTargetColumn === column
-                        ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
-                        : 'bg-[#F9FAFB] hover:bg-[#F3F4F6] border border-[#E5E7EB]'
-                    } ${
-                      Object.values(mapping).includes(column)
-                        ? 'bg-primary/10 text-primary pointer-events-none'
-                        : ''
-                    }`}
-                  >
-                    <span className="text-sm">{column}</span>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
+          <ColumnList
+            title="Source file columns"
+            columns={sourceColumns}
+            searchValue={sourceSearch}
+            onSearchChange={setSourceSearch}
+            selectedColumn={selectedSourceColumn}
+            onColumnClick={handleSourceColumnClick}
+            isColumnMapped={(column) => column in mapping}
+            searchPlaceholder="Search source columns..."
+          />
+          <ColumnList
+            title="Winfakt columns"
+            columns={targetColumns}
+            searchValue={targetSearch}
+            onSearchChange={setTargetSearch}
+            selectedColumn={selectedTargetColumn}
+            onColumnClick={handleTargetColumnClick}
+            isColumnMapped={(column) => Object.values(mapping).includes(column)}
+            searchPlaceholder="Search Winfakt columns..."
+          />
         </div>
       </CardContent>
     </Card>
