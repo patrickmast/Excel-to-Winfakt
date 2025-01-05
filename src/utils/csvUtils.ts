@@ -7,7 +7,7 @@ export const downloadCSV = (data: any[], filename: string) => {
     Object.entries(row).forEach(([key, value]) => {
       // Only escape if the value is a string
       if (typeof value === 'string') {
-        // Escape quotes with backslash without wrapping the string in quotes
+        // Replace quotes with escaped quotes
         newRow[key] = value.replace(/"/g, '\\"');
       } else {
         newRow[key] = value;
@@ -16,10 +16,19 @@ export const downloadCSV = (data: any[], filename: string) => {
     return newRow;
   });
   
+  // Create a custom stringify function to avoid wrapping in quotes
+  const customStringify = (value: any) => {
+    if (typeof value === 'string') {
+      return value; // Don't wrap in quotes, already escaped above
+    }
+    return value;
+  };
+  
   const csv = Papa.unparse(escapedData, {
     delimiter: ';',
     quotes: false, // This ensures Papa doesn't wrap fields in quotes
-    escapeFormulae: false // Prevent escaping of = signs
+    escapeFormulae: false, // Prevent escaping of = signs
+    transform: customStringify
   });
   
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
