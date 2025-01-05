@@ -28,14 +28,14 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
         "p-3 rounded-md cursor-pointer transition-colors relative",
         isSelected || showSettings
           ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
-          : 'bg-[#F9FAFB] hover:bg-[#F0FFF6] hover:border-[#BBF7D0] border border-[#E5E7EB]',
+          : 'bg-[#F9FAFB] hover:bg-white hover:border-[#BBF7D0] border border-[#E5E7EB]',
         className
       )}
     >
       <div className="flex justify-between items-center w-full">
         <div className="flex items-center justify-between flex-1 min-w-0">
           <span className="text-sm truncate">{columnName}</span>
-          {previewValue && showPreview && (
+          {previewValue && (
             <span className="text-xs text-gray-500 ml-2 truncate max-w-[50%]">
               {previewValue}
             </span>
