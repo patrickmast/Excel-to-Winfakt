@@ -106,6 +106,8 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
             <ExpressionEditor 
               value={expressionCode}
               onChange={setExpressionCode}
+              result={testResult}
+              error={testError}
             />
           </TabsContent>
           <TabsContent value="result" className="flex-1 mt-0">
