@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import FileUpload from '../components/FileUpload';
 import ColumnMapper from '../components/ColumnMapper';
-import { Button } from '../components/ui/button';
 import { useToast } from '../components/ui/use-toast';
 import { downloadCSV } from '../utils/csvUtils';
 
@@ -20,19 +19,16 @@ const Index = () => {
     });
   };
 
-  const handleExport = () => {
-    if (Object.keys(columnMapping).length === 0) {
-      toast({
-        title: "No columns mapped",
-        description: "Please map at least one column before exporting",
-        variant: "destructive",
-      });
+  const handleMappingChange = (mapping: Record<string, string>) => {
+    setColumnMapping(mapping);
+    
+    if (Object.keys(mapping).length === 0) {
       return;
     }
 
     const mappedData = sourceData.map(row => {
       const newRow: Record<string, any> = {};
-      Object.entries(columnMapping).forEach(([source, target]) => {
+      Object.entries(mapping).forEach(([source, target]) => {
         if (source && target) {
           newRow[target] = row[source];
         }
@@ -55,21 +51,11 @@ const Index = () => {
         {sourceColumns.length === 0 ? (
           <FileUpload onDataLoaded={handleFileData} />
         ) : (
-          <div className="space-y-6">
-            <ColumnMapper 
-              sourceColumns={sourceColumns}
-              targetColumns={TARGET_COLUMNS}
-              onMappingChange={setColumnMapping}
-            />
-            <div className="flex justify-end">
-              <Button 
-                onClick={handleExport}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                Export CSV
-              </Button>
-            </div>
-          </div>
+          <ColumnMapper 
+            sourceColumns={sourceColumns}
+            targetColumns={TARGET_COLUMNS}
+            onMappingChange={handleMappingChange}
+          />
         )}
       </div>
     </div>
