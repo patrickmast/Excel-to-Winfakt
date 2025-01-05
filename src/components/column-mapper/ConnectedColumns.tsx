@@ -23,12 +23,6 @@ const ConnectedColumns = ({
 }: ConnectedColumnsProps) => {
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
 
-  const handleDisconnect = (source: string) => {
-    if (onDisconnect) {
-      onDisconnect(source);
-    }
-  };
-
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -63,12 +57,12 @@ const ConnectedColumns = ({
                   </button>
                 </div>
               </div>
-              <div 
-                className="flex-shrink-0 group cursor-pointer p-2 hover:bg-red-50 rounded-full transition-colors"
-                onClick={() => handleDisconnect(source)}
-              >
+              <div className="flex-shrink-0 group">
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:hidden" />
-                <X className="h-4 w-4 text-red-500 hidden group-hover:block" />
+                <X 
+                  className="h-4 w-4 text-red-500 hidden group-hover:block cursor-pointer" 
+                  onClick={() => onDisconnect?.(source)}
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="bg-[#F0FEF5] p-4 rounded-md border border-[#BBF7D0]">
