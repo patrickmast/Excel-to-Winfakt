@@ -24,12 +24,14 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
           : 'bg-[#F9FAFB] hover:bg-white hover:border-[#BBF7D0] border border-[#E5E7EB]'
       )}
     >
-      <span className="text-sm">{columnName}</span>
-      {previewValue && (
-        <span className="text-xs text-gray-500 block truncate mt-1">
-          {previewValue}
-        </span>
-      )}
+      <div className="flex justify-between items-center">
+        <span className="text-sm">{columnName}</span>
+        {previewValue && (
+          <span className="text-xs text-gray-500 ml-2 truncate">
+            {previewValue}
+          </span>
+        )}
+      </div>
     </div>
   );
 };
