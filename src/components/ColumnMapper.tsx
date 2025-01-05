@@ -15,27 +15,41 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
   const [sourceSearch, setSourceSearch] = useState('');
   const [targetSearch, setTargetSearch] = useState('');
   const [selectedSourceColumn, setSelectedSourceColumn] = useState<string | null>(null);
+  const [selectedTargetColumn, setSelectedTargetColumn] = useState<string | null>(null);
 
   useEffect(() => {
     onMappingChange(mapping);
   }, [mapping, onMappingChange]);
 
   const handleSourceColumnClick = (column: string) => {
-    // If the clicked column is already selected, deselect it
     if (selectedSourceColumn === column) {
       setSelectedSourceColumn(null);
     } else {
       setSelectedSourceColumn(column);
+      if (selectedTargetColumn) {
+        setMapping(prev => ({
+          ...prev,
+          [column]: selectedTargetColumn
+        }));
+        setSelectedSourceColumn(null);
+        setSelectedTargetColumn(null);
+      }
     }
   };
 
   const handleTargetColumnClick = (targetColumn: string) => {
-    if (selectedSourceColumn) {
-      setMapping(prev => ({
-        ...prev,
-        [selectedSourceColumn]: targetColumn
-      }));
-      setSelectedSourceColumn(null);
+    if (selectedTargetColumn === targetColumn) {
+      setSelectedTargetColumn(null);
+    } else {
+      setSelectedTargetColumn(targetColumn);
+      if (selectedSourceColumn) {
+        setMapping(prev => ({
+          ...prev,
+          [selectedSourceColumn]: targetColumn
+        }));
+        setSelectedSourceColumn(null);
+        setSelectedTargetColumn(null);
+      }
     }
   };
 
@@ -134,11 +148,13 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange }: ColumnM
                     key={column}
                     onClick={() => handleTargetColumnClick(column)}
                     className={`p-3 rounded-md cursor-pointer transition-colors ${
+                      selectedTargetColumn === column
+                        ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
+                        : 'bg-[#F9FAFB] hover:bg-[#F3F4F6] border border-[#E5E7EB]'
+                    } ${
                       Object.values(mapping).includes(column)
                         ? 'bg-primary/10 text-primary pointer-events-none'
-                        : selectedSourceColumn
-                        ? 'bg-[#F9FAFB] hover:bg-[#F3F4F6] border border-[#E5E7EB]'
-                        : 'bg-[#F9FAFB] hover:bg-[#F3F4F6] border border-[#E5E7EB] text-muted-foreground'
+                        : ''
                     }`}
                   >
                     <span className="text-sm">{column}</span>
