@@ -1,98 +1,96 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
+import { ArrowRight, X, Settings } from 'lucide-react';
+import { Button } from '../ui/button';
+import { useState } from 'react';
 import ColumnSettingsDialog from './ColumnSettingsDialog';
-import ConnectedColumnBox from './ConnectedColumnBox';
+import { CardHeader, CardTitle } from '../ui/card';
 
 interface ConnectedColumnsProps {
   connectedColumns: [string, string][];
-  onDisconnect: (column: string) => void;
-  onExport: () => void;
-  onUpdateTransform: (column: string, code: string) => void;
-  columnTransforms: Record<string, string>;
+  onDisconnect?: (source: string) => void;
+  onExport?: () => void;
+  onUpdateTransform?: (column: string, code: string) => void;
+  columnTransforms?: Record<string, string>;
   sourceColumns: string[];
 }
 
-const ConnectedColumns: React.FC<ConnectedColumnsProps> = ({
-  connectedColumns,
-  onDisconnect,
+const ConnectedColumns = ({ 
+  connectedColumns, 
+  onDisconnect, 
   onExport,
   onUpdateTransform,
-  columnTransforms,
-  sourceColumns,
-}) => {
-  const [selectedColumn, setSelectedColumn] = React.useState<string | null>(null);
+  columnTransforms = {},
+  sourceColumns = []
+}: ConnectedColumnsProps) => {
+  const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
 
-  const getPreviewValue = (sourceColumn: string) => {
-    if (!columnTransforms[sourceColumn]) return sourceColumn;
-
-    try {
-      // Create sample data based on column names
-      const row: Record<string, any> = {};
-      sourceColumns.forEach(col => {
-        if (col.toLowerCase().includes('date')) {
-          row[col] = new Date().toISOString();
-        } else if (col.toLowerCase().includes('price') || col.toLowerCase().includes('amount')) {
-          row[col] = 100.50;
-        } else if (col.toLowerCase().includes('quantity') || col.toLowerCase().includes('number')) {
-          row[col] = 42;
-        } else {
-          row[col] = 'Sample Text';
-        }
-      });
-
-      const value = row[sourceColumn];
-      // eslint-disable-next-line no-new-func
-      const transform = new Function('value', 'row', `return ${columnTransforms[sourceColumn]}`);
-      return String(transform(value, row));
-    } catch (error) {
-      return 'Error in transform';
+  const handleDisconnect = (source: string) => {
+    if (onDisconnect) {
+      onDisconnect(source);
     }
   };
 
   return (
     <div>
-      <div className="space-y-2">
-        {connectedColumns.map(([source, target]) => (
-          <div key={source} className="flex items-center space-x-2">
-            <ConnectedColumnBox
-              sourceColumn={source}
-              targetColumn={target}
-              onDisconnect={() => onDisconnect(source)}
-              previewValue={getPreviewValue(source)}
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSelectedColumn(source)}
-              className="h-8 w-8"
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
+      <div className="flex items-center justify-between">
+        <CardHeader className="px-0 pt-0">
+          <CardTitle>Connected columns</CardTitle>
+        </CardHeader>
+        {onExport && (
+          <Button 
+            onClick={onExport}
+            className="bg-blue-600 hover:bg-blue-700"
+            disabled={connectedColumns.length === 0}
+          >
+            Export CSV
+          </Button>
+        )}
       </div>
-
+      {connectedColumns.length > 0 && (
+        <div className="w-full space-y-2 mt-4">
+          {connectedColumns.map(([source, target]) => (
+            <div 
+              key={source} 
+              className="flex items-center gap-4"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="bg-[#F0FEF5] p-4 rounded-md border border-[#BBF7D0] relative">
+                  <p className="truncate text-sm font-medium pr-8">{source}</p>
+                  <button
+                    onClick={() => setSelectedColumn(source)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-green-100 rounded-md transition-colors"
+                  >
+                    <Settings className="h-4 w-4 text-gray-600" />
+                  </button>
+                </div>
+              </div>
+              <div className="flex-shrink-0 group">
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:hidden" />
+                <X 
+                  className="h-4 w-4 text-red-500 hidden group-hover:block cursor-pointer" 
+                  onClick={() => handleDisconnect(source)}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="bg-[#F0FEF5] p-4 rounded-md border border-[#BBF7D0]">
+                  <p className="truncate text-sm font-medium">{target}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       {selectedColumn && (
         <ColumnSettingsDialog
           isOpen={!!selectedColumn}
           onClose={() => setSelectedColumn(null)}
           columnName={selectedColumn}
+          initialCode={columnTransforms[selectedColumn] || ''}
           onSave={(code) => {
-            onUpdateTransform(selectedColumn, code);
+            onUpdateTransform?.(selectedColumn, code);
             setSelectedColumn(null);
           }}
-          initialCode={columnTransforms[selectedColumn] || ''}
           sourceColumns={sourceColumns}
         />
-      )}
-
-      {connectedColumns.length > 0 && (
-        <div className="mt-4">
-          <Button onClick={onExport} className="w-full">
-            Export
-          </Button>
-        </div>
       )}
     </div>
   );
