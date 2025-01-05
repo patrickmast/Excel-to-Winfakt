@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import ConnectedColumns from './column-mapper/ConnectedColumns';
 import ColumnList from './column-mapper/ColumnList';
-import { Button } from './ui/button';
 
 interface ColumnMapperProps {
   sourceColumns: string[];
@@ -67,21 +66,12 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
   return (
     <Card className="w-full">
       <CardContent className="p-6 space-y-8">
-        <div className="flex justify-between items-center">
-          <div className="flex-1">
-            <ConnectedColumns 
-              connectedColumns={connectedColumns} 
-              onDisconnect={handleDisconnect}
-            />
-          </div>
-          {connectedColumns.length > 0 && (
-            <Button 
-              onClick={() => onExport(mapping)}
-              className="bg-blue-600 hover:bg-blue-700 ml-4"
-            >
-              Export CSV
-            </Button>
-          )}
+        <div className="flex-1">
+          <ConnectedColumns 
+            connectedColumns={connectedColumns} 
+            onDisconnect={handleDisconnect}
+            onExport={() => onExport(mapping)}
+          />
         </div>
         
         <div className="grid grid-cols-2 gap-8">

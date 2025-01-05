@@ -1,18 +1,27 @@
-import { CardHeader, CardTitle } from '../ui/card';
 import { ArrowRight, X } from 'lucide-react';
+import { Button } from '../ui/button';
 
 interface ConnectedColumnsProps {
   connectedColumns: [string, string][];
   onDisconnect?: (source: string) => void;
+  onExport?: () => void;
 }
 
-const ConnectedColumns = ({ connectedColumns, onDisconnect }: ConnectedColumnsProps) => {
+const ConnectedColumns = ({ connectedColumns, onDisconnect, onExport }: ConnectedColumnsProps) => {
   if (connectedColumns.length === 0) return null;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-semibold">Connected columns</h3>
+        {onExport && (
+          <Button 
+            onClick={onExport}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Export CSV
+          </Button>
+        )}
       </div>
       <div className="w-full space-y-2">
         {connectedColumns.map(([source, target]) => (
