@@ -99,7 +99,7 @@ const Index = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setSettingsOpen(false)}>
+              <AlertDialogCancel>
                 Close
               </AlertDialogCancel>
             </AlertDialogFooter>
