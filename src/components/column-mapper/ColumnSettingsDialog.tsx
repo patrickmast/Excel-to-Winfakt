@@ -63,28 +63,7 @@ const ColumnSettingsDialog = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle>Settings for {columnName}</DialogTitle>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Insert Column
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>Available Columns</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {sourceColumns.map((col) => (
-                  <DropdownMenuItem
-                    key={col}
-                    onClick={() => copyToClipboard(col)}
-                  >
-                    {col}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <DialogTitle>Settings for {columnName}</DialogTitle>
           <DialogDescription>
             Enter JavaScript code to transform the value. Use 'value' for the current column's value,
             and select a column from the menu to insert it in your code.
@@ -101,11 +80,32 @@ const ColumnSettingsDialog = ({
             />
           </div>
         </div>
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>Save</Button>
+        <div className="flex justify-between space-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                Insert Column
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Available Columns</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {sourceColumns.map((col) => (
+                <DropdownMenuItem
+                  key={col}
+                  onClick={() => copyToClipboard(col)}
+                >
+                  {col}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave}>Save</Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
