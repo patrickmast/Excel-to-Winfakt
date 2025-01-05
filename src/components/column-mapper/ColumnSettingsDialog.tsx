@@ -29,23 +29,21 @@ interface ColumnSettingsDialogProps {
   sourceColumns: string[];
 }
 
-const helperFunctionsMarkdown = `# Available Helper Functions
-
-## String Operations
+const helperFunctionsMarkdown = `String Operations
 value.toUpperCase()        // Convert to uppercase
 value.toLowerCase()        // Convert to lowercase
 value.trim()              // Remove whitespace from both ends
 value.substring(start, end) // Extract part of string
 value.replace(search, replace) // Replace text
 
-## Number Operations
+Number Operations
 parseFloat(value)         // Convert to decimal number
 parseInt(value)           // Convert to integer
 Number(value).toFixed(2)  // Format with 2 decimals
 Math.round(value)         // Round to nearest integer
 Math.abs(value)          // Get absolute value
 
-## Date Operations
+Date Operations
 new Date(value).toLocaleDateString() // Format as date
 new Date(value).toISOString()        // Convert to ISO format`;
 
