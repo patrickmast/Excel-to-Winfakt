@@ -2,6 +2,7 @@ import { ArrowRight, X, Settings } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useState } from 'react';
 import ColumnSettingsDialog from './ColumnSettingsDialog';
+import { CardHeader, CardTitle } from '../ui/card';
 
 interface ConnectedColumnsProps {
   connectedColumns: [string, string][];
@@ -24,8 +25,10 @@ const ConnectedColumns = ({
 
   return (
     <div>
-      <div className="flex items-center justify-between h-[36px]">
-        <h3 className="text-xl font-semibold">Connected columns</h3>
+      <div className="flex items-center justify-between">
+        <CardHeader className="px-0 pt-0">
+          <CardTitle>Connected columns</CardTitle>
+        </CardHeader>
         {onExport && (
           <Button 
             onClick={onExport}
