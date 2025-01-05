@@ -102,7 +102,7 @@ const ColumnSettingsDialog = ({
               />
             </div>
           </TabsContent>
-          <TabsContent value="functions" className="flex-1 mt-0 overflow-auto">
+          <TabsContent value="functions" className="flex-1 mt-0 overflow-y-auto">
             <div className="space-y-4">
               <div className="bg-muted rounded-lg p-4">
                 <h4 className="font-semibold mb-2">String Operations</h4>
