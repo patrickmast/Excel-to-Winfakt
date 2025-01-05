@@ -91,7 +91,7 @@ const Index = () => {
         />
 
         <AlertDialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-          <AlertDialogContent onPointerDownOutside={() => setSettingsOpen(false)}>
+          <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Settings</AlertDialogTitle>
               <AlertDialogDescription>
