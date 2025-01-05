@@ -57,12 +57,12 @@ const ColumnSettingsDialog = ({
   initialCode = '',
   sourceColumns = [],
 }: ColumnSettingsDialogProps) => {
-  const [code, setCode] = useState(initialCode);
+  const [expressionCode, setExpressionCode] = useState(initialCode);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'expression' | 'functions'>('expression');
 
   const handleSave = () => {
-    onSave(code);
+    onSave(expressionCode);
     onClose();
   };
 
@@ -101,12 +101,8 @@ const ColumnSettingsDialog = ({
         <Tabs 
           defaultValue="expression" 
           className="flex-1 flex flex-col"
-          onValueChange={(value) => {
-            setActiveTab(value as 'expression' | 'functions');
-            if (value === 'functions') {
-              setCode(helperFunctionsMarkdown);
-            }
-          }}
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as 'expression' | 'functions')}
         >
           <TabsList className="border-b border-border h-8 justify-start space-x-8 bg-transparent p-0">
             <TabsTrigger 
@@ -125,8 +121,8 @@ const ColumnSettingsDialog = ({
           <TabsContent value="expression" className="flex-1 mt-0">
             <div className="h-full flex flex-col">
               <Textarea
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
+                value={expressionCode}
+                onChange={(e) => setExpressionCode(e.target.value)}
                 className="flex-1 font-mono resize-none"
                 placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
               />
@@ -135,8 +131,7 @@ const ColumnSettingsDialog = ({
           <TabsContent value="functions" className="flex-1 mt-0">
             <div className="h-full flex flex-col">
               <Textarea
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
+                value={helperFunctionsMarkdown}
                 className="flex-1 font-mono resize-none"
                 readOnly
               />
