@@ -125,7 +125,7 @@ const ColumnMapper = ({
                 <div className="flex items-center justify-between">
                   <span>Source file columns</span>
                   <FileUpload onDataLoaded={handleFileData}>
-                    <Button variant="outline" size="sm" className="ml-2">
+                    <Button variant="outline" size="default" className="ml-2 h-10">
                       <Upload className="h-4 w-4 mr-2" />
                       Upload file
                     </Button>
@@ -145,7 +145,7 @@ const ColumnMapper = ({
                 <div className="flex items-center justify-between">
                   <span>Winfakt columns</span>
                   <Select value={activeColumnSet} onValueChange={onColumnSetChange}>
-                    <SelectTrigger className="w-[140px] ml-2">
+                    <SelectTrigger className="w-[140px] ml-2 h-10">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
