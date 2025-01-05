@@ -96,7 +96,7 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
       <p className="mt-2 text-sm text-gray-600">
         {isDragActive
           ? "Drop the file here"
-          : "Drag 'n' drop a file here, or click to select file"}
+          : "Drag 'n' drop a file here, or click to select a file"}
       </p>
       <p className="text-xs text-gray-500 mt-2">
         Supports Excel (.xlsx, .xls) and CSV files
