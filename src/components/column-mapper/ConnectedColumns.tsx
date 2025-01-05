@@ -90,9 +90,10 @@ const ConnectedColumns = ({
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="bg-[#F0FEF5] p-4 rounded-md border border-[#BBF7D0]">
-                  <p className="truncate text-sm font-medium">{target}</p>
-                </div>
+                <ColumnPreview
+                  columnName={target}
+                  className="bg-[#F0FEF5] border border-[#BBF7D0]"
+                />
               </div>
             </div>
           ))}
