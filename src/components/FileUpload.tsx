@@ -3,6 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { useToast } from '../hooks/use-toast';
+import { Upload } from 'lucide-react';
 
 interface FileUploadProps {
   onDataLoaded: (columns: string[], data: any[]) => void;
@@ -91,7 +92,7 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
         ${isDragActive ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}`}
     >
       <input {...getInputProps()} />
-      <FileUp className="mx-auto h-12 w-12 text-gray-400" />
+      <Upload className="mx-auto h-12 w-12 text-gray-400" />
       <p className="mt-2 text-sm text-gray-600">
         {isDragActive
           ? "Drop the file here"
