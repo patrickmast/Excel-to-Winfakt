@@ -16,6 +16,7 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
   const [targetSearch, setTargetSearch] = useState('');
   const [selectedSourceColumn, setSelectedSourceColumn] = useState<string | null>(null);
   const [selectedTargetColumn, setSelectedTargetColumn] = useState<string | null>(null);
+  const [connectionCounter, setConnectionCounter] = useState<number>(0);
 
   useEffect(() => {
     onMappingChange(mapping);
@@ -27,10 +28,12 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
     } else {
       setSelectedSourceColumn(column);
       if (selectedTargetColumn) {
+        const uniqueKey = `${column}_${connectionCounter}`;
         setMapping(prev => ({
           ...prev,
-          [column]: selectedTargetColumn
+          [uniqueKey]: selectedTargetColumn
         }));
+        setConnectionCounter(prev => prev + 1);
         setSelectedSourceColumn(null);
         setSelectedTargetColumn(null);
         // Reset search fields after connecting columns
@@ -46,10 +49,12 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
     } else {
       setSelectedTargetColumn(targetColumn);
       if (selectedSourceColumn) {
+        const uniqueKey = `${selectedSourceColumn}_${connectionCounter}`;
         setMapping(prev => ({
           ...prev,
-          [selectedSourceColumn]: targetColumn
+          [uniqueKey]: targetColumn
         }));
+        setConnectionCounter(prev => prev + 1);
         setSelectedSourceColumn(null);
         setSelectedTargetColumn(null);
         // Reset search fields after connecting columns
@@ -67,7 +72,10 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
     });
   };
 
-  const connectedColumns = Object.entries(mapping).filter(([_, target]) => target !== '');
+  const connectedColumns = Object.entries(mapping).map(([key, target]) => {
+    const sourceColumn = key.split('_')[0];
+    return [sourceColumn, target] as [string, string];
+  }).filter(([_, target]) => target !== '');
 
   return (
     <div className="space-y-8">
@@ -89,7 +97,7 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
               onSearchChange={setSourceSearch}
               selectedColumn={selectedSourceColumn}
               onColumnClick={handleSourceColumnClick}
-              isColumnMapped={(column) => column in mapping}
+              isColumnMapped={(column) => false} // Source columns can always be selected
               searchPlaceholder="Search source columns..."
             />
             <ColumnList
