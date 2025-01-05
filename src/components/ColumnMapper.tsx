@@ -27,7 +27,6 @@ const ColumnMapper = ({
 }: ColumnMapperProps) => {
   const [state, updateState] = useMappingState(onMappingChange);
   
-  // Reset mapping when column set changes
   useEffect(() => {
     updateState({
       mapping: {},
@@ -81,8 +80,8 @@ const ColumnMapper = ({
 
   const handleDisconnect = (sourceColumn: string) => {
     const newMapping = { ...state.mapping };
-    delete newMapping[sourceColumn];
     const newTransforms = { ...state.columnTransforms };
+    delete newMapping[sourceColumn];
     delete newTransforms[sourceColumn];
     updateState({
       mapping: newMapping,
@@ -101,15 +100,14 @@ const ColumnMapper = ({
   const handleExport = () => {
     const transformedData = state.sourceData.map(row => {
       const newRow: Record<string, any> = {};
-      Object.entries(state.mapping).forEach(([source, target]) => {
-        const sourceColumn = source.split('_')[0];
+      Object.entries(state.mapping).forEach(([uniqueKey, target]) => {
+        const sourceColumn = uniqueKey.split('_')[0];
         let value = row[sourceColumn];
         
-        // Apply transform if it exists
-        if (state.columnTransforms[sourceColumn]) {
+        // Apply transform if it exists using the unique key
+        if (state.columnTransforms[uniqueKey]) {
           try {
-            // Create a function that has access to all columns in the row
-            const transform = new Function('value', 'row', `return ${state.columnTransforms[sourceColumn]}`);
+            const transform = new Function('value', 'row', `return ${state.columnTransforms[uniqueKey]}`);
             value = transform(value, row);
           } catch (error) {
             console.error(`Error transforming column ${sourceColumn}:`, error);
@@ -130,8 +128,8 @@ const ColumnMapper = ({
 
   const connectedColumns = Object.entries(state.mapping).map(([key, target]) => {
     const sourceColumn = key.split('_')[0];
-    return [sourceColumn, target] as [string, string];
-  }).filter(([_, target]) => target !== '');
+    return [key, sourceColumn, target] as [string, string, string];
+  }).filter(([_, __, target]) => target !== '');
 
   const mappedTargetColumns = new Set(Object.values(state.mapping));
 
@@ -142,11 +140,11 @@ const ColumnMapper = ({
           connectedColumns={connectedColumns} 
           onDisconnect={handleDisconnect}
           onExport={handleExport}
-          onUpdateTransform={(column, code) => {
+          onUpdateTransform={(uniqueKey, code) => {
             updateState({
               columnTransforms: {
                 ...state.columnTransforms,
-                [column]: code
+                [uniqueKey]: code
               }
             });
           }}
