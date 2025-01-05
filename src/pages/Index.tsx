@@ -91,16 +91,17 @@ const Index = () => {
         />
 
         <AlertDialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-          <AlertDialogContent>
+          <AlertDialogContent onPointerDownOutside={() => setSettingsOpen(false)}>
             <AlertDialogHeader>
               <AlertDialogTitle>Settings</AlertDialogTitle>
               <AlertDialogDescription>
                 Configure your application settings
               </AlertDialogDescription>
             </AlertDialogHeader>
-            {/* Settings content will go here */}
             <AlertDialogFooter>
-              <AlertDialogCancel>Close</AlertDialogCancel>
+              <AlertDialogCancel onClick={() => setSettingsOpen(false)}>
+                Close
+              </AlertDialogCancel>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
