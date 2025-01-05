@@ -19,16 +19,20 @@ const ConnectedColumns = ({ connectedColumns }: ConnectedColumnsProps) => {
           {connectedColumns.map(([source, target]) => (
             <div 
               key={source} 
-              className="flex items-center gap-4 bg-secondary/50 p-4 rounded-md border border-border"
+              className="flex items-center gap-4"
             >
               <div className="flex-1 min-w-0">
-                <p className="truncate text-sm font-medium">{source}</p>
+                <div className="bg-secondary/50 p-4 rounded-md border border-border">
+                  <p className="truncate text-sm font-medium">{source}</p>
+                </div>
               </div>
               <div className="flex-shrink-0">
                 <ArrowRight className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="truncate text-sm font-medium">{target}</p>
+                <div className="bg-secondary/50 p-4 rounded-md border border-border">
+                  <p className="truncate text-sm font-medium">{target}</p>
+                </div>
               </div>
             </div>
           ))}
