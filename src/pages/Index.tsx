@@ -6,6 +6,7 @@ import { downloadCSV } from '../utils/csvUtils';
 const Index = () => {
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
   const [sourceData, setSourceData] = useState<any[]>([]);
+  const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
   const { toast } = useToast();
 
   const handleMappingChange = (mapping: Record<string, string>) => {
@@ -38,14 +39,16 @@ const Index = () => {
           onMappingChange={handleMappingChange}
           onExport={handleExport}
           onDataLoaded={setSourceData}
-          targetColumns={TARGET_COLUMNS}
+          targetColumns={activeColumnSet === 'artikelen' ? ARTIKEL_COLUMNS : KLANTEN_COLUMNS}
+          activeColumnSet={activeColumnSet}
+          onColumnSetChange={setActiveColumnSet}
         />
       </div>
     </div>
   );
 };
 
-const TARGET_COLUMNS = [
+const ARTIKEL_COLUMNS = [
   "Actief?", "Stock verwerken?", "Artikelnummer", "Omschrijving", "Omschrijving NL",
   "Omschrijving GB", "Omschrijving DE", "Omschrijving FR", "Omschrijving TR",
   "BTW-percentage", "Netto verkoopprijs 1", "Netto verkoopprijs 2", "Netto verkoopprijs 3",
@@ -62,6 +65,15 @@ const TARGET_COLUMNS = [
   "Is beginstock", "Hoofdgroep", "Subgroep", "Eenheid", "Korting uitgeschakeld",
   "Gemarkeerd voor label printer", "Aantal 2", "intrastat-excnt", "intrastat-extreg",
   "intrastat-extgo", "intrastat-exweight", "intrastat-excntori"
+];
+
+const KLANTEN_COLUMNS = [
+  "nr", "company-name", "firstname", "lastname", "address-line-1", "postal", "city",
+  "country-code", "email", "lng", "info", "phone", "mobile", "vat", "payment-days",
+  "payment-end-month",
+  ...Array.from({length: 20}, (_, i) => `ev-num-${i + 1}`),
+  ...Array.from({length: 20}, (_, i) => `ev-text-${i + 1}`),
+  ...Array.from({length: 20}, (_, i) => `ev-bool-${i + 1}`)
 ];
 
 export default Index;

@@ -5,15 +5,31 @@ import ColumnList from './column-mapper/ColumnList';
 import FileUpload from './FileUpload';
 import { Button } from './ui/button';
 import { Upload } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ColumnMapperProps {
   targetColumns: string[];
   onMappingChange: (mapping: Record<string, string>) => void;
   onExport: (mapping: Record<string, string>) => void;
   onDataLoaded: (data: any[]) => void;
+  activeColumnSet: 'artikelen' | 'klanten';
+  onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
 }
 
-const ColumnMapper = ({ targetColumns, onMappingChange, onExport, onDataLoaded }: ColumnMapperProps) => {
+const ColumnMapper = ({ 
+  targetColumns, 
+  onMappingChange, 
+  onExport, 
+  onDataLoaded,
+  activeColumnSet,
+  onColumnSetChange 
+}: ColumnMapperProps) => {
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [sourceSearch, setSourceSearch] = useState('');
   const [targetSearch, setTargetSearch] = useState('');
@@ -25,6 +41,11 @@ const ColumnMapper = ({ targetColumns, onMappingChange, onExport, onDataLoaded }
   useEffect(() => {
     onMappingChange(mapping);
   }, [mapping, onMappingChange]);
+
+  // Reset mapping when column set changes
+  useEffect(() => {
+    setMapping({});
+  }, [activeColumnSet]);
 
   const handleSourceColumnClick = (column: string) => {
     if (selectedSourceColumn === column) {
@@ -120,7 +141,20 @@ const ColumnMapper = ({ targetColumns, onMappingChange, onExport, onDataLoaded }
               searchPlaceholder="Search source columns..."
             />
             <ColumnList
-              title="Winfakt columns"
+              title={
+                <div className="flex items-center justify-between">
+                  <span>Winfakt columns</span>
+                  <Select value={activeColumnSet} onValueChange={onColumnSetChange}>
+                    <SelectTrigger className="w-[140px] ml-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="artikelen">Artikelen</SelectItem>
+                      <SelectItem value="klanten">Klanten</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              }
               columns={targetColumns}
               searchValue={targetSearch}
               onSearchChange={setTargetSearch}
