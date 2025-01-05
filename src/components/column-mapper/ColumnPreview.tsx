@@ -9,6 +9,7 @@ interface ColumnPreviewProps {
   onClick?: () => void;
   showSettings?: boolean;
   className?: string;
+  showPreview?: boolean;
 }
 
 const ColumnPreview: React.FC<ColumnPreviewProps> = ({
@@ -17,7 +18,8 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
   isSelected,
   onClick,
   showSettings = false,
-  className
+  className,
+  showPreview = true
 }) => {
   return (
     <div
@@ -33,7 +35,7 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
       <div className="flex justify-between items-center w-full">
         <div className="flex items-center justify-between flex-1 min-w-0">
           <span className="text-sm truncate">{columnName}</span>
-          {previewValue && showSettings && (
+          {previewValue && showPreview && (
             <span className="text-xs text-gray-500 ml-2 truncate max-w-[50%]">
               {previewValue}
             </span>

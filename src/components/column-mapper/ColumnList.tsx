@@ -72,6 +72,7 @@ const ColumnList = ({
             previewValue={getPreviewValue(column)}
             isSelected={selectedColumn === column}
             onClick={() => onColumnClick(column)}
+            showPreview={title === "Source file columns"}
           />
         ))}
       </div>
