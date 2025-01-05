@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 import {
   Dialog,
   DialogContent,
@@ -30,33 +29,25 @@ interface ColumnSettingsDialogProps {
   sourceColumns: string[];
 }
 
-const helperFunctionsMarkdown = `
-# Available Helper Functions
+const helperFunctionsMarkdown = `# Available Helper Functions
 
 ## String Operations
-\`\`\`javascript
 value.toUpperCase()        // Convert to uppercase
 value.toLowerCase()        // Convert to lowercase
 value.trim()              // Remove whitespace from both ends
 value.substring(start, end) // Extract part of string
 value.replace(search, replace) // Replace text
-\`\`\`
 
 ## Number Operations
-\`\`\`javascript
 parseFloat(value)         // Convert to decimal number
 parseInt(value)           // Convert to integer
 Number(value).toFixed(2)  // Format with 2 decimals
 Math.round(value)         // Round to nearest integer
 Math.abs(value)          // Get absolute value
-\`\`\`
 
 ## Date Operations
-\`\`\`javascript
 new Date(value).toLocaleDateString() // Format as date
-new Date(value).toISOString()        // Convert to ISO format
-\`\`\`
-`;
+new Date(value).toISOString()        // Convert to ISO format`;
 
 const ColumnSettingsDialog = ({
   isOpen,
@@ -142,10 +133,13 @@ const ColumnSettingsDialog = ({
             </div>
           </TabsContent>
           <TabsContent value="functions" className="flex-1 mt-0">
-            <div className="h-full overflow-y-auto pr-2">
-              <ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert">
-                {code}
-              </ReactMarkdown>
+            <div className="h-full flex flex-col">
+              <Textarea
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className="flex-1 font-mono resize-none"
+                readOnly
+              />
             </div>
           </TabsContent>
         </Tabs>
