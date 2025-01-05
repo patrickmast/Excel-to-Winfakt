@@ -1,8 +1,9 @@
-import { Input } from '../ui/input';
-import { CardHeader, CardTitle } from '../ui/card';
+import { Input } from '@/components/ui/input';
+import { CardHeader, CardTitle } from '@/components/ui/card';
+import { ReactNode } from 'react';
 
 interface ColumnListProps {
-  title: string;
+  title: ReactNode;
   columns: string[];
   searchValue: string;
   onSearchChange: (value: string) => void;

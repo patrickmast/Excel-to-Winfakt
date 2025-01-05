@@ -2,21 +2,25 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import ConnectedColumns from './column-mapper/ConnectedColumns';
 import ColumnList from './column-mapper/ColumnList';
+import FileUpload from './FileUpload';
+import { Button } from './ui/button';
+import { Upload } from 'lucide-react';
 
 interface ColumnMapperProps {
-  sourceColumns: string[];
   targetColumns: string[];
   onMappingChange: (mapping: Record<string, string>) => void;
   onExport: (mapping: Record<string, string>) => void;
+  onDataLoaded: (data: any[]) => void;
 }
 
-const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport }: ColumnMapperProps) => {
+const ColumnMapper = ({ targetColumns, onMappingChange, onExport, onDataLoaded }: ColumnMapperProps) => {
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [sourceSearch, setSourceSearch] = useState('');
   const [targetSearch, setTargetSearch] = useState('');
   const [selectedSourceColumn, setSelectedSourceColumn] = useState<string | null>(null);
   const [selectedTargetColumn, setSelectedTargetColumn] = useState<string | null>(null);
   const [connectionCounter, setConnectionCounter] = useState<number>(0);
+  const [sourceColumns, setSourceColumns] = useState<string[]>([]);
 
   useEffect(() => {
     onMappingChange(mapping);
@@ -36,7 +40,6 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
         setConnectionCounter(prev => prev + 1);
         setSelectedSourceColumn(null);
         setSelectedTargetColumn(null);
-        // Reset search fields after connecting columns
         setSourceSearch('');
         setTargetSearch('');
       }
@@ -57,7 +60,6 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
         setConnectionCounter(prev => prev + 1);
         setSelectedSourceColumn(null);
         setSelectedTargetColumn(null);
-        // Reset search fields after connecting columns
         setSourceSearch('');
         setTargetSearch('');
       }
@@ -72,12 +74,16 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
     });
   };
 
+  const handleFileData = (columns: string[], data: any[]) => {
+    setSourceColumns(columns);
+    onDataLoaded(data);
+  };
+
   const connectedColumns = Object.entries(mapping).map(([key, target]) => {
     const sourceColumn = key.split('_')[0];
     return [sourceColumn, target] as [string, string];
   }).filter(([_, target]) => target !== '');
 
-  // Get all unique target columns that are currently mapped
   const mappedTargetColumns = new Set(Object.values(mapping));
 
   return (
@@ -94,13 +100,23 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
         <CardContent className="p-6">
           <div className="grid grid-cols-2 gap-8">
             <ColumnList
-              title="Source file columns"
+              title={
+                <div className="flex items-center justify-between">
+                  <span>Source file columns</span>
+                  <FileUpload onDataLoaded={handleFileData}>
+                    <Button variant="outline" size="sm" className="ml-2">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload file
+                    </Button>
+                  </FileUpload>
+                </div>
+              }
               columns={sourceColumns}
               searchValue={sourceSearch}
               onSearchChange={setSourceSearch}
               selectedColumn={selectedSourceColumn}
               onColumnClick={handleSourceColumnClick}
-              isColumnMapped={(column) => false} // Source columns can always be selected
+              isColumnMapped={(column) => false}
               searchPlaceholder="Search source columns..."
             />
             <ColumnList

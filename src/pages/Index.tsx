@@ -1,23 +1,12 @@
 import { useState } from 'react';
-import FileUpload from '../components/FileUpload';
 import ColumnMapper from '../components/ColumnMapper';
 import { useToast } from '../components/ui/use-toast';
 import { downloadCSV } from '../utils/csvUtils';
 
 const Index = () => {
-  const [sourceColumns, setSourceColumns] = useState<string[]>([]);
-  const [sourceData, setSourceData] = useState<any[]>([]);
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
+  const [sourceData, setSourceData] = useState<any[]>([]);
   const { toast } = useToast();
-
-  const handleFileData = (columns: string[], data: any[]) => {
-    setSourceColumns(columns);
-    setSourceData(data);
-    toast({
-      title: "File loaded successfully",
-      description: `Found ${columns.length} columns and ${data.length} rows`,
-    });
-  };
 
   const handleMappingChange = (mapping: Record<string, string>) => {
     setColumnMapping(mapping);
@@ -45,17 +34,12 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">CSV/Excel Converter</h1>
-        
-        {sourceColumns.length === 0 ? (
-          <FileUpload onDataLoaded={handleFileData} />
-        ) : (
-          <ColumnMapper 
-            sourceColumns={sourceColumns}
-            targetColumns={TARGET_COLUMNS}
-            onMappingChange={handleMappingChange}
-            onExport={handleExport}
-          />
-        )}
+        <ColumnMapper 
+          onMappingChange={handleMappingChange}
+          onExport={handleExport}
+          onDataLoaded={setSourceData}
+          targetColumns={TARGET_COLUMNS}
+        />
       </div>
     </div>
   );
