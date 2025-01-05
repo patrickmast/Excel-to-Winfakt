@@ -77,6 +77,9 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
     return [sourceColumn, target] as [string, string];
   }).filter(([_, target]) => target !== '');
 
+  // Get all unique target columns that are currently mapped
+  const mappedTargetColumns = new Set(Object.values(mapping));
+
   return (
     <div className="space-y-8">
       <div className="bg-white rounded-lg border border-gray-200 py-4 px-6">
@@ -107,7 +110,7 @@ const ColumnMapper = ({ sourceColumns, targetColumns, onMappingChange, onExport 
               onSearchChange={setTargetSearch}
               selectedColumn={selectedTargetColumn}
               onColumnClick={handleTargetColumnClick}
-              isColumnMapped={(column) => Object.values(mapping).includes(column)}
+              isColumnMapped={(column) => mappedTargetColumns.has(column)}
               searchPlaceholder="Search Winfakt columns..."
             />
           </div>
