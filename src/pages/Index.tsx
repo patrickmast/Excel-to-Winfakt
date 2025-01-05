@@ -91,7 +91,7 @@ const Index = () => {
         />
 
         <AlertDialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-          <AlertDialogContent onPointerDownOutside={(e) => e.preventDefault()}>
+          <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Settings</AlertDialogTitle>
               <AlertDialogDescription>
@@ -100,7 +100,7 @@ const Index = () => {
             </AlertDialogHeader>
             {/* Settings content will go here */}
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setSettingsOpen(false)}>Close</AlertDialogCancel>
+              <AlertDialogCancel>Close</AlertDialogCancel>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
