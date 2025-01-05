@@ -41,7 +41,8 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
     onClose();
   };
 
-  const testExpression = () => {
+  const testExpression = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent tab change when clicking the icon
     try {
       setTestResult(null);
       setTestError(null);
@@ -98,8 +99,8 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
         >
           <TabsList className="h-8 justify-start space-x-8 bg-transparent p-0 pl-1">
             <TabsTrigger value="expression">Expression</TabsTrigger>
-            <TabsTrigger value="result" onClick={testExpression} className="flex items-center gap-2">
-              Result <PlayIcon className="h-4 w-4" />
+            <TabsTrigger value="result" className="flex items-center gap-2">
+              Result <PlayIcon className="h-4 w-4 cursor-pointer hover:text-primary" onClick={testExpression} />
             </TabsTrigger>
             <TabsTrigger value="functions">Functions</TabsTrigger>
           </TabsList>
