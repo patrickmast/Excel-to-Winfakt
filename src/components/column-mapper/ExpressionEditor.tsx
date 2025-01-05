@@ -16,7 +16,7 @@ const ExpressionEditor: React.FC<ExpressionEditorProps> = ({ value, onChange, re
       <Textarea
         value={displayValue}
         onChange={(e) => onChange(e.target.value)}
-        className={`flex-1 font-mono resize-none ${error ? 'text-destructive' : ''} ${result ? 'text-[#BBF7D0]' : ''}`}
+        className={`flex-1 font-mono resize-none ${error ? 'text-destructive' : ''} ${result ? 'text-success' : ''}`}
         placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
         readOnly={result !== null || error !== null}
       />
