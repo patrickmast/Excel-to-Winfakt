@@ -6,7 +6,15 @@ export const downloadCSV = (data: any[], filename: string) => {
     const newRow: Record<string, any> = {};
     Object.entries(row).forEach(([key, value]) => {
       // Only escape if the value is a string
-      newRow[key] = typeof value === 'string' ? value.replace(/"/g, '\\"') : value;
+      if (typeof value === 'string') {
+        // If the string contains quotes, escape them with backslash
+        const hasQuotes = value.includes('"');
+        const escapedValue = value.replace(/"/g, '\\"');
+        // Only wrap in quotes if the original string had quotes
+        newRow[key] = hasQuotes ? escapedValue : value;
+      } else {
+        newRow[key] = value;
+      }
     });
     return newRow;
   });
