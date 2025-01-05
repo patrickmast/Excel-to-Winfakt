@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { CardHeader, CardTitle } from '@/components/ui/card';
 import { ReactNode } from 'react';
+import ColumnPreview from './ColumnPreview';
 
 interface ColumnListProps {
   title: ReactNode;
@@ -11,6 +12,8 @@ interface ColumnListProps {
   onColumnClick: (column: string) => void;
   isColumnMapped: (column: string) => boolean;
   searchPlaceholder: string;
+  columnTransforms?: Record<string, string>;
+  sourceData?: any[];
 }
 
 const ColumnList = ({
@@ -22,7 +25,28 @@ const ColumnList = ({
   onColumnClick,
   isColumnMapped,
   searchPlaceholder,
+  columnTransforms = {},
+  sourceData = []
 }: ColumnListProps) => {
+  const getPreviewValue = (column: string): string | null => {
+    if (!sourceData.length) return null;
+
+    const firstRow = sourceData[0];
+    let value = firstRow[column];
+
+    if (columnTransforms[column]) {
+      try {
+        const transform = new Function('value', 'row', `return ${columnTransforms[column]}`);
+        value = transform(value, firstRow);
+      } catch (error) {
+        console.error(`Error computing preview for ${column}:`, error);
+        value = 'Error in transform';
+      }
+    }
+
+    return value !== undefined ? String(value) : null;
+  };
+
   // First filter out mapped columns (for Winfakt columns only), then apply search filter
   const filteredColumns = columns
     .filter(column => title === "Source file columns" || !isColumnMapped(column))
@@ -42,17 +66,13 @@ const ColumnList = ({
       />
       <div className="space-y-2">
         {filteredColumns.map(column => (
-          <div
+          <ColumnPreview
             key={column}
+            columnName={column}
+            previewValue={getPreviewValue(column)}
+            isSelected={selectedColumn === column}
             onClick={() => onColumnClick(column)}
-            className={`p-3 rounded-md cursor-pointer transition-colors ${
-              selectedColumn === column
-                ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
-                : 'bg-[#F9FAFB] hover:bg-white hover:border-[#BBF7D0] border border-[#E5E7EB]'
-            }`}
-          >
-            <span className="text-sm">{column}</span>
-          </div>
+          />
         ))}
       </div>
     </div>

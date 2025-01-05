@@ -152,6 +152,7 @@ const ColumnMapper = ({
           }}
           columnTransforms={state.columnTransforms}
           sourceColumns={state.sourceColumns}
+          sourceData={state.sourceData}
         />
       </div>
       
@@ -177,6 +178,8 @@ const ColumnMapper = ({
               onColumnClick={handleSourceColumnClick}
               isColumnMapped={(column) => false}
               searchPlaceholder="Search source columns..."
+              columnTransforms={state.columnTransforms}
+              sourceData={state.sourceData}
             />
             <ColumnList
               title={

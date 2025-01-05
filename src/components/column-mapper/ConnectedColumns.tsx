@@ -3,6 +3,7 @@ import { Button } from '../ui/button';
 import { useState } from 'react';
 import ColumnSettingsDialog from './ColumnSettingsDialog';
 import { CardHeader, CardTitle } from '../ui/card';
+import ColumnPreview from './ColumnPreview';
 
 interface ConnectedColumnsProps {
   connectedColumns: [string, string][];
@@ -11,6 +12,7 @@ interface ConnectedColumnsProps {
   onUpdateTransform?: (column: string, code: string) => void;
   columnTransforms?: Record<string, string>;
   sourceColumns: string[];
+  sourceData?: any[];
 }
 
 const ConnectedColumns = ({ 
@@ -19,7 +21,8 @@ const ConnectedColumns = ({
   onExport,
   onUpdateTransform,
   columnTransforms = {},
-  sourceColumns = []
+  sourceColumns = [],
+  sourceData = []
 }: ConnectedColumnsProps) => {
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
 
@@ -27,6 +30,25 @@ const ConnectedColumns = ({
     if (onDisconnect) {
       onDisconnect(source);
     }
+  };
+
+  const getPreviewValue = (column: string): string | null => {
+    if (!sourceData?.length) return null;
+
+    const firstRow = sourceData[0];
+    let value = firstRow[column];
+
+    if (columnTransforms[column]) {
+      try {
+        const transform = new Function('value', 'row', `return ${columnTransforms[column]}`);
+        value = transform(value, firstRow);
+      } catch (error) {
+        console.error(`Error computing preview for ${column}:`, error);
+        value = 'Error in transform';
+      }
+    }
+
+    return value !== undefined ? String(value) : null;
   };
 
   return (
@@ -53,15 +75,11 @@ const ConnectedColumns = ({
               className="flex items-center gap-4"
             >
               <div className="flex-1 min-w-0">
-                <div className="bg-[#F0FEF5] p-4 rounded-md border border-[#BBF7D0] relative">
-                  <p className="truncate text-sm font-medium pr-8">{source}</p>
-                  <button
-                    onClick={() => setSelectedColumn(source)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-green-100 rounded-md transition-colors"
-                  >
-                    <Settings className="h-4 w-4 text-gray-600" />
-                  </button>
-                </div>
+                <ColumnPreview
+                  columnName={source}
+                  previewValue={getPreviewValue(source)}
+                  onClick={() => setSelectedColumn(source)}
+                />
               </div>
               <div className="flex-shrink-0 group">
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:hidden" />
