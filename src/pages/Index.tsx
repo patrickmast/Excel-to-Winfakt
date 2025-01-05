@@ -25,7 +25,6 @@ const Index = () => {
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
   const [sourceData, setSourceData] = useState<any[]>([]);
   const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const { toast } = useToast();
 
   const handleMappingChange = (mapping: Record<string, string>) => {
@@ -69,10 +68,27 @@ const Index = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Settings</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Configure your application settings
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>
+                      Close
+                    </AlertDialogCancel>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <DropdownMenuItem onClick={showVersionInfo}>
                 <Info className="mr-2 h-4 w-4" />
                 <span>Info</span>
@@ -89,22 +105,6 @@ const Index = () => {
           activeColumnSet={activeColumnSet}
           onColumnSetChange={setActiveColumnSet}
         />
-
-        <AlertDialog>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Settings</AlertDialogTitle>
-              <AlertDialogDescription>
-                Configure your application settings
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>
-                Close
-              </AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     </div>
   );
