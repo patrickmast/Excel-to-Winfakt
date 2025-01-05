@@ -1,4 +1,4 @@
-import { ArrowRight, X, Settings } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useState } from 'react';
 import ColumnSettingsDialog from './ColumnSettingsDialog';
@@ -79,6 +79,7 @@ const ConnectedColumns = ({
                   columnName={source}
                   previewValue={getPreviewValue(source)}
                   onClick={() => setSelectedColumn(source)}
+                  showSettings={true}
                 />
               </div>
               <div className="flex-shrink-0 group">
