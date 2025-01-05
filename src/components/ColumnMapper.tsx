@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import ConnectedColumns from './column-mapper/ConnectedColumns';
 import ColumnList from './column-mapper/ColumnList';
 import FileUpload from './FileUpload';
 import { Button } from './ui/button';
 import { Upload } from 'lucide-react';
+import { downloadCSV } from '@/utils/csvUtils';
+import { toast } from '@/hooks/use-toast';
 import {
   Select,
   SelectContent,
@@ -12,15 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface ColumnMapperProps {
-  targetColumns: string[];
-  onMappingChange: (mapping: Record<string, string>) => void;
-  onExport: (mapping: Record<string, string>) => void;
-  onDataLoaded: (data: any[]) => void;
-  activeColumnSet: 'artikelen' | 'klanten';
-  onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
-}
+import { ColumnMapperProps } from './column-mapper/types';
+import { useMappingState } from './column-mapper/useMappingState';
 
 const ColumnMapper = ({ 
   targetColumns, 
@@ -30,95 +25,90 @@ const ColumnMapper = ({
   activeColumnSet,
   onColumnSetChange 
 }: ColumnMapperProps) => {
-  const [mapping, setMapping] = useState<Record<string, string>>({});
-  const [columnTransforms, setColumnTransforms] = useState<Record<string, string>>({});
-  const [sourceSearch, setSourceSearch] = useState('');
-  const [targetSearch, setTargetSearch] = useState('');
-  const [selectedSourceColumn, setSelectedSourceColumn] = useState<string | null>(null);
-  const [selectedTargetColumn, setSelectedTargetColumn] = useState<string | null>(null);
-  const [connectionCounter, setConnectionCounter] = useState<number>(0);
-  const [sourceColumns, setSourceColumns] = useState<string[]>([]);
-
-  useEffect(() => {
-    onMappingChange(mapping);
-  }, [mapping, onMappingChange]);
-
+  const [state, updateState] = useMappingState(onMappingChange);
+  
   // Reset mapping when column set changes
   useEffect(() => {
-    setMapping({});
-    setColumnTransforms({});
+    updateState({
+      mapping: {},
+      columnTransforms: {}
+    });
   }, [activeColumnSet]);
 
   const handleSourceColumnClick = (column: string) => {
-    if (selectedSourceColumn === column) {
-      setSelectedSourceColumn(null);
+    if (state.selectedSourceColumn === column) {
+      updateState({ selectedSourceColumn: null });
     } else {
-      setSelectedSourceColumn(column);
-      if (selectedTargetColumn) {
-        const uniqueKey = `${column}_${connectionCounter}`;
-        setMapping(prev => ({
-          ...prev,
-          [uniqueKey]: selectedTargetColumn
-        }));
-        setConnectionCounter(prev => prev + 1);
-        setSelectedSourceColumn(null);
-        setSelectedTargetColumn(null);
-        setSourceSearch('');
-        setTargetSearch('');
+      updateState({ selectedSourceColumn: column });
+      if (state.selectedTargetColumn) {
+        const uniqueKey = `${column}_${state.connectionCounter}`;
+        updateState({
+          mapping: {
+            ...state.mapping,
+            [uniqueKey]: state.selectedTargetColumn
+          },
+          connectionCounter: state.connectionCounter + 1,
+          selectedSourceColumn: null,
+          selectedTargetColumn: null,
+          sourceSearch: '',
+          targetSearch: ''
+        });
       }
     }
   };
 
   const handleTargetColumnClick = (targetColumn: string) => {
-    if (selectedTargetColumn === targetColumn) {
-      setSelectedTargetColumn(null);
+    if (state.selectedTargetColumn === targetColumn) {
+      updateState({ selectedTargetColumn: null });
     } else {
-      setSelectedTargetColumn(targetColumn);
-      if (selectedSourceColumn) {
-        const uniqueKey = `${selectedSourceColumn}_${connectionCounter}`;
-        setMapping(prev => ({
-          ...prev,
-          [uniqueKey]: targetColumn
-        }));
-        setConnectionCounter(prev => prev + 1);
-        setSelectedSourceColumn(null);
-        setSelectedTargetColumn(null);
-        setSourceSearch('');
-        setTargetSearch('');
+      updateState({ selectedTargetColumn: targetColumn });
+      if (state.selectedSourceColumn) {
+        const uniqueKey = `${state.selectedSourceColumn}_${state.connectionCounter}`;
+        updateState({
+          mapping: {
+            ...state.mapping,
+            [uniqueKey]: targetColumn
+          },
+          connectionCounter: state.connectionCounter + 1,
+          selectedSourceColumn: null,
+          selectedTargetColumn: null,
+          sourceSearch: '',
+          targetSearch: ''
+        });
       }
     }
   };
 
   const handleDisconnect = (sourceColumn: string) => {
-    setMapping(prev => {
-      const newMapping = { ...prev };
-      delete newMapping[sourceColumn];
-      return newMapping;
-    });
-    setColumnTransforms(prev => {
-      const newTransforms = { ...prev };
-      delete newTransforms[sourceColumn];
-      return newTransforms;
+    const newMapping = { ...state.mapping };
+    delete newMapping[sourceColumn];
+    const newTransforms = { ...state.columnTransforms };
+    delete newTransforms[sourceColumn];
+    updateState({
+      mapping: newMapping,
+      columnTransforms: newTransforms
     });
   };
 
   const handleFileData = (columns: string[], data: any[]) => {
-    setSourceColumns(columns);
+    updateState({
+      sourceColumns: columns,
+      sourceData: data
+    });
     onDataLoaded(data);
   };
 
   const handleExport = () => {
-    const transformedData = sourceData.map(row => {
+    const transformedData = state.sourceData.map(row => {
       const newRow: Record<string, any> = {};
-      Object.entries(mapping).forEach(([source, target]) => {
+      Object.entries(state.mapping).forEach(([source, target]) => {
         const sourceColumn = source.split('_')[0];
         let value = row[sourceColumn];
         
         // Apply transform if it exists
-        if (columnTransforms[sourceColumn]) {
+        if (state.columnTransforms[sourceColumn]) {
           try {
-            // Create a new Function to evaluate the transform code
-            const transform = new Function('value', `return ${columnTransforms[sourceColumn]}`);
+            const transform = new Function('value', `return ${state.columnTransforms[sourceColumn]}`);
             value = transform(value);
           } catch (error) {
             console.error(`Error transforming column ${sourceColumn}:`, error);
@@ -137,12 +127,12 @@ const ColumnMapper = ({
     });
   };
 
-  const connectedColumns = Object.entries(mapping).map(([key, target]) => {
+  const connectedColumns = Object.entries(state.mapping).map(([key, target]) => {
     const sourceColumn = key.split('_')[0];
     return [sourceColumn, target] as [string, string];
   }).filter(([_, target]) => target !== '');
 
-  const mappedTargetColumns = new Set(Object.values(mapping));
+  const mappedTargetColumns = new Set(Object.values(state.mapping));
 
   return (
     <div className="space-y-8">
@@ -152,12 +142,14 @@ const ColumnMapper = ({
           onDisconnect={handleDisconnect}
           onExport={handleExport}
           onUpdateTransform={(column, code) => {
-            setColumnTransforms(prev => ({
-              ...prev,
-              [column]: code
-            }));
+            updateState({
+              columnTransforms: {
+                ...state.columnTransforms,
+                [column]: code
+              }
+            });
           }}
-          columnTransforms={columnTransforms}
+          columnTransforms={state.columnTransforms}
         />
       </div>
       
@@ -176,10 +168,10 @@ const ColumnMapper = ({
                   </FileUpload>
                 </div>
               }
-              columns={sourceColumns}
-              searchValue={sourceSearch}
-              onSearchChange={setSourceSearch}
-              selectedColumn={selectedSourceColumn}
+              columns={state.sourceColumns}
+              searchValue={state.sourceSearch}
+              onSearchChange={(value) => updateState({ sourceSearch: value })}
+              selectedColumn={state.selectedSourceColumn}
               onColumnClick={handleSourceColumnClick}
               isColumnMapped={(column) => false}
               searchPlaceholder="Search source columns..."
@@ -200,9 +192,9 @@ const ColumnMapper = ({
                 </div>
               }
               columns={targetColumns}
-              searchValue={targetSearch}
-              onSearchChange={setTargetSearch}
-              selectedColumn={selectedTargetColumn}
+              searchValue={state.targetSearch}
+              onSearchChange={(value) => updateState({ targetSearch: value })}
+              selectedColumn={state.selectedTargetColumn}
               onColumnClick={handleTargetColumnClick}
               isColumnMapped={(column) => mappedTargetColumns.has(column)}
               searchPlaceholder="Search Winfakt columns..."
