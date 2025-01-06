@@ -12,7 +12,6 @@ Number Operations
 parseFloat(value)         // Convert to decimal number
 parseInt(value)           // Convert to integer
 Number(value)            // Convert string to number
-+value                   // Convert string to number (shorthand)
 Number(value).toFixed(2)  // Format with 2 decimals
 Math.round(value)         // Round to nearest integer
 Math.abs(value)          // Get absolute value
