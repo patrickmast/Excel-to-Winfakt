@@ -72,35 +72,37 @@ const HelperFunctions: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <ScrollArea className="flex-1 border rounded-md relative">
-        <Table className="relative">
-          <TableHeader className="sticky top-0 bg-background z-10">
-            <TableRow>
-              <TableHead className="w-[50px]"></TableHead>
-              <TableHead>Function</TableHead>
-              <TableHead>Description</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {helperFunctions.map((func, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => copyToClipboard(func.name)}
-                    className="h-8 w-8"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-                <TableCell className="font-mono">{func.name}</TableCell>
-                <TableCell>{func.description}</TableCell>
+      <div className="flex-1 border rounded-md overflow-hidden">
+        <ScrollArea className="h-full">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background z-10">
+              <TableRow>
+                <TableHead className="w-[50px]"></TableHead>
+                <TableHead>Function</TableHead>
+                <TableHead>Description</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </ScrollArea>
+            </TableHeader>
+            <TableBody>
+              {helperFunctions.map((func, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => copyToClipboard(func.name)}
+                      className="h-8 w-8"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                  <TableCell className="font-mono">{func.name}</TableCell>
+                  <TableCell>{func.description}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </ScrollArea>
+      </div>
     </div>
   );
 };
