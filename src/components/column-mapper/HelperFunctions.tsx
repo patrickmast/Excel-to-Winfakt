@@ -1,33 +1,106 @@
 import React from 'react';
-import { Textarea } from "@/components/ui/textarea";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Copy } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "@/hooks/use-toast";
 
-const helperFunctionsMarkdown = `String Operations
-value.toUpperCase()        // Convert to uppercase
-value.toLowerCase()        // Convert to lowercase
-value.trim()              // Remove whitespace from both ends
-value.substring(start, end) // Extract part of string
-value.replace(search, replace) // Replace text
-
-Number Operations
-parseFloat(value)         // Convert to decimal number
-parseInt(value)           // Convert to integer
-Number(value)            // Convert string to number
-Number(value).toFixed(2)  // Format with 2 decimals
-Math.round(value)         // Round to nearest integer
-Math.abs(value)          // Get absolute value
-
-Date Operations
-new Date(value).toLocaleDateString() // Format as date
-new Date(value).toISOString()        // Convert to ISO format`;
+const helperFunctions = [
+  {
+    name: "value.toUpperCase()",
+    description: "Convert to uppercase",
+  },
+  {
+    name: "value.toLowerCase()",
+    description: "Convert to lowercase",
+  },
+  {
+    name: "value.trim()",
+    description: "Remove whitespace from both ends",
+  },
+  {
+    name: "value.substring(start, end)",
+    description: "Extract part of string",
+  },
+  {
+    name: "value.replace(search, replace)",
+    description: "Replace text",
+  },
+  {
+    name: "parseFloat(value)",
+    description: "Convert to decimal number",
+  },
+  {
+    name: "parseInt(value)",
+    description: "Convert to integer",
+  },
+  {
+    name: "Number(value)",
+    description: "Convert string to number",
+  },
+  {
+    name: "Number(value).toFixed(2)",
+    description: "Format with 2 decimals",
+  },
+  {
+    name: "Math.round(value)",
+    description: "Round to nearest integer",
+  },
+  {
+    name: "Math.abs(value)",
+    description: "Get absolute value",
+  },
+  {
+    name: "new Date(value).toLocaleDateString()",
+    description: "Format as date",
+  },
+  {
+    name: "new Date(value).toISOString()",
+    description: "Convert to ISO format",
+  }
+];
 
 const HelperFunctions: React.FC = () => {
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        description: "Function copied to clipboard",
+        duration: 2000,
+      });
+    }).catch(console.error);
+  };
+
   return (
     <div className="h-full flex flex-col">
-      <Textarea
-        value={helperFunctionsMarkdown}
-        className="flex-1 font-mono resize-none"
-        readOnly
-      />
+      <ScrollArea className="flex-1 border rounded-md">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]"></TableHead>
+              <TableHead>Function</TableHead>
+              <TableHead>Description</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {helperFunctions.map((func, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => copyToClipboard(func.name)}
+                    className="h-8 w-8"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+                <TableCell className="font-mono">{func.name}</TableCell>
+                <TableCell>{func.description}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </ScrollArea>
     </div>
   );
 };
