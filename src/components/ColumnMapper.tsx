@@ -2,9 +2,6 @@ import { useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import ConnectedColumns from './column-mapper/ConnectedColumns';
 import ColumnList from './column-mapper/ColumnList';
-import FileUpload from './FileUpload';
-import { Button } from './ui/button';
-import { Upload } from 'lucide-react';
 import { downloadCSV } from '@/utils/csvUtils';
 import { toast } from '@/hooks/use-toast';
 import {
@@ -16,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { ColumnMapperProps } from './column-mapper/types';
 import { useMappingState } from './column-mapper/useMappingState';
+import Header from './column-mapper/Header';
 
 const ColumnMapper = ({ 
   targetColumns, 
@@ -90,9 +88,17 @@ const ColumnMapper = ({
   };
 
   const handleFileData = (columns: string[], data: any[]) => {
+    // Reset the mapping state when new file data is loaded
     updateState({
       sourceColumns: columns,
-      sourceData: data
+      sourceData: data,
+      mapping: {},
+      columnTransforms: {},
+      selectedSourceColumn: null,
+      selectedTargetColumn: null,
+      sourceSearch: '',
+      targetSearch: '',
+      connectionCounter: 0
     });
     onDataLoaded(data);
   };
@@ -104,7 +110,6 @@ const ColumnMapper = ({
         const sourceColumn = uniqueKey.split('_')[0];
         let value = row[sourceColumn];
         
-        // Apply transform if it exists using the unique key
         if (state.columnTransforms[uniqueKey]) {
           try {
             const transform = new Function('value', 'row', `return ${state.columnTransforms[uniqueKey]}`);
@@ -159,15 +164,11 @@ const ColumnMapper = ({
           <div className="grid grid-cols-2 gap-8">
             <ColumnList
               title={
-                <div className="flex items-center justify-between">
-                  <span>Source file columns</span>
-                  <FileUpload onDataLoaded={handleFileData}>
-                    <Button variant="outline" size="default" className="ml-2 h-10">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Select file
-                    </Button>
-                  </FileUpload>
-                </div>
+                <Header 
+                  activeColumnSet={activeColumnSet}
+                  onColumnSetChange={onColumnSetChange}
+                  onDataLoaded={handleFileData}
+                />
               }
               columns={state.sourceColumns}
               searchValue={state.sourceSearch}
