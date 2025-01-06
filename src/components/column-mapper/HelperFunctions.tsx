@@ -71,7 +71,7 @@ const HelperFunctions: React.FC = () => {
   };
 
   return (
-    <div className="h-[280px]">
+    <div className="h-[350px]">
       <ScrollArea className="h-full border rounded-md">
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
