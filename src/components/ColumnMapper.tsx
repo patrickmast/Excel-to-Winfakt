@@ -11,9 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from './ui/button';
+import { Save } from 'lucide-react';
 import { ColumnMapperProps } from './column-mapper/types';
 import { useMappingState } from './column-mapper/useMappingState';
 import Header from './column-mapper/Header';
+import { useConfiguration } from '@/hooks/use-configuration';
 
 const ColumnMapper = ({ 
   targetColumns, 
@@ -24,6 +27,7 @@ const ColumnMapper = ({
   onColumnSetChange 
 }: ColumnMapperProps) => {
   const [state, updateState] = useMappingState(onMappingChange);
+  const { saveConfiguration, isSaving } = useConfiguration();
   
   useEffect(() => {
     updateState({
@@ -138,25 +142,55 @@ const ColumnMapper = ({
 
   const mappedTargetColumns = new Set(Object.values(state.mapping));
 
+  const handleSaveConfiguration = async () => {
+    const currentFile = window.currentUploadedFile;
+    if (!currentFile) {
+      toast({
+        title: "Error",
+        description: "Please upload a file first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await saveConfiguration(
+      currentFile,
+      currentFile.name,
+      state.mapping,
+      state.columnTransforms
+    );
+  };
+
   return (
     <div className="space-y-8">
       <div className="bg-white rounded-lg border border-gray-200 py-4 px-6">
-        <ConnectedColumns 
-          connectedColumns={connectedColumns} 
-          onDisconnect={handleDisconnect}
-          onExport={handleExport}
-          onUpdateTransform={(uniqueKey, code) => {
-            updateState({
-              columnTransforms: {
-                ...state.columnTransforms,
-                [uniqueKey]: code
-              }
-            });
-          }}
-          columnTransforms={state.columnTransforms}
-          sourceColumns={state.sourceColumns}
-          sourceData={state.sourceData}
-        />
+        <div className="flex justify-between items-center mb-4">
+          <ConnectedColumns 
+            connectedColumns={connectedColumns} 
+            onDisconnect={handleDisconnect}
+            onExport={handleExport}
+            onUpdateTransform={(uniqueKey, code) => {
+              updateState({
+                columnTransforms: {
+                  ...state.columnTransforms,
+                  [uniqueKey]: code
+                }
+              });
+            }}
+            columnTransforms={state.columnTransforms}
+            sourceColumns={state.sourceColumns}
+            sourceData={state.sourceData}
+          />
+          <Button
+            onClick={handleSaveConfiguration}
+            disabled={isSaving}
+            variant="outline"
+            className="ml-2"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {isSaving ? 'Saving...' : 'Save Configuration'}
+          </Button>
+        </div>
       </div>
       
       <Card>
