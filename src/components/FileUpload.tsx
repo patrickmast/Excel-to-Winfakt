@@ -13,6 +13,16 @@ interface FileUploadProps {
 const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
   const { toast } = useToast();
 
+  const processColumns = (columns: string[]) => {
+    return columns.map((col, index) => {
+      if (!col || col.trim() === '') {
+        const letter = String.fromCharCode(65 + index);
+        return `Column ${letter}/${index + 1}`;
+      }
+      return col;
+    });
+  };
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (!file) return;
@@ -29,7 +39,7 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
           const jsonData = XLSX.utils.sheet_to_json(worksheet);
           
           if (jsonData.length > 0) {
-            const columns = Object.keys(jsonData[0]);
+            const columns = processColumns(Object.keys(jsonData[0]));
             onDataLoaded(columns, jsonData);
             toast({
               title: "File loaded successfully",
@@ -41,7 +51,7 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
           Papa.parse(text, {
             header: true,
             complete: (results) => {
-              const columns = results.meta.fields || [];
+              const columns = processColumns(results.meta.fields || []);
               onDataLoaded(columns, results.data);
               toast({
                 title: "File loaded successfully",
