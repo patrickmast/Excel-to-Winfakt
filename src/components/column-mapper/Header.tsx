@@ -20,7 +20,8 @@ interface HeaderProps {
 const Header = ({ activeColumnSet, onColumnSetChange, onDataLoaded }: HeaderProps) => {
   const { toast } = useToast();
 
-  const handlePreview = () => {
+  const handlePreview = (e: Event) => {
+    e.preventDefault();
     const currentFile = window.currentUploadedFile;
     
     if (!currentFile) {
@@ -44,8 +45,8 @@ const Header = ({ activeColumnSet, onColumnSetChange, onDataLoaded }: HeaderProp
           const worksheet = workbook.Sheets[sheetName];
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
           
-          // Create table HTML from the Excel data
           tableContent = createTableHTML(jsonData);
+          openPreviewWindow(currentFile, tableContent);
         } else if (extension === 'csv') {
           const text = event.target?.result as string;
           Papa.parse(text, {
@@ -54,9 +55,8 @@ const Header = ({ activeColumnSet, onColumnSetChange, onDataLoaded }: HeaderProp
               openPreviewWindow(currentFile, tableContent);
             },
           });
-          return; // Return early as Papa.parse is async
+          return;
         }
-        openPreviewWindow(currentFile, tableContent);
       } catch (error) {
         toast({
           title: "Error processing file",
@@ -160,9 +160,9 @@ const Header = ({ activeColumnSet, onColumnSetChange, onDataLoaded }: HeaderProp
               Select file
             </DropdownMenuItem>
             <DropdownMenuItem 
-              onSelect={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
-                handlePreview();
+                handlePreview(e);
               }}
               disabled={!hasFile}
               className={!hasFile ? 'opacity-50 cursor-not-allowed' : ''}
