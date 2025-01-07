@@ -96,12 +96,17 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
       'application/vnd.ms-excel': ['.xls'],
       'text/csv': ['.csv']
     },
-    multiple: false
+    multiple: false,
+    noClick: !!children // Disable click when using custom children
   });
 
   if (children) {
     return (
-      <form data-upload-form {...getRootProps()}>
+      <form 
+        data-upload-form 
+        {...getRootProps()} 
+        onClick={(e) => e.stopPropagation()}
+      >
         <input {...getInputProps()} />
         {children}
       </form>
@@ -109,8 +114,12 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
   }
 
   return (
-    <form data-upload-form {...getRootProps()} className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors
-      ${isDragActive ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}`}>
+    <form 
+      data-upload-form 
+      {...getRootProps()} 
+      className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors
+        ${isDragActive ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}`}
+    >
       <input {...getInputProps()} />
       <Upload className="mx-auto h-12 w-12 text-gray-400" />
       <p className="mt-2 text-sm text-gray-600">
