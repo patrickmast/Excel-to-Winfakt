@@ -101,19 +101,16 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
 
   if (children) {
     return (
-      <div {...getRootProps()}>
+      <form data-upload-form {...getRootProps()}>
         <input {...getInputProps()} />
         {children}
-      </div>
+      </form>
     );
   }
 
   return (
-    <div
-      {...getRootProps()}
-      className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors
-        ${isDragActive ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}`}
-    >
+    <form data-upload-form {...getRootProps()} className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors
+      ${isDragActive ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}`}>
       <input {...getInputProps()} />
       <Upload className="mx-auto h-12 w-12 text-gray-400" />
       <p className="mt-2 text-sm text-gray-600">
@@ -124,7 +121,7 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
       <p className="text-xs text-gray-500 mt-2">
         Supports Excel (.xlsx, .xls) and CSV files
       </p>
-    </div>
+    </form>
   );
 };
 
