@@ -5,6 +5,16 @@ import Papa from 'papaparse';
 import { useToast } from '../hooks/use-toast';
 import { Upload } from 'lucide-react';
 
+// Declare the global variable for TypeScript
+declare global {
+  interface Window {
+    currentUploadedFile: File | null;
+  }
+}
+
+// Initialize the global variable
+window.currentUploadedFile = null;
+
 interface FileUploadProps {
   onDataLoaded: (columns: string[], data: any[]) => void;
   children?: ReactNode;
@@ -26,6 +36,9 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (!file) return;
+
+    // Store the current file globally
+    window.currentUploadedFile = file;
 
     const reader = new FileReader();
     reader.onload = (event) => {
