@@ -1,5 +1,5 @@
 import { Button } from '../ui/button';
-import { Upload, Eye } from 'lucide-react';
+import { Upload, Eye, ChevronDown } from 'lucide-react';
 import FileUpload from '../FileUpload';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -75,27 +75,33 @@ const Header = ({ activeColumnSet, onColumnSetChange, onDataLoaded }: HeaderProp
     }
   };
 
+  const hasFile = !!window.currentUploadedFile;
+
   return (
     <div className="flex items-center justify-between">
       <span>Source file columns</span>
       <FileUpload onDataLoaded={onDataLoaded}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="default" className="ml-2 h-10">
-              <Upload className="h-4 w-4 mr-2" />
+            <Button variant="outline" size="default" className="ml-2">
               Source file
+              <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>
-              <Upload className="h-4 w-4 mr-2" />
+              <Upload className="mr-2 h-4 w-4" />
               Select file
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={(e) => {
-              e.preventDefault();
-              handlePreview();
-            }}>
-              <Eye className="h-4 w-4 mr-2" />
+            <DropdownMenuItem 
+              onSelect={(e) => {
+                e.preventDefault();
+                handlePreview();
+              }}
+              disabled={!hasFile}
+              className={!hasFile ? 'opacity-50 cursor-not-allowed' : ''}
+            >
+              <Eye className="mr-2 h-4 w-4" />
               Preview current file
             </DropdownMenuItem>
           </DropdownMenuContent>
