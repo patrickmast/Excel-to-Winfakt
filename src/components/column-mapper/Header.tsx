@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
+import { MouseEvent } from 'react';
 
 interface HeaderProps {
   activeColumnSet: 'artikelen' | 'klanten';
@@ -20,7 +21,7 @@ interface HeaderProps {
 const Header = ({ activeColumnSet, onColumnSetChange, onDataLoaded }: HeaderProps) => {
   const { toast } = useToast();
 
-  const handlePreview = (e: Event) => {
+  const handlePreview = (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     const currentFile = window.currentUploadedFile;
     
