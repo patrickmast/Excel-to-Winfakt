@@ -29,6 +29,7 @@ const Index = () => {
   const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
   const { toast } = useToast();
   const { saveConfiguration, isSaving } = useConfiguration();
+  const [currentConfigId, setCurrentConfigId] = useState<string | null>(null);
 
   const handleMappingChange = (mapping: Record<string, string>) => {
     setColumnMapping(mapping);
@@ -63,20 +64,17 @@ const Index = () => {
       return;
     }
 
-    await saveConfiguration(
+    const result = await saveConfiguration(
       currentFile,
       currentFile.name,
       columnMapping,
       {},
       isNewConfig
     );
-  };
 
-  const showVersionInfo = () => {
-    toast({
-      title: "Version Info",
-      description: "CSV Transformer v1.0.0",
-    });
+    if (result) {
+      setCurrentConfigId(result.id);
+    }
   };
 
   return (
@@ -119,8 +117,11 @@ const Index = () => {
                     <AlertDialogTitle>About CSV Transformer</AlertDialogTitle>
                     <AlertDialogDescription>
                       Version 1.0.0
-                      <br />
-                      A tool for transforming CSV and Excel files.
+                      {currentConfigId && (
+                        <div className="mt-2">
+                          Configuration ID: {currentConfigId}
+                        </div>
+                      )}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
