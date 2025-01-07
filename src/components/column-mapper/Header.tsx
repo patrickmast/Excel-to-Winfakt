@@ -161,10 +161,7 @@ const Header = ({ activeColumnSet, onColumnSetChange, onDataLoaded }: HeaderProp
               Select file
             </DropdownMenuItem>
             <DropdownMenuItem 
-              onClick={(e) => {
-                e.preventDefault();
-                handlePreview(e);
-              }}
+              onClick={handlePreview}
               disabled={!hasFile}
               className={!hasFile ? 'opacity-50 cursor-not-allowed' : ''}
             >
