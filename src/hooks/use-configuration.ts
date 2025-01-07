@@ -17,25 +17,23 @@ export const useConfiguration = () => {
     try {
       // Convert file to ArrayBuffer
       const arrayBuffer = await file.arrayBuffer();
-      // Convert ArrayBuffer to Uint8Array
+      // Convert ArrayBuffer to Uint8Array for Supabase
       const uint8Array = new Uint8Array(arrayBuffer);
-      // Convert Uint8Array to base64 string
-      const base64String = btoa(
-        uint8Array.reduce((data, byte) => data + String.fromCharCode(byte), '')
-      );
 
       const { data, error } = await supabase
         .from('shared_configurations')
-        .insert({
-          source_file: base64String,
-          file_name: fileName,
-          settings: {
-            mapping,
-            columnTransforms,
+        .insert([
+          {
+            source_file: uint8Array,
+            file_name: fileName,
+            settings: {
+              mapping,
+              columnTransforms,
+            },
           },
-        })
+        ])
         .select()
-        .maybeSingle();
+        .single();
 
       if (error) {
         throw new Error(error.message);

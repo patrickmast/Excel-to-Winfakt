@@ -1,23 +1,37 @@
 import * as React from "react"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import { Check, ChevronRight, Circle } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { 
-  MenubarTriggerProps, 
-  MenubarSubTriggerProps,
-  MenubarSubContentProps,
-  MenubarContentProps,
-  MenubarItemProps,
-  MenubarCheckboxItemProps,
-  MenubarRadioItemProps,
-  MenubarLabelProps,
-  MenubarSeparatorProps,
-  MenubarShortcutProps
-} from "./types"
 
-export const MenubarTrigger = React.forwardRef<
+import { cn } from "@/lib/utils"
+
+const MenubarMenu = MenubarPrimitive.Menu
+
+const MenubarGroup = MenubarPrimitive.Group
+
+const MenubarPortal = MenubarPrimitive.Portal
+
+const MenubarSub = MenubarPrimitive.Sub
+
+const MenubarRadioGroup = MenubarPrimitive.RadioGroup
+
+const Menubar = React.forwardRef<
+  React.ElementRef<typeof MenubarPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <MenubarPrimitive.Root
+    ref={ref}
+    className={cn(
+      "flex h-10 items-center space-x-1 rounded-md border bg-background p-1",
+      className
+    )}
+    {...props}
+  />
+))
+Menubar.displayName = MenubarPrimitive.Root.displayName
+
+const MenubarTrigger = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Trigger>,
-  MenubarTriggerProps
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Trigger>
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.Trigger
     ref={ref}
@@ -30,9 +44,11 @@ export const MenubarTrigger = React.forwardRef<
 ))
 MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName
 
-export const MenubarSubTrigger = React.forwardRef<
+const MenubarSubTrigger = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.SubTrigger>,
-  MenubarSubTriggerProps
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.SubTrigger> & {
+    inset?: boolean
+  }
 >(({ className, inset, children, ...props }, ref) => (
   <MenubarPrimitive.SubTrigger
     ref={ref}
@@ -49,9 +65,9 @@ export const MenubarSubTrigger = React.forwardRef<
 ))
 MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName
 
-export const MenubarSubContent = React.forwardRef<
+const MenubarSubContent = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.SubContent>,
-  MenubarSubContentProps
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.SubContent>
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.SubContent
     ref={ref}
@@ -64,9 +80,9 @@ export const MenubarSubContent = React.forwardRef<
 ))
 MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName
 
-export const MenubarContent = React.forwardRef<
+const MenubarContent = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Content>,
-  MenubarContentProps
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Content>
 >(
   (
     { className, align = "start", alignOffset = -4, sideOffset = 8, ...props },
@@ -89,9 +105,11 @@ export const MenubarContent = React.forwardRef<
 )
 MenubarContent.displayName = MenubarPrimitive.Content.displayName
 
-export const MenubarItem = React.forwardRef<
+const MenubarItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Item>,
-  MenubarItemProps
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Item> & {
+    inset?: boolean
+  }
 >(({ className, inset, ...props }, ref) => (
   <MenubarPrimitive.Item
     ref={ref}
@@ -105,9 +123,9 @@ export const MenubarItem = React.forwardRef<
 ))
 MenubarItem.displayName = MenubarPrimitive.Item.displayName
 
-export const MenubarCheckboxItem = React.forwardRef<
+const MenubarCheckboxItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.CheckboxItem>,
-  MenubarCheckboxItemProps
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.CheckboxItem>
 >(({ className, children, checked, ...props }, ref) => (
   <MenubarPrimitive.CheckboxItem
     ref={ref}
@@ -128,9 +146,9 @@ export const MenubarCheckboxItem = React.forwardRef<
 ))
 MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName
 
-export const MenubarRadioItem = React.forwardRef<
+const MenubarRadioItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.RadioItem>,
-  MenubarRadioItemProps
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.RadioItem>
 >(({ className, children, ...props }, ref) => (
   <MenubarPrimitive.RadioItem
     ref={ref}
@@ -150,9 +168,11 @@ export const MenubarRadioItem = React.forwardRef<
 ))
 MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName
 
-export const MenubarLabel = React.forwardRef<
+const MenubarLabel = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Label>,
-  MenubarLabelProps
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Label> & {
+    inset?: boolean
+  }
 >(({ className, inset, ...props }, ref) => (
   <MenubarPrimitive.Label
     ref={ref}
@@ -166,9 +186,9 @@ export const MenubarLabel = React.forwardRef<
 ))
 MenubarLabel.displayName = MenubarPrimitive.Label.displayName
 
-export const MenubarSeparator = React.forwardRef<
+const MenubarSeparator = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Separator>,
-  MenubarSeparatorProps
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Separator>
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.Separator
     ref={ref}
@@ -178,10 +198,10 @@ export const MenubarSeparator = React.forwardRef<
 ))
 MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName
 
-export const MenubarShortcut = ({
+const MenubarShortcut = ({
   className,
   ...props
-}: MenubarShortcutProps) => {
+}: React.HTMLAttributes<HTMLSpanElement>) => {
   return (
     <span
       className={cn(
@@ -193,3 +213,22 @@ export const MenubarShortcut = ({
   )
 }
 MenubarShortcut.displayname = "MenubarShortcut"
+
+export {
+  Menubar,
+  MenubarMenu,
+  MenubarTrigger,
+  MenubarContent,
+  MenubarItem,
+  MenubarSeparator,
+  MenubarLabel,
+  MenubarCheckboxItem,
+  MenubarRadioGroup,
+  MenubarRadioItem,
+  MenubarPortal,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  MenubarGroup,
+  MenubarSub,
+  MenubarShortcut,
+}
