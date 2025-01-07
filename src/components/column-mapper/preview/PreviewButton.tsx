@@ -50,22 +50,21 @@ const PreviewButton = ({ hasFile }: PreviewButtonProps) => {
           <meta property="og:image" content="https://files.taxi/patrick/ufadZsPEjfAAKF2xsgOg.jpeg" />
           <style>
             body { font-family: Arial, sans-serif; margin: 2rem; }
-            .file-info { margin-bottom: 2rem; }
+            .file-info { margin-bottom: 1rem; color: #374151; }
             .file-content { white-space: pre-wrap; }
             table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
             th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
             th { background-color: #f5f5f5; }
             tr:hover { background-color: #f9f9f9; }
+            hr { border: 0; border-top: 1px solid #e5e7eb; margin: 1rem 0; }
           </style>
         </head>
         <body>
           <div class="file-info">
-            <h2>File Information</h2>
-            <p><strong>Name:</strong> ${file.name}</p>
-            <p><strong>Size:</strong> ${(file.size / 1024).toFixed(2)} KB</p>
+            <strong>Filename:</strong> ${file.name} (${(file.size / 1024).toFixed(2)} KB)
           </div>
+          <hr>
           <div class="file-content">
-            <h2>File Contents</h2>
             ${tableContent}
           </div>
         </body>
