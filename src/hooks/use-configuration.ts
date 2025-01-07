@@ -9,22 +9,31 @@ export const useConfiguration = () => {
     file: File, 
     fileName: string, 
     mapping: Record<string, string>, 
-    columnTransforms: Record<string, string>
+    columnTransforms: Record<string, string>,
+    isNewConfig: boolean = true
   ) => {
     setIsSaving(true);
     
     try {
+      // Convert file to ArrayBuffer
+      const arrayBuffer = await file.arrayBuffer();
+      // Convert ArrayBuffer to Uint8Array for Supabase
+      const uint8Array = new Uint8Array(arrayBuffer);
+
       const { data, error } = await supabase
-        .from('app_logs')
+        .from('shared_configurations')
         .insert([
           {
-            description: `Configuration saved for file: ${fileName}`,
-            log: {
+            source_file: uint8Array,
+            file_name: fileName,
+            settings: {
               mapping,
               columnTransforms,
             },
           },
-        ]);
+        ])
+        .select()
+        .single();
 
       if (error) {
         throw new Error(error.message);
@@ -32,7 +41,7 @@ export const useConfiguration = () => {
 
       toast({
         title: "Success",
-        description: "Configuration saved successfully",
+        description: `Configuration ${isNewConfig ? 'saved' : 'updated'} successfully`,
       });
 
       return data;

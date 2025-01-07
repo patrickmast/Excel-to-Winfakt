@@ -2,12 +2,13 @@ import { useState } from 'react';
 import ColumnMapper from '../components/ColumnMapper';
 import { useToast } from '../components/ui/use-toast';
 import { downloadCSV } from '../utils/csvUtils';
-import { Menu, Settings, Info } from 'lucide-react';
+import { Menu, Save, Plus, Info } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { 
   AlertDialog,
@@ -20,12 +21,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
+import { useConfiguration } from '@/hooks/use-configuration';
 
 const Index = () => {
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
   const [sourceData, setSourceData] = useState<any[]>([]);
   const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
   const { toast } = useToast();
+  const { saveConfiguration, isSaving } = useConfiguration();
 
   const handleMappingChange = (mapping: Record<string, string>) => {
     setColumnMapping(mapping);
@@ -49,6 +52,26 @@ const Index = () => {
     });
   };
 
+  const handleSaveConfiguration = async (isNewConfig: boolean = true) => {
+    const currentFile = window.currentUploadedFile;
+    if (!currentFile) {
+      toast({
+        title: "Error",
+        description: "Please upload a file first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await saveConfiguration(
+      currentFile,
+      currentFile.name,
+      columnMapping,
+      {},
+      isNewConfig
+    );
+  };
+
   const showVersionInfo = () => {
     toast({
       title: "Version Info",
@@ -63,36 +86,48 @@ const Index = () => {
           <h1 className="text-3xl font-bold text-gray-900">CSV/Excel Converter</h1>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="default" className="flex items-center gap-2">
                 <Menu className="h-5 w-5" />
+                Menu
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem 
+                onClick={() => handleSaveConfiguration(true)}
+                disabled={isSaving}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                <span>Save as New</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleSaveConfiguration(false)}
+                disabled={isSaving}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                <span>Save</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
+                    <Info className="mr-2 h-4 w-4" />
+                    <span>Info</span>
                   </DropdownMenuItem>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Settings</AlertDialogTitle>
+                    <AlertDialogTitle>About CSV Transformer</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Configure your application settings
+                      Version 1.0.0
+                      <br />
+                      A tool for transforming CSV and Excel files.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>
-                      Close
-                    </AlertDialogCancel>
+                    <AlertDialogCancel>Close</AlertDialogCancel>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-              <DropdownMenuItem onClick={showVersionInfo}>
-                <Info className="mr-2 h-4 w-4" />
-                <span>Info</span>
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

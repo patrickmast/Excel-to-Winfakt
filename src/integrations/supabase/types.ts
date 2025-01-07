@@ -60,6 +60,33 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_configurations: {
+        Row: {
+          created_at: string
+          file_name: string
+          id: string
+          last_modified: string
+          settings: Json
+          source_file: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          id?: string
+          last_modified?: string
+          settings: Json
+          source_file: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          id?: string
+          last_modified?: string
+          settings?: Json
+          source_file?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
