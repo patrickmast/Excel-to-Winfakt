@@ -2,8 +2,8 @@ import { Upload } from 'lucide-react';
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const FileSelector = () => {
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleClick = (event: Event) => {
+    event.preventDefault();
     // Find and trigger the hidden file input
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
