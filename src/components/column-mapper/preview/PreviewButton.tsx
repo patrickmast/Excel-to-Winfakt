@@ -22,21 +22,27 @@ const PreviewButton = ({ hasFile }: PreviewButtonProps) => {
     }
 
     try {
-      const formData = new FormData();
-      formData.append('file', currentFile);
-
-      const response = await fetch('/api/upload-preview', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload file');
-      }
-
-      const { fileId } = await response.json();
-      const previewUrl = `/preview?fileId=${fileId}&filename=${encodeURIComponent(currentFile.name)}`;
-      window.open(previewUrl, '_blank');
+      // Create a unique ID for the file using timestamp and random string
+      const fileId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Store the file in localStorage (temporary solution)
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const fileData = {
+          id: fileId,
+          name: currentFile.name,
+          size: currentFile.size,
+          content: e.target?.result,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(`preview_${fileId}`, JSON.stringify(fileData));
+        
+        // Open preview in new window
+        const previewUrl = `/preview?fileId=${fileId}&filename=${encodeURIComponent(currentFile.name)}`;
+        window.open(previewUrl, '_blank');
+      };
+      
+      reader.readAsText(currentFile);
     } catch (error) {
       toast({
         title: "Error",
