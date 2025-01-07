@@ -29,5 +29,5 @@ export {
   MenubarSubTrigger,
   MenubarPrimitive.Group as MenubarGroup,
   MenubarPrimitive.Sub as MenubarSub,
-  MenubarShortcut
+  MenubarShortcut,
 }
