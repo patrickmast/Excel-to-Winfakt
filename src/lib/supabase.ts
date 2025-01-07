@@ -1,17 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Check if environment variables are defined
-if (!import.meta.env.VITE_SUPABASE_URL) {
-  throw new Error('VITE_SUPABASE_URL is not defined. Please connect to Supabase through the Lovable interface.');
-}
-
-if (!import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  throw new Error('VITE_SUPABASE_ANON_KEY is not defined. Please connect to Supabase through the Lovable interface.');
-}
-
 export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
+  'https://ujebouvijitxqazlvnfm.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqZWJvdXZpaml0eHFhemx2bmZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwOTA3NDAsImV4cCI6MjA0OTY2Njc0MH0.lBfslcWthy3nsncxd6H_B9j_JctzWxDZyStNqsXmK7M'
 );
 
 export type SharedConfiguration = {
