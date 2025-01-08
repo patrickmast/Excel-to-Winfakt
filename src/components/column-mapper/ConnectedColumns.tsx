@@ -54,22 +54,16 @@ const ConnectedColumns = ({
 
   return (
     <div>
-      <div className="flex items-center justify-between w-full">
-        <div className="flex-1">
-          <CardHeader className="px-0 pt-0">
-            <CardTitle>Connected columns</CardTitle>
-          </CardHeader>
-        </div>
+      <div className="flex items-center gap-4 mb-6">
+        <CardTitle className="text-xl font-semibold">Connected columns</CardTitle>
         {onExport && (
-          <div className="flex-shrink-0 ml-auto">
-            <Button 
-              onClick={onExport}
-              className="bg-blue-600 hover:bg-blue-700"
-              disabled={connectedColumns.length === 0}
-            >
-              Export CSV
-            </Button>
-          </div>
+          <Button 
+            onClick={onExport}
+            className="bg-blue-600 hover:bg-blue-700"
+            disabled={connectedColumns.length === 0}
+          >
+            Export CSV
+          </Button>
         )}
       </div>
       
