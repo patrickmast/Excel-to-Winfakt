@@ -6,28 +6,30 @@ const FileSelector = () => {
     event.preventDefault();
     event.stopPropagation();
     
-    // First, close the dropdown by finding and clicking the trigger button
+    // First, find the dropdown trigger button and close the dropdown
     const dropdownTrigger = document.querySelector('[data-state="open"][role="button"]') as HTMLButtonElement;
     if (dropdownTrigger) {
       dropdownTrigger.click();
     }
     
-    // After a small delay, trigger the file input
-    setTimeout(() => {
+    // Use requestAnimationFrame to ensure the dropdown is fully closed
+    requestAnimationFrame(() => {
       // Get the closest form element with data-upload-form attribute
       const forms = document.querySelectorAll('form[data-upload-form]');
       const form = Array.from(forms).find(form => {
-        // Find the form that contains both the file input and is within the dropdown
+        // Find the form that contains both the file input and is not within the dropdown
         const hasFileInput = form.querySelector('input[type="file"]') !== null;
         const isInDropdown = form.closest('[role="menu"]') !== null;
         return hasFileInput && !isInDropdown;
       });
       
-      const fileInput = form?.querySelector('input[type="file"]') as HTMLInputElement;
-      if (fileInput) {
-        fileInput.click();
+      if (form) {
+        const fileInput = form.querySelector('input[type="file"]') as HTMLInputElement;
+        if (fileInput) {
+          fileInput.click();
+        }
       }
-    }, 100); // Small delay to ensure the dropdown is closed first
+    });
   };
 
   return (
