@@ -40,6 +40,12 @@ const PreviewButton = ({ hasFile }: PreviewButtonProps) => {
         // Open preview in new window
         const previewUrl = `/preview?fileId=${fileId}&filename=${encodeURIComponent(currentFile.name)}`;
         window.open(previewUrl, '_blank');
+
+        // Close the dropdown by finding and clicking the trigger button
+        const dropdownTrigger = document.querySelector('[data-state="open"][role="combobox"]') as HTMLButtonElement;
+        if (dropdownTrigger) {
+          dropdownTrigger.click();
+        }
       };
       
       reader.readAsText(currentFile);

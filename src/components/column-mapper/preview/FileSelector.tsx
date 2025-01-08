@@ -18,6 +18,11 @@ const FileSelector = () => {
     const fileInput = form?.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
       fileInput.click();
+      // Close the dropdown by finding and clicking the trigger button
+      const dropdownTrigger = document.querySelector('[data-state="open"][role="combobox"]') as HTMLButtonElement;
+      if (dropdownTrigger) {
+        dropdownTrigger.click();
+      }
     }
   };
 
