@@ -2,21 +2,12 @@ import { useState, useEffect } from 'react';
 import ColumnMapper from '../components/ColumnMapper';
 import { useToast } from '../components/ui/use-toast';
 import { downloadCSV } from '../utils/csvUtils';
-import { Menu, Save, Plus, Info } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { Button } from '@/components/ui/button';
 import { useConfiguration } from '@/hooks/use-configuration';
-import SavedConfigDialog from '@/components/column-mapper/SavedConfigDialog';
-import InfoDialog from '@/components/column-mapper/InfoDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
+import Header from '@/components/column-mapper/Header';
+import SaveConfiguration from '@/components/column-mapper/SaveConfiguration';
 
 const Index = () => {
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
@@ -25,11 +16,10 @@ const Index = () => {
   const { toast } = useToast();
   const { saveConfiguration, isSaving } = useConfiguration();
   const [currentConfigId, setCurrentConfigId] = useState<string | null>(null);
-  const [showSavedDialog, setShowSavedDialog] = useState(false);
-  const [savedConfigUrl, setSavedConfigUrl] = useState('');
   const [searchParams] = useSearchParams();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showSavedDialog, setShowSavedDialog] = useState(false);
+  const [savedConfigUrl, setSavedConfigUrl] = useState('');
 
   useEffect(() => {
     const loadSavedConfiguration = async () => {
@@ -139,62 +129,21 @@ const Index = () => {
     }
   };
 
-  const handleInfoClose = () => {
-    setShowInfoDialog(false);
-  };
-
-  const handleInfoClick = () => {
-    setShowInfoDialog(true);
-    setIsMenuOpen(false);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <SavedConfigDialog
-        open={showSavedDialog}
-        onOpenChange={setShowSavedDialog}
-        configUrl={savedConfigUrl}
+      <SaveConfiguration
+        currentConfigId={currentConfigId}
+        showInfoDialog={showInfoDialog}
+        onInfoDialogChange={setShowInfoDialog}
       />
       
-      <InfoDialog 
-        open={showInfoDialog}
-        onOpenChange={setShowInfoDialog}
-        configId={currentConfigId}
-      />
-
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">CSV/Excel Converter</h1>
-          <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="default" className="flex items-center gap-2">
-                <Menu className="h-5 w-5" />
-                Menu
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem 
-                onClick={() => handleSaveConfiguration(true)}
-                disabled={isSaving}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                <span>Save as New</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => handleSaveConfiguration(false)}
-                disabled={isSaving}
-              >
-                <Save className="mr-2 h-4 w-4" />
-                <span>Save</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleInfoClick}>
-                <Info className="mr-2 h-4 w-4" />
-                <span>Info</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <Header
+          onSaveNew={() => handleSaveConfiguration(true)}
+          onSave={() => handleSaveConfiguration(false)}
+          onInfoClick={() => setShowInfoDialog(true)}
+          isSaving={isSaving}
+        />
         
         <ColumnMapper 
           onMappingChange={handleMappingChange}
