@@ -2,7 +2,7 @@ import { ArrowRight, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useState } from 'react';
 import ColumnSettingsDialog from './ColumnSettingsDialog';
-import { CardHeader, CardTitle } from '../ui/card';
+import { CardTitle } from '../ui/card';
 import ColumnPreview from './ColumnPreview';
 
 interface ConnectedColumnsProps {
@@ -53,8 +53,8 @@ const ConnectedColumns = ({
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between w-full px-4">
+    <div className="w-full bg-white rounded-lg border border-gray-200 py-4">
+      <div className="flex items-center justify-between w-full px-6">
         <CardTitle className="text-xl font-semibold">Connected columns</CardTitle>
         {onExport && (
           <Button 
@@ -68,7 +68,7 @@ const ConnectedColumns = ({
       </div>
       
       {connectedColumns.length > 0 && (
-        <div className="w-full space-y-2 mt-4">
+        <div className="w-full space-y-2 mt-4 px-6">
           {connectedColumns.map(([uniqueKey, sourceColumn, targetColumn]) => (
             <div 
               key={uniqueKey} 
