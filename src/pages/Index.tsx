@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ColumnMapper from '../components/ColumnMapper';
 import { useToast } from '../components/ui/use-toast';
 import { downloadCSV } from '../utils/csvUtils';
 import { Menu, Save, Plus, Info } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +35,58 @@ const Index = () => {
   const [currentConfigId, setCurrentConfigId] = useState<string | null>(null);
   const [showSavedDialog, setShowSavedDialog] = useState(false);
   const [savedConfigUrl, setSavedConfigUrl] = useState('');
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const loadSavedConfiguration = async () => {
+      const id = searchParams.get('id');
+      if (!id) return;
+
+      try {
+        const { data: config, error } = await supabase
+          .from('shared_configurations')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) throw error;
+        if (!config) return;
+
+        // Convert base64 to Blob
+        const byteCharacters = atob(config.source_file);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray]);
+
+        // Create File object
+        const file = new File([blob], config.file_name, { type: 'application/octet-stream' });
+        window.currentUploadedFile = file;
+
+        // Set the configuration
+        setCurrentConfigId(config.id);
+        if (config.settings?.mapping) {
+          setColumnMapping(config.settings.mapping);
+        }
+
+        toast({
+          title: "Configuration loaded",
+          description: "The saved configuration has been loaded successfully",
+        });
+      } catch (error) {
+        console.error('Error loading configuration:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load the saved configuration",
+          variant: "destructive",
+        });
+      }
+    };
+
+    loadSavedConfiguration();
+  }, [searchParams, toast]);
 
   const handleMappingChange = (mapping: Record<string, string>) => {
     setColumnMapping(mapping);
