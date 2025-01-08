@@ -29,6 +29,7 @@ const Index = () => {
   const [savedConfigUrl, setSavedConfigUrl] = useState('');
   const [searchParams] = useSearchParams();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const loadSavedConfiguration = async () => {
@@ -144,6 +145,7 @@ const Index = () => {
 
   const handleInfoClick = () => {
     setShowInfoDialog(true);
+    setIsMenuOpen(false);
   };
 
   return (
@@ -163,7 +165,7 @@ const Index = () => {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">CSV/Excel Converter</h1>
-          <DropdownMenu>
+          <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="default" className="flex items-center gap-2">
                 <Menu className="h-5 w-5" />
@@ -186,7 +188,7 @@ const Index = () => {
                 <span>Save</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={handleInfoClick}>
+              <DropdownMenuItem onClick={handleInfoClick}>
                 <Info className="mr-2 h-4 w-4" />
                 <span>Info</span>
               </DropdownMenuItem>

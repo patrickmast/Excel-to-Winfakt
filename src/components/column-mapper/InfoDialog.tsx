@@ -15,6 +15,8 @@ interface InfoDialogProps {
 }
 
 const InfoDialog = ({ open, onOpenChange, configId }: InfoDialogProps) => {
+  if (!open) return null;
+  
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -30,7 +32,7 @@ const InfoDialog = ({ open, onOpenChange, configId }: InfoDialogProps) => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Close</AlertDialogCancel>
+          <AlertDialogCancel onClick={() => onOpenChange(false)}>Close</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
