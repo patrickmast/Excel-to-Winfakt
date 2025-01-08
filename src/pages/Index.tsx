@@ -78,8 +78,7 @@ const Index = () => {
     if (result) {
       setCurrentConfigId(result.id);
       if (isNewConfig) {
-        // Update the URL format to match PreviewButton's format
-        const configUrl = `${window.location.origin}/preview?fileId=${result.id}&filename=${encodeURIComponent(currentFile.name)}`;
+        const configUrl = `${window.location.origin}/id=${result.id}`;
         setSavedConfigUrl(configUrl);
         setShowSavedDialog(true);
       } else {
