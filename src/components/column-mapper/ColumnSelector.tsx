@@ -27,15 +27,6 @@ const ColumnSelector: React.FC<ColumnSelectorProps> = ({
     col.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleColumnSelect = (columnName: string) => {
-    onColumnSelect(columnName);
-    // Find and click the trigger button to close the dropdown
-    const dropdownTrigger = document.querySelector('[data-state="open"][role="button"]') as HTMLButtonElement;
-    if (dropdownTrigger) {
-      dropdownTrigger.click();
-    }
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -55,10 +46,7 @@ const ColumnSelector: React.FC<ColumnSelectorProps> = ({
         {filteredColumns.map((col) => (
           <DropdownMenuItem
             key={col}
-            onSelect={(e) => {
-              e.preventDefault();
-              handleColumnSelect(col);
-            }}
+            onSelect={() => onColumnSelect(col)}
           >
             {col}
           </DropdownMenuItem>

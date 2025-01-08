@@ -40,12 +40,6 @@ const PreviewButton = ({ hasFile }: PreviewButtonProps) => {
         // Open preview in new window
         const previewUrl = `/preview?fileId=${fileId}&filename=${encodeURIComponent(currentFile.name)}`;
         window.open(previewUrl, '_blank');
-
-        // Close the dropdown by finding and clicking the trigger button
-        const dropdownTrigger = document.querySelector('[data-state="open"][role="button"]') as HTMLButtonElement;
-        if (dropdownTrigger) {
-          dropdownTrigger.click();
-        }
       };
       
       reader.readAsText(currentFile);
@@ -60,7 +54,7 @@ const PreviewButton = ({ hasFile }: PreviewButtonProps) => {
 
   return (
     <DropdownMenuItem 
-      onClick={handlePreview}
+      onSelect={handlePreview}
       disabled={!hasFile}
       className={!hasFile ? 'opacity-50 cursor-not-allowed' : ''}
     >
