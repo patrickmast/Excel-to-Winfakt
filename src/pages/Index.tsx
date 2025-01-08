@@ -78,7 +78,7 @@ const Index = () => {
     if (result) {
       setCurrentConfigId(result.id);
       if (isNewConfig) {
-        const configUrl = `${window.location.origin}/id=${result.id}`;
+        const configUrl = `${window.location.origin}/preview/${result.id}`;
         setSavedConfigUrl(configUrl);
         setShowSavedDialog(true);
       } else {
