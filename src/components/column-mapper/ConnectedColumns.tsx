@@ -54,20 +54,25 @@ const ConnectedColumns = ({
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <CardHeader className="px-0 pt-0">
-          <CardTitle>Connected columns</CardTitle>
-        </CardHeader>
+      <div className="flex items-center w-full">
+        <div className="flex-1">
+          <CardHeader className="px-0 pt-0">
+            <CardTitle>Connected columns</CardTitle>
+          </CardHeader>
+        </div>
         {onExport && (
-          <Button 
-            onClick={onExport}
-            className="bg-blue-600 hover:bg-blue-700"
-            disabled={connectedColumns.length === 0}
-          >
-            Export CSV
-          </Button>
+          <div className="flex-shrink-0">
+            <Button 
+              onClick={onExport}
+              className="bg-blue-600 hover:bg-blue-700"
+              disabled={connectedColumns.length === 0}
+            >
+              Export CSV
+            </Button>
+          </div>
         )}
       </div>
+      
       {connectedColumns.length > 0 && (
         <div className="w-full space-y-2 mt-4">
           {connectedColumns.map(([uniqueKey, sourceColumn, targetColumn]) => (
