@@ -42,7 +42,7 @@ const PreviewButton = ({ hasFile }: PreviewButtonProps) => {
         window.open(previewUrl, '_blank');
 
         // Close the dropdown by finding and clicking the trigger button
-        const dropdownTrigger = document.querySelector('[data-state="open"][role="combobox"]') as HTMLButtonElement;
+        const dropdownTrigger = document.querySelector('[data-state="open"][role="button"]') as HTMLButtonElement;
         if (dropdownTrigger) {
           dropdownTrigger.click();
         }
