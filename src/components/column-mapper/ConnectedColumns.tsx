@@ -54,7 +54,7 @@ const ConnectedColumns = ({
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center justify-between w-full px-4">
         <CardTitle className="text-xl font-semibold">Connected columns</CardTitle>
         {onExport && (
           <Button 
