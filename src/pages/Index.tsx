@@ -20,7 +20,6 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogCancel,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
 import { useConfiguration } from '@/hooks/use-configuration';
@@ -147,6 +146,10 @@ const Index = () => {
     }
   };
 
+  const handleInfoClose = () => {
+    setShowInfoDialog(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <SavedConfigDialog
@@ -198,24 +201,26 @@ const Index = () => {
         />
       </div>
 
-      <AlertDialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>About CSV Transformer</AlertDialogTitle>
-            <AlertDialogDescription>
-              Version 1.0.0
-              {currentConfigId && (
-                <div className="mt-2">
-                  Configuration ID: {currentConfigId}
-                </div>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Close</AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {showInfoDialog && (
+        <AlertDialog open={showInfoDialog} onOpenChange={handleInfoClose}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>About CSV Transformer</AlertDialogTitle>
+              <AlertDialogDescription>
+                Version 1.0.0
+                {currentConfigId && (
+                  <div className="mt-2">
+                    Configuration ID: {currentConfigId}
+                  </div>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={handleInfoClose}>Close</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 };
