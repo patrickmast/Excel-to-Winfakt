@@ -18,3 +18,8 @@ export interface MappingState {
   sourceColumns: string[];
   sourceData: any[];
 }
+
+export interface ConfigurationSettings {
+  mapping: Record<string, string>;
+  columnTransforms?: Record<string, string>;
+}

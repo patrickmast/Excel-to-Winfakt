@@ -25,11 +25,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useConfiguration } from '@/hooks/use-configuration';
 import SavedConfigDialog from '@/components/column-mapper/SavedConfigDialog';
-
-interface ConfigurationSettings {
-  mapping: Record<string, string>;
-  columnTransforms?: Record<string, string>;
-}
+import { ConfigurationSettings } from '@/components/column-mapper/types';
 
 const Index = () => {
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
@@ -72,7 +68,7 @@ const Index = () => {
 
         // Set the configuration
         setCurrentConfigId(config.id);
-        const settings = config.settings as ConfigurationSettings;
+        const settings = config.settings as unknown as ConfigurationSettings;
         if (settings?.mapping) {
           setColumnMapping(settings.mapping);
         }
