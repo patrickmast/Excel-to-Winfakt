@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
 import { useConfiguration } from '@/hooks/use-configuration';
+import SavedConfigDialog from '@/components/column-mapper/SavedConfigDialog';
 
 const Index = () => {
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
@@ -30,6 +31,8 @@ const Index = () => {
   const { toast } = useToast();
   const { saveConfiguration, isSaving } = useConfiguration();
   const [currentConfigId, setCurrentConfigId] = useState<string | null>(null);
+  const [showSavedDialog, setShowSavedDialog] = useState(false);
+  const [savedConfigUrl, setSavedConfigUrl] = useState('');
 
   const handleMappingChange = (mapping: Record<string, string>) => {
     setColumnMapping(mapping);
@@ -74,11 +77,26 @@ const Index = () => {
 
     if (result) {
       setCurrentConfigId(result.id);
+      if (isNewConfig) {
+        const configUrl = `${window.location.origin}/preview/${result.id}`;
+        setSavedConfigUrl(configUrl);
+        setShowSavedDialog(true);
+      } else {
+        toast({
+          title: "Success",
+          description: "Configuration updated successfully",
+        });
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SavedConfigDialog
+        open={showSavedDialog}
+        onOpenChange={setShowSavedDialog}
+        configUrl={savedConfigUrl}
+      />
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">CSV/Excel Converter</h1>
