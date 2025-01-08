@@ -37,6 +37,7 @@ const Index = () => {
   const [showSavedDialog, setShowSavedDialog] = useState(false);
   const [savedConfigUrl, setSavedConfigUrl] = useState('');
   const [searchParams] = useSearchParams();
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
 
   useEffect(() => {
     const loadSavedConfiguration = async () => {
@@ -179,30 +180,10 @@ const Index = () => {
                 <span>Save</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    <Info className="mr-2 h-4 w-4" />
-                    <span>Info</span>
-                  </DropdownMenuItem>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>About CSV Transformer</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Version 1.0.0
-                      {currentConfigId && (
-                        <div className="mt-2">
-                          Configuration ID: {currentConfigId}
-                        </div>
-                      )}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Close</AlertDialogCancel>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <DropdownMenuItem onSelect={() => setShowInfoDialog(true)}>
+                <Info className="mr-2 h-4 w-4" />
+                <span>Info</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -216,6 +197,25 @@ const Index = () => {
           onColumnSetChange={setActiveColumnSet}
         />
       </div>
+
+      <AlertDialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>About CSV Transformer</AlertDialogTitle>
+            <AlertDialogDescription>
+              Version 1.0.0
+              {currentConfigId && (
+                <div className="mt-2">
+                  Configuration ID: {currentConfigId}
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
