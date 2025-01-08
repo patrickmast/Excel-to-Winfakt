@@ -11,8 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from './ui/button';
-import { Save } from 'lucide-react';
 import { ColumnMapperProps } from './column-mapper/types';
 import { useMappingState } from './column-mapper/useMappingState';
 import Header from './column-mapper/Header';
@@ -181,15 +179,6 @@ const ColumnMapper = ({
             sourceColumns={state.sourceColumns}
             sourceData={state.sourceData}
           />
-          <Button
-            onClick={handleSaveConfiguration}
-            disabled={isSaving}
-            variant="outline"
-            className="ml-2"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {isSaving ? 'Saving...' : 'Save Configuration'}
-          </Button>
         </div>
       </div>
       
