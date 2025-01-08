@@ -11,10 +11,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from './ui/button';
+import { Copy } from 'lucide-react';
 import { ColumnMapperProps } from './column-mapper/types';
 import { useMappingState } from './column-mapper/useMappingState';
 import Header from './column-mapper/Header';
 import { useConfiguration } from '@/hooks/use-configuration';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { useState } from 'react';
 
 const ColumnMapper = ({ 
   targetColumns, 
@@ -26,6 +36,8 @@ const ColumnMapper = ({
 }: ColumnMapperProps) => {
   const [state, updateState] = useMappingState(onMappingChange);
   const { saveConfiguration, isSaving } = useConfiguration();
+  const [showSavedDialog, setShowSavedDialog] = useState(false);
+  const [savedConfigUrl, setSavedConfigUrl] = useState('');
   
   useEffect(() => {
     updateState({
@@ -33,6 +45,22 @@ const ColumnMapper = ({
       columnTransforms: {}
     });
   }, [activeColumnSet]);
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(savedConfigUrl);
+      toast({
+        title: "URL copied",
+        description: "Configuration URL has been copied to clipboard",
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to copy",
+        description: "Please copy the URL manually",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSourceColumnClick = (column: string) => {
     if (state.selectedSourceColumn === column) {
@@ -133,13 +161,6 @@ const ColumnMapper = ({
     });
   };
 
-  const connectedColumns = Object.entries(state.mapping).map(([key, target]) => {
-    const sourceColumn = key.split('_')[0];
-    return [key, sourceColumn, target] as [string, string, string];
-  }).filter(([_, __, target]) => target !== '');
-
-  const mappedTargetColumns = new Set(Object.values(state.mapping));
-
   const handleSaveConfiguration = async () => {
     const currentFile = window.currentUploadedFile;
     if (!currentFile) {
@@ -151,16 +172,51 @@ const ColumnMapper = ({
       return;
     }
 
-    await saveConfiguration(
+    const result = await saveConfiguration(
       currentFile,
       currentFile.name,
       state.mapping,
       state.columnTransforms
     );
+
+    if (result) {
+      const configUrl = `${window.location.origin}/preview/${result.id}`;
+      setSavedConfigUrl(configUrl);
+      setShowSavedDialog(true);
+    }
   };
+
+  const connectedColumns = Object.entries(state.mapping).map(([key, target]) => {
+    const sourceColumn = key.split('_')[0];
+    return [key, sourceColumn, target] as [string, string, string];
+  }).filter(([_, __, target]) => target !== '');
+
+  const mappedTargetColumns = new Set(Object.values(state.mapping));
 
   return (
     <div className="space-y-8">
+      <Dialog open={showSavedDialog} onOpenChange={setShowSavedDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Settings saved successfully</DialogTitle>
+            <DialogDescription className="space-y-4">
+              <p>Your configuration has been saved. You can access it using the URL below:</p>
+              <div className="flex items-center gap-2 p-2 bg-muted rounded-md">
+                <span className="flex-1 text-sm break-all">{savedConfigUrl}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCopyUrl}
+                  className="h-8 w-8"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
       <div className="bg-white rounded-lg border border-gray-200 py-4 px-6">
         <div className="flex justify-between items-center mb-4">
           <ConnectedColumns 
