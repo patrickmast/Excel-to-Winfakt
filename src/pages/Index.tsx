@@ -12,18 +12,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { 
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
 import { useConfiguration } from '@/hooks/use-configuration';
 import SavedConfigDialog from '@/components/column-mapper/SavedConfigDialog';
+import InfoDialog from '@/components/column-mapper/InfoDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
 
 const Index = () => {
@@ -150,6 +142,10 @@ const Index = () => {
     setShowInfoDialog(false);
   };
 
+  const handleInfoClick = () => {
+    setShowInfoDialog(true);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <SavedConfigDialog
@@ -157,6 +153,13 @@ const Index = () => {
         onOpenChange={setShowSavedDialog}
         configUrl={savedConfigUrl}
       />
+      
+      <InfoDialog 
+        open={showInfoDialog}
+        onOpenChange={setShowInfoDialog}
+        configId={currentConfigId}
+      />
+
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">CSV/Excel Converter</h1>
@@ -183,7 +186,7 @@ const Index = () => {
                 <span>Save</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => setShowInfoDialog(true)}>
+              <DropdownMenuItem onSelect={handleInfoClick}>
                 <Info className="mr-2 h-4 w-4" />
                 <span>Info</span>
               </DropdownMenuItem>
@@ -200,27 +203,6 @@ const Index = () => {
           onColumnSetChange={setActiveColumnSet}
         />
       </div>
-
-      {showInfoDialog && (
-        <AlertDialog open={showInfoDialog} onOpenChange={handleInfoClose}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>About CSV Transformer</AlertDialogTitle>
-              <AlertDialogDescription>
-                Version 1.0.0
-                {currentConfigId && (
-                  <div className="mt-2">
-                    Configuration ID: {currentConfigId}
-                  </div>
-                )}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={handleInfoClose}>Close</AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
     </div>
   );
 };
