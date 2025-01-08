@@ -19,6 +19,10 @@ interface ColumnMapperContentProps {
   onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
   onDataLoaded: (columns: string[], data: any[]) => void;
   onExport: () => void;
+  onSaveNew?: () => void;
+  onSave?: () => void;
+  onInfoClick?: () => void;
+  isSaving?: boolean;
 }
 
 const ColumnMapperContent = ({
@@ -28,7 +32,11 @@ const ColumnMapperContent = ({
   activeColumnSet,
   onColumnSetChange,
   onDataLoaded,
-  onExport
+  onExport,
+  onSaveNew = () => {},
+  onSave = () => {},
+  onInfoClick = () => {},
+  isSaving = false
 }: ColumnMapperContentProps) => {
   const handleSourceColumnClick = (column: string) => {
     if (state.selectedSourceColumn === column) {
@@ -124,6 +132,10 @@ const ColumnMapperContent = ({
                   activeColumnSet={activeColumnSet}
                   onColumnSetChange={onColumnSetChange}
                   onDataLoaded={onDataLoaded}
+                  onSaveNew={onSaveNew}
+                  onSave={onSave}
+                  onInfoClick={onInfoClick}
+                  isSaving={isSaving}
                 />
               }
               columns={state.sourceColumns}
