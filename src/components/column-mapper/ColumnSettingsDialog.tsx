@@ -48,22 +48,11 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
       setTestResult(null);
       setTestError(null);
 
-      const row: Record<string, any> = {};
-      sourceColumns.forEach(col => {
-        if (col.toLowerCase().includes('date')) {
-          row[col] = new Date().toISOString();
-        } else if (col.toLowerCase().includes('price') || col.toLowerCase().includes('amount')) {
-          row[col] = 100.50;
-        } else if (col.toLowerCase().includes('quantity') || col.toLowerCase().includes('number')) {
-          row[col] = 42;
-        } else {
-          row[col] = 'Sample Text';
-        }
-      });
-
-      const value = row[columnName] || 'Sample Value';
-      const result = new Function('row', 'value', `return ${expressionCode}`)(row, value);
+      // Use the first row of actual source data for testing
+      const row = sourceData.length > 0 ? sourceData[0] : {};
+      const value = row[columnName];
       
+      const result = new Function('row', 'value', `return ${expressionCode}`)(row, value);
       setTestResult(String(result));
       setActiveTab('result');
     } catch (error) {
@@ -101,7 +90,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
               Result <PlayIcon className="h-4 w-4 cursor-pointer hover:text-primary" onClick={testExpression} />
             </TabsTrigger>
             <TabsTrigger value="functions">Functions</TabsTrigger>
-            <TabsTrigger value="columns">Source columns</TabsTrigger>
+            <TabsTrigger value="Source columns">Source columns</TabsTrigger>
           </TabsList>
           <TabsContent value="expression" className="flex-1 mt-0">
             <ExpressionEditor 
