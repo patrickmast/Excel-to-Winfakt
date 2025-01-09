@@ -18,9 +18,10 @@ window.currentUploadedFile = null;
 interface FileUploadProps {
   onDataLoaded: (columns: string[], data: any[]) => void;
   children?: ReactNode;
+  currentMapping?: Record<string, string>;
 }
 
-const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
+const FileUpload = ({ onDataLoaded, children, currentMapping }: FileUploadProps) => {
   const { toast } = useToast();
 
   const processColumns = (columns: string[]) => {
@@ -31,6 +32,29 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
       }
       return col;
     });
+  };
+
+  const validateColumnsAgainstMapping = (columns: string[]) => {
+    if (!currentMapping) return true;
+
+    const requiredSourceColumns = new Set(
+      Object.keys(currentMapping).map(key => key.split('_')[0])
+    );
+
+    const missingColumns = Array.from(requiredSourceColumns).filter(
+      col => !columns.includes(col)
+    );
+
+    if (missingColumns.length > 0) {
+      toast({
+        title: "Incompatible file",
+        description: `This file is not compatible with the current configuration. Missing columns: ${missingColumns.join(', ')}`,
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    return true;
   };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -53,11 +77,16 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
           
           if (jsonData.length > 0) {
             const columns = processColumns(Object.keys(jsonData[0]));
-            onDataLoaded(columns, jsonData);
-            toast({
-              title: "File loaded successfully",
-              description: `Found ${columns.length} columns and ${jsonData.length} rows`,
-            });
+            
+            if (validateColumnsAgainstMapping(columns)) {
+              onDataLoaded(columns, jsonData);
+              toast({
+                title: "File loaded successfully",
+                description: `Found ${columns.length} columns and ${jsonData.length} rows`,
+              });
+            } else {
+              window.currentUploadedFile = null;
+            }
           }
         } else if (extension === 'csv') {
           const text = event.target?.result as string;
@@ -65,11 +94,16 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
             header: true,
             complete: (results) => {
               const columns = processColumns(results.meta.fields || []);
-              onDataLoaded(columns, results.data);
-              toast({
-                title: "File loaded successfully",
-                description: `Found ${columns.length} columns and ${results.data.length} rows`,
-              });
+              
+              if (validateColumnsAgainstMapping(columns)) {
+                onDataLoaded(columns, results.data);
+                toast({
+                  title: "File loaded successfully",
+                  description: `Found ${columns.length} columns and ${results.data.length} rows`,
+                });
+              } else {
+                window.currentUploadedFile = null;
+              }
             },
           });
         }
@@ -87,7 +121,7 @@ const FileUpload = ({ onDataLoaded, children }: FileUploadProps) => {
     } else {
       reader.readAsBinaryString(file);
     }
-  }, [onDataLoaded, toast]);
+  }, [onDataLoaded, toast, currentMapping]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,

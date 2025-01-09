@@ -13,15 +13,24 @@ interface HeaderProps {
   activeColumnSet: 'artikelen' | 'klanten';
   onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
   onDataLoaded: (columns: string[], data: any[]) => void;
+  currentMapping?: Record<string, string>;
 }
 
-const Header = ({ activeColumnSet, onColumnSetChange, onDataLoaded }: HeaderProps) => {
+const Header = ({ 
+  activeColumnSet, 
+  onColumnSetChange, 
+  onDataLoaded,
+  currentMapping 
+}: HeaderProps) => {
   const hasFile = !!window.currentUploadedFile;
 
   return (
     <div className="flex items-center justify-between">
       <span>Source file columns</span>
-      <FileUpload onDataLoaded={onDataLoaded}>
+      <FileUpload 
+        onDataLoaded={onDataLoaded}
+        currentMapping={currentMapping}
+      >
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="default" className="ml-2">

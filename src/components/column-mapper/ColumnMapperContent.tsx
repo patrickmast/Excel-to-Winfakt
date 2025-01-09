@@ -124,6 +124,7 @@ const ColumnMapperContent = ({
                   activeColumnSet={activeColumnSet}
                   onColumnSetChange={onColumnSetChange}
                   onDataLoaded={onDataLoaded}
+                  currentMapping={state.mapping}
                 />
               }
               columns={state.sourceColumns}
