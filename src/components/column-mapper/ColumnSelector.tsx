@@ -29,7 +29,7 @@ const ColumnSelector: React.FC<ColumnSelectorProps> = ({
   };
 
   return (
-    <div className="h-[396px] px-4 pb-4">
+    <div className="h-[396px] px-4">
       <ScrollArea className="h-full rounded-md border">
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
