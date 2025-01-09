@@ -48,7 +48,6 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
       setTestResult(null);
       setTestError(null);
 
-      // Use the first row of actual source data for testing
       const row = sourceData.length > 0 ? sourceData[0] : {};
       const value = row[columnName];
       
@@ -70,56 +69,63 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[625px] h-[600px] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="max-w-[625px] h-[90vh] max-h-[700px] flex flex-col p-0">
+        <DialogHeader className="p-6 pb-2">
           <DialogTitle>Settings for {columnName}</DialogTitle>
           <DialogDescription>
             Enter JavaScript code to transform the value. Use 'value' for the current column's value,
             and select a column from the menu to insert it in your code.
           </DialogDescription>
         </DialogHeader>
-        <Tabs 
-          defaultValue="expression" 
-          className="flex-1 flex flex-col overflow-hidden"
-          value={activeTab}
-          onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions' | 'Source columns')}
-        >
-          <TabsList className="h-8 justify-start space-x-8 bg-transparent p-0 pl-1">
-            <TabsTrigger value="expression">Expression</TabsTrigger>
-            <TabsTrigger value="result" className="flex items-center gap-2">
-              Result <PlayIcon className="h-4 w-4 cursor-pointer hover:text-primary" onClick={testExpression} />
-            </TabsTrigger>
-            <TabsTrigger value="functions">Functions</TabsTrigger>
-            <TabsTrigger value="Source columns">Source columns</TabsTrigger>
-          </TabsList>
-          <TabsContent value="expression" className="flex-1 mt-0 overflow-hidden">
-            <ExpressionEditor 
-              value={expressionCode}
-              onChange={setExpressionCode}
-              result={null}
-              error={null}
-            />
-          </TabsContent>
-          <TabsContent value="result" className="flex-1 mt-0 overflow-hidden">
-            <ExpressionEditor 
-              value={expressionCode}
-              onChange={setExpressionCode}
-              result={testResult}
-              error={testError}
-            />
-          </TabsContent>
-          <TabsContent value="functions" className="flex-1 mt-0 overflow-hidden">
-            <HelperFunctions />
-          </TabsContent>
-          <TabsContent value="Source columns" className="flex-1 mt-0 overflow-hidden">
-            <ColumnSelector
-              sourceColumns={sourceColumns}
-              sourceData={sourceData}
-              onColumnSelect={copyToClipboard}
-            />
-          </TabsContent>
-        </Tabs>
-        <div className="flex justify-end space-x-2 mt-4 pt-4 border-t">
+        
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <Tabs 
+            defaultValue="expression" 
+            className="flex-1 flex flex-col"
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions' | 'Source columns')}
+          >
+            <TabsList className="h-10 px-6 justify-start space-x-8 bg-transparent">
+              <TabsTrigger value="expression">Expression</TabsTrigger>
+              <TabsTrigger value="result" className="flex items-center gap-2">
+                Result <PlayIcon className="h-4 w-4 cursor-pointer hover:text-primary" onClick={testExpression} />
+              </TabsTrigger>
+              <TabsTrigger value="functions">Functions</TabsTrigger>
+              <TabsTrigger value="Source columns">Source columns</TabsTrigger>
+            </TabsList>
+            
+            <div className="flex-1 overflow-hidden">
+              <TabsContent value="expression" className="h-full m-0 data-[state=active]:flex">
+                <ExpressionEditor 
+                  value={expressionCode}
+                  onChange={setExpressionCode}
+                  result={null}
+                  error={null}
+                />
+              </TabsContent>
+              <TabsContent value="result" className="h-full m-0 data-[state=active]:flex">
+                <ExpressionEditor 
+                  value={expressionCode}
+                  onChange={setExpressionCode}
+                  result={testResult}
+                  error={testError}
+                />
+              </TabsContent>
+              <TabsContent value="functions" className="h-full m-0 data-[state=active]:flex">
+                <HelperFunctions />
+              </TabsContent>
+              <TabsContent value="Source columns" className="h-full m-0 data-[state=active]:flex">
+                <ColumnSelector
+                  sourceColumns={sourceColumns}
+                  sourceData={sourceData}
+                  onColumnSelect={copyToClipboard}
+                />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
+
+        <div className="flex justify-end space-x-2 p-4 border-t">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
