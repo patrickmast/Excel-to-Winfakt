@@ -123,7 +123,9 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave} variant="default">
+            Save
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
