@@ -12,7 +12,7 @@ const ExpressionEditor: React.FC<ExpressionEditorProps> = ({ value, onChange, re
   const displayValue = (result || error) ? (error || result || '') : value;
   
   return (
-    <div className="h-[396px] px-4">
+    <div className="h-[380px] px-4 mb-4">
       <Textarea
         value={displayValue}
         onChange={(e) => onChange(e.target.value)}
