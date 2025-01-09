@@ -110,6 +110,7 @@ const ConnectedColumns = ({
             setSelectedColumn(null);
           }}
           sourceColumns={sourceColumns}
+          sourceData={sourceData}
         />
       )}
     </div>
