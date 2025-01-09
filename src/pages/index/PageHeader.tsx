@@ -10,7 +10,7 @@ interface PageHeaderProps {
 const PageHeader = ({ onSaveNew, onSave, onInfo, isSaving }: PageHeaderProps) => {
   return (
     <div className="flex justify-between items-center mb-8">
-      <h1 className="text-3xl font-bold text-gray-900">CSV/Excel Converter</h1>
+      <h1 className="text-3xl font-bold text-gray-900">CSV for Winfakt imports</h1>
       <ConfigurationMenu
         onSaveNew={onSaveNew}
         onSave={onSave}
