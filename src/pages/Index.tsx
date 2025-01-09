@@ -17,6 +17,7 @@ import { useConfiguration } from '@/hooks/use-configuration';
 import SavedConfigDialog from '@/components/column-mapper/SavedConfigDialog';
 import InfoDialog from '@/components/column-mapper/InfoDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
+import PageHeader from './index/PageHeader';
 
 const Index = () => {
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
@@ -29,7 +30,6 @@ const Index = () => {
   const [savedConfigUrl, setSavedConfigUrl] = useState('');
   const [searchParams] = useSearchParams();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const loadSavedConfiguration = async () => {
@@ -46,19 +46,6 @@ const Index = () => {
         if (error) throw error;
         if (!config) return;
 
-        // Convert base64 to Blob
-        const byteCharacters = atob(config.source_file);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray]);
-
-        // Create File object
-        const file = new File([blob], config.file_name, { type: 'application/octet-stream' });
-        window.currentUploadedFile = file;
-
         // Set the configuration
         setCurrentConfigId(config.id);
         const settings = config.settings as unknown as ConfigurationSettings;
@@ -68,7 +55,7 @@ const Index = () => {
 
         toast({
           title: "Configuration loaded",
-          description: "The saved configuration has been loaded successfully",
+          description: "The saved configuration has been loaded successfully. Please select your source file.",
         });
       } catch (error) {
         console.error('Error loading configuration:', error);
@@ -87,38 +74,8 @@ const Index = () => {
     setColumnMapping(mapping);
   };
 
-  const handleExport = (mapping: Record<string, string>) => {
-    const mappedData = sourceData.map(row => {
-      const newRow: Record<string, any> = {};
-      Object.entries(mapping).forEach(([source, target]) => {
-        if (source && target) {
-          newRow[target] = row[source];
-        }
-      });
-      return newRow;
-    });
-
-    downloadCSV(mappedData, 'converted.csv');
-    toast({
-      title: "Export successful",
-      description: "Your file has been converted and downloaded",
-    });
-  };
-
   const handleSaveConfiguration = async (isNewConfig: boolean = true) => {
-    const currentFile = window.currentUploadedFile;
-    if (!currentFile) {
-      toast({
-        title: "Error",
-        description: "Please upload a file first",
-        variant: "destructive",
-      });
-      return;
-    }
-
     const result = await saveConfiguration(
-      currentFile,
-      currentFile.name,
       columnMapping,
       {},
       isNewConfig
@@ -139,15 +96,6 @@ const Index = () => {
     }
   };
 
-  const handleInfoClose = () => {
-    setShowInfoDialog(false);
-  };
-
-  const handleInfoClick = () => {
-    setShowInfoDialog(true);
-    setIsMenuOpen(false);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <SavedConfigDialog
@@ -163,42 +111,31 @@ const Index = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">CSV/Excel Converter</h1>
-          <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="default" className="flex items-center gap-2">
-                <Menu className="h-5 w-5" />
-                Menu
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem 
-                onClick={() => handleSaveConfiguration(true)}
-                disabled={isSaving}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                <span>Save as New</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => handleSaveConfiguration(false)}
-                disabled={isSaving}
-              >
-                <Save className="mr-2 h-4 w-4" />
-                <span>Save</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleInfoClick}>
-                <Info className="mr-2 h-4 w-4" />
-                <span>Info</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <PageHeader
+          onSaveNew={() => handleSaveConfiguration(true)}
+          onSave={() => handleSaveConfiguration(false)}
+          onInfo={() => setShowInfoDialog(true)}
+          isSaving={isSaving}
+        />
         
         <ColumnMapper 
           onMappingChange={handleMappingChange}
-          onExport={handleExport}
+          onExport={(mapping) => {
+            const mappedData = sourceData.map(row => {
+              const newRow: Record<string, any> = {};
+              Object.entries(mapping).forEach(([source, target]) => {
+                if (source && target) {
+                  newRow[target] = row[source];
+                }
+              });
+              return newRow;
+            });
+            downloadCSV(mappedData, 'converted.csv');
+            toast({
+              title: "Export successful",
+              description: "Your file has been converted and downloaded",
+            });
+          }}
           onDataLoaded={setSourceData}
           targetColumns={activeColumnSet === 'artikelen' ? ARTIKEL_COLUMNS : KLANTEN_COLUMNS}
           activeColumnSet={activeColumnSet}
