@@ -29,8 +29,8 @@ const ColumnSelector: React.FC<ColumnSelectorProps> = ({
   };
 
   return (
-    <div className="h-[380px] px-4 mb-4">
-      <ScrollArea className="h-full rounded-md border">
+    <div className="h-[360px] px-4 mb-4">
+      <ScrollArea className="h-full w-full rounded-md border">
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
