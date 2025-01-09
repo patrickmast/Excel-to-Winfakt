@@ -71,19 +71,7 @@ const ColumnMapper = ({
   };
 
   const handleSaveConfiguration = async () => {
-    const currentFile = window.currentUploadedFile;
-    if (!currentFile) {
-      toast({
-        title: "Error",
-        description: "Please upload a file first",
-        variant: "destructive",
-      });
-      return;
-    }
-
     const result = await saveConfiguration(
-      currentFile,
-      currentFile.name,
       state.mapping,
       state.columnTransforms
     );
