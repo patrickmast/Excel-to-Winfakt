@@ -33,7 +33,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
   sourceData = [],
 }) => {
   const [expressionCode, setExpressionCode] = useState(initialCode);
-  const [activeTab, setActiveTab] = useState<'expression' | 'result' | 'functions' | 'columns'>('expression');
+  const [activeTab, setActiveTab] = useState<'expression' | 'result' | 'functions' | 'Source columns'>('expression');
   const [testResult, setTestResult] = useState<string | null>(null);
   const [testError, setTestError] = useState<string | null>(null);
 
@@ -82,7 +82,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
           defaultValue="expression" 
           className="flex-1 flex flex-col"
           value={activeTab}
-          onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions' | 'columns')}
+          onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions' | 'Source columns')}
         >
           <TabsList className="h-8 justify-start space-x-8 bg-transparent p-0 pl-1">
             <TabsTrigger value="expression">Expression</TabsTrigger>
@@ -111,7 +111,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
           <TabsContent value="functions" className="flex-1 mt-0">
             <HelperFunctions />
           </TabsContent>
-          <TabsContent value="columns" className="flex-1 mt-0">
+          <TabsContent value="Source columns" className="flex-1 mt-0">
             <div className="p-4">
               <ColumnSelector
                 sourceColumns={sourceColumns}
