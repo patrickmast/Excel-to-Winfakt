@@ -1,14 +1,6 @@
 import React from 'react';
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ColumnSelectorProps {
   sourceColumns: string[];
@@ -28,31 +20,27 @@ const ColumnSelector: React.FC<ColumnSelectorProps> = ({
   );
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          Insert Column
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" side="top" className="max-h-[300px] overflow-y-auto">
-        <DropdownMenuLabel>Available Columns</DropdownMenuLabel>
-        <Input
-          placeholder="Search source columns"
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="mx-1 my-1 w-[calc(100%-8px)]"
-        />
-        <DropdownMenuSeparator />
-        {filteredColumns.map((col) => (
-          <DropdownMenuItem
-            key={col}
-            onSelect={() => onColumnSelect(col)}
-          >
-            {col}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="space-y-4">
+      <Input
+        placeholder="Search source columns"
+        value={searchTerm}
+        onChange={(e) => onSearchChange(e.target.value)}
+        className="w-full"
+      />
+      <ScrollArea className="h-[400px] pr-4">
+        <div className="space-y-2">
+          {filteredColumns.map((col) => (
+            <div
+              key={col}
+              onClick={() => onColumnSelect(col)}
+              className="p-3 rounded-md cursor-pointer transition-colors bg-muted hover:bg-accent"
+            >
+              <span className="text-sm">{col}</span>
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
   );
 };
 
