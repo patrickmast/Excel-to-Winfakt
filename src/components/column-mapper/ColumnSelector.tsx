@@ -1,5 +1,4 @@
 import React from 'react';
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -7,31 +6,26 @@ import { Copy } from "lucide-react";
 
 interface ColumnSelectorProps {
   sourceColumns: string[];
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
+  sourceData: any[];
   onColumnSelect: (columnName: string) => void;
 }
 
 const ColumnSelector: React.FC<ColumnSelectorProps> = ({
   sourceColumns,
-  searchTerm,
-  onSearchChange,
+  sourceData,
   onColumnSelect,
 }) => {
-  const filteredColumns = sourceColumns.filter(col => 
-    col.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const getFirstValue = (columnName: string) => {
+    if (sourceData && sourceData.length > 0) {
+      return String(sourceData[0][columnName] ?? '');
+    }
+    return '';
+  };
 
   return (
     <div className="space-y-4">
-      <Input
-        placeholder="Search source columns"
-        value={searchTerm}
-        onChange={(e) => onSearchChange(e.target.value)}
-        className="w-full"
-      />
       <ScrollArea className="h-[400px]">
-        <Table>
+        <Table className="border">
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]"></TableHead>
@@ -40,7 +34,7 @@ const ColumnSelector: React.FC<ColumnSelectorProps> = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredColumns.map((col) => (
+            {sourceColumns.map((col) => (
               <TableRow key={col}>
                 <TableCell>
                   <Button
@@ -53,7 +47,7 @@ const ColumnSelector: React.FC<ColumnSelectorProps> = ({
                   </Button>
                 </TableCell>
                 <TableCell>{col}</TableCell>
-                <TableCell className="font-mono text-sm">row["{col}"]</TableCell>
+                <TableCell className="font-mono text-sm">{getFirstValue(col)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

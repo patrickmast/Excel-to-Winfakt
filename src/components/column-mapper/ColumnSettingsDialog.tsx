@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlayIcon, ListIcon } from 'lucide-react';
+import { PlayIcon } from 'lucide-react';
 import ExpressionEditor from './ExpressionEditor';
 import HelperFunctions from './HelperFunctions';
 import ColumnSelector from './ColumnSelector';
@@ -20,6 +20,7 @@ interface ColumnSettingsDialogProps {
   onSave: (code: string) => void;
   initialCode?: string;
   sourceColumns: string[];
+  sourceData: any[];
 }
 
 const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
@@ -29,9 +30,9 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
   onSave,
   initialCode = '',
   sourceColumns = [],
+  sourceData = [],
 }) => {
   const [expressionCode, setExpressionCode] = useState(initialCode);
-  const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'expression' | 'result' | 'functions' | 'columns'>('expression');
   const [testResult, setTestResult] = useState<string | null>(null);
   const [testError, setTestError] = useState<string | null>(null);
@@ -73,9 +74,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
 
   const copyToClipboard = (columnName: string) => {
     const text = `row["${columnName}"]`;
-    navigator.clipboard.writeText(text).then(() => {
-      setSearchTerm('');
-    }).catch((err) => {
+    navigator.clipboard.writeText(text).catch((err) => {
       console.error('Failed to copy text: ', err);
     });
   };
@@ -102,9 +101,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
               Result <PlayIcon className="h-4 w-4 cursor-pointer hover:text-primary" onClick={testExpression} />
             </TabsTrigger>
             <TabsTrigger value="functions">Functions</TabsTrigger>
-            <TabsTrigger value="columns" className="flex items-center gap-2">
-              Columns <ListIcon className="h-4 w-4" />
-            </TabsTrigger>
+            <TabsTrigger value="columns">Source columns</TabsTrigger>
           </TabsList>
           <TabsContent value="expression" className="flex-1 mt-0">
             <ExpressionEditor 
@@ -129,8 +126,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
             <div className="p-4">
               <ColumnSelector
                 sourceColumns={sourceColumns}
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
+                sourceData={sourceData}
                 onColumnSelect={copyToClipboard}
               />
             </div>
