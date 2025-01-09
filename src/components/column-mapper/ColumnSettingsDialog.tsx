@@ -80,7 +80,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
         </DialogHeader>
         <Tabs 
           defaultValue="expression" 
-          className="flex-1 flex flex-col"
+          className="flex-1 flex flex-col overflow-hidden"
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions' | 'Source columns')}
         >
@@ -92,7 +92,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
             <TabsTrigger value="functions">Functions</TabsTrigger>
             <TabsTrigger value="Source columns">Source columns</TabsTrigger>
           </TabsList>
-          <TabsContent value="expression" className="flex-1 mt-0">
+          <TabsContent value="expression" className="flex-1 mt-0 overflow-hidden">
             <ExpressionEditor 
               value={expressionCode}
               onChange={setExpressionCode}
@@ -100,7 +100,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
               error={null}
             />
           </TabsContent>
-          <TabsContent value="result" className="flex-1 mt-0">
+          <TabsContent value="result" className="flex-1 mt-0 overflow-hidden">
             <ExpressionEditor 
               value={expressionCode}
               onChange={setExpressionCode}
@@ -108,20 +108,18 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
               error={testError}
             />
           </TabsContent>
-          <TabsContent value="functions" className="flex-1 mt-0">
+          <TabsContent value="functions" className="flex-1 mt-0 overflow-hidden">
             <HelperFunctions />
           </TabsContent>
-          <TabsContent value="Source columns" className="flex-1 mt-0">
-            <div className="p-4">
-              <ColumnSelector
-                sourceColumns={sourceColumns}
-                sourceData={sourceData}
-                onColumnSelect={copyToClipboard}
-              />
-            </div>
+          <TabsContent value="Source columns" className="flex-1 mt-0 overflow-hidden">
+            <ColumnSelector
+              sourceColumns={sourceColumns}
+              sourceData={sourceData}
+              onColumnSelect={copyToClipboard}
+            />
           </TabsContent>
         </Tabs>
-        <div className="flex justify-end space-x-2 mt-2">
+        <div className="flex justify-end space-x-2 mt-4 pt-4 border-t">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
