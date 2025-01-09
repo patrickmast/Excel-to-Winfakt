@@ -6,7 +6,7 @@ import FunctionRow from './helper-functions/FunctionRow';
 
 const HelperFunctions: React.FC = () => {
   return (
-    <div className="h-[396px] p-4">
+    <div className="h-[396px] px-4 pb-4">
       <ScrollArea className="h-full rounded-md border">
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
