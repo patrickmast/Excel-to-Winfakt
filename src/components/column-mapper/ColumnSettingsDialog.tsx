@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlayIcon } from 'lucide-react';
+import { PlayIcon, ListIcon } from 'lucide-react';
 import ExpressionEditor from './ExpressionEditor';
 import HelperFunctions from './HelperFunctions';
 import ColumnSelector from './ColumnSelector';
@@ -32,7 +32,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
 }) => {
   const [expressionCode, setExpressionCode] = useState(initialCode);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'expression' | 'result' | 'functions'>('expression');
+  const [activeTab, setActiveTab] = useState<'expression' | 'result' | 'functions' | 'columns'>('expression');
   const [testResult, setTestResult] = useState<string | null>(null);
   const [testError, setTestError] = useState<string | null>(null);
 
@@ -42,7 +42,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
   };
 
   const testExpression = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent tab change when clicking the icon
+    e.stopPropagation();
     try {
       setTestResult(null);
       setTestError(null);
@@ -61,7 +61,6 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
       });
 
       const value = row[columnName] || 'Sample Value';
-      // eslint-disable-next-line no-new-func
       const result = new Function('row', 'value', `return ${expressionCode}`)(row, value);
       
       setTestResult(String(result));
@@ -95,7 +94,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
           defaultValue="expression" 
           className="flex-1 flex flex-col"
           value={activeTab}
-          onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions')}
+          onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions' | 'columns')}
         >
           <TabsList className="h-8 justify-start space-x-8 bg-transparent p-0 pl-1">
             <TabsTrigger value="expression">Expression</TabsTrigger>
@@ -103,6 +102,9 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
               Result <PlayIcon className="h-4 w-4 cursor-pointer hover:text-primary" onClick={testExpression} />
             </TabsTrigger>
             <TabsTrigger value="functions">Functions</TabsTrigger>
+            <TabsTrigger value="columns" className="flex items-center gap-2">
+              Columns <ListIcon className="h-4 w-4" />
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="expression" className="flex-1 mt-0">
             <ExpressionEditor 
@@ -123,22 +125,22 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
           <TabsContent value="functions" className="flex-1 mt-0">
             <HelperFunctions />
           </TabsContent>
+          <TabsContent value="columns" className="flex-1 mt-0">
+            <div className="p-4">
+              <ColumnSelector
+                sourceColumns={sourceColumns}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                onColumnSelect={copyToClipboard}
+              />
+            </div>
+          </TabsContent>
         </Tabs>
-        <div className="flex justify-between space-x-2 mt-2">
-          <div className="flex space-x-2">
-            <ColumnSelector
-              sourceColumns={sourceColumns}
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              onColumnSelect={copyToClipboard}
-            />
-          </div>
-          <div className="flex space-x-2">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>Save</Button>
-          </div>
+        <div className="flex justify-end space-x-2 mt-2">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave}>Save</Button>
         </div>
       </DialogContent>
     </Dialog>
