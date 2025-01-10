@@ -8,9 +8,12 @@ const Footer = () => {
     });
   };
 
-  const getBase36Timestamp = () => {
-    return '1.' + Math.floor(Date.now() / 1000).toString(36).slice(-5).toLowerCase();
-  };
+const getBase36Timestamp = () => {
+    const base36 = Math.floor(Date.now() / 1000).toString(36).slice(-5).toLowerCase();
+    const prefix = base36.slice(0, 2);
+    const suffix = base36.slice(2);
+    return `1.${prefix}.${suffix}`;
+};
 
   return (
     <footer className="mt-8 py-4 border-t border-gray-200">
