@@ -18,6 +18,7 @@ import SavedConfigDialog from '@/components/column-mapper/SavedConfigDialog';
 import InfoDialog from '@/components/column-mapper/InfoDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
 import PageHeader from './index/PageHeader';
+import Footer from '@/components/Footer';
 
 const Index = () => {
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
@@ -97,7 +98,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <SavedConfigDialog
         open={showSavedDialog}
         onOpenChange={setShowSavedDialog}
@@ -110,7 +111,7 @@ const Index = () => {
         configId={currentConfigId}
       />
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 flex-grow">
         <PageHeader
           onSaveNew={() => handleSaveConfiguration(true)}
           onSave={() => handleSaveConfiguration(false)}
@@ -142,6 +143,7 @@ const Index = () => {
           onColumnSetChange={setActiveColumnSet}
         />
       </div>
+      <Footer />
     </div>
   );
 };
