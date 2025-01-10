@@ -12,7 +12,7 @@ const Footer = () => {
     <footer className="mt-8 py-4 border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center text-xs text-gray-400">
-          <span>Version 1.0.1</span>
+          <span>Version 1.0.2</span>
           <span>Deployed at {formatDate()}</span>
         </div>
       </div>
