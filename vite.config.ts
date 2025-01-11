@@ -23,7 +23,6 @@ export default defineConfig(({ mode }) => ({
     target: 'esnext',
   },
   esbuild: {
-    logOverride: { 'this-is-undefined-in-esm': 'silent' },
-    tsconfigRaw: '{ "compilerOptions": { "declaration": false } }'
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
   }
 }));
