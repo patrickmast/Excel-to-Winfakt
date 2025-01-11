@@ -1,12 +1,8 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
-
-const config = defineConfig({
-  plugins: [react()],
+export default {
+  plugins: [
+    require('@vitejs/plugin-react-swc')()
+  ],
   build: {
-    outDir: 'dist',
-    target: 'esnext'
+    outDir: 'dist'
   }
-});
-
-export default config;
+}
