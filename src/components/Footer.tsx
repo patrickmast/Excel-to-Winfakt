@@ -17,13 +17,16 @@ const Footer = () => {
 
   const getVersionNumber = () => {
     // Reference date adjusted to achieve desired version number range
-    const REFERENCE_TIMESTAMP = 33704063600; // This gives us the same output as before
+    const REFERENCE_TIMESTAMP = 1704063600; // Jan 1, 2025 00:00:00 UTC
 
     // Convert deployment timestamp to seconds and get difference
     const secondsSinceReference = Math.floor(Number(DEPLOYMENT_TIMESTAMP) / 1000) - REFERENCE_TIMESTAMP;
 
+    // Add offset to get the desired version number range
+    const versionNumber = secondsSinceReference + 32000000;
+
     // Format with dots as thousand separators
-    return secondsSinceReference.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1.');
+    return versionNumber.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1.');
   };
 
   const formatDate = () => {
