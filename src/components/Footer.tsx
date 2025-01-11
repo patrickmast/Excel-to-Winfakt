@@ -8,16 +8,18 @@ const Footer = () => {
     });
   };
 
-const getBase36Timestamp = () => {
-    const timestamp = Math.floor(Date.now() / 1000).toString();
-    return timestamp.replace(/(\d)(?=(\d{3})+$)/g, '$1.');
+
+const getVersionNumber = () => {
+  const referenceTimestamp = 1735553600 - 1000000; // Dec 30, 2024 10:13:20 UTC
+  const seconds = Math.floor((Date.now() / 1000) - referenceTimestamp);
+  return seconds.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1.');
 };
 
   return (
     <footer className="mt-8 py-4 border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center text-xs text-gray-400">
-          <span>Version {getBase36Timestamp()}</span>
+          <span>Version {getVersionNumber()}</span>
           <span>Deployed at {formatDate()}</span>
         </div>
       </div>
