@@ -21,5 +21,14 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     chunkSizeWarningLimit: 1000,
     target: 'esnext',
-  }
+  },
+  esbuild: {
+    // This will prevent TypeScript from trying to generate declaration files
+    // during development, which is causing the TS6305 errors
+    tsconfigRaw: {
+      compilerOptions: {
+        declaration: false,
+      },
+    },
+  },
 }));
