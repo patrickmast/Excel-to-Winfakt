@@ -53,27 +53,37 @@ npm run dev
 ## What technologies are used for this project?
 
 This project is built with:
-
 - Vite
 - TypeScript
 - React
 - shadcn-ui
 - Tailwind CSS
 
-## Build Configuration
+
+## Deploy to Cloudflare
 
 When deploying to Cloudflare Workers, the Vite configuration requires the build target to be set to `esnext`:
 
 The key change to get the deployment working in Cloudflare was adding target: 'esnext' to the build configuration, which ensures Vite builds for modern JavaScript environments like Cloudflare Workers.
 
-For reference, here's what we changed:
-
-vite.config.ts
-
-Apply
-
-// ... existing code ... build: { outDir: 'dist', chunkSizeWarningLimit: 1000, target: 'esnext',  // Added this line to target modern JS environments }, // ... existing code ...
+For reference, here's what we changed in vite.config.ts
+```typescript
+// ... existing code ...
+  build: {
+    outDir: 'dist',
+    chunkSizeWarningLimit: 1000,
+    target: 'esnext',  // Added this line to target modern JS environments
+  },
+// ... existing code ...
+```
 
 This setting tells Vite to generate modern JavaScript code without transpiling to older versions, which is ideal for environments like Cloudflare Workers that support the latest JavaScript features.
 
-vite.config.ts
+- Build command: `npm ci && npm run build`
+- Build output: `dist`
+- Root directory:
+- Build comments: `Enabled`
+
+Envoirement variables:
+- CI: `true`
+- NODE_VERSION: `18`
