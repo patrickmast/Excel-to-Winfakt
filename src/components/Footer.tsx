@@ -9,10 +9,8 @@ const Footer = () => {
   };
 
 const getBase36Timestamp = () => {
-    const base36 = Math.floor(Date.now() / 1000).toString(36).slice(-5).toLowerCase();
-    const prefix = base36.slice(0, 2);
-    const suffix = base36.slice(2);
-    return `1.${prefix}.${suffix}`;
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    return timestamp.replace(/(\d)(?=(\d{3})+$)/g, '$1.');
 };
 
   return (
