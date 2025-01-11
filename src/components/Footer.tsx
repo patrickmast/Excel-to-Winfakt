@@ -19,7 +19,7 @@ const Footer = () => {
     const referenceTimestamp = 1704063600; // 2025-01-01T00:00:00.000Z
     const seconds = Math.floor((Number(DEPLOYMENT_TIMESTAMP) / 1000) - referenceTimestamp);
     console.log('Calculating version with timestamp:', DEPLOYMENT_TIMESTAMP);
-    return (1000000 + seconds).toString().replace(/(\d)(?=(\d{3})+$)/g, '$1.');
+    return (1000000 + seconds - 32000000).toString().replace(/(\d)(?=(\d{3})+$)/g, '$1.');
   };
 
   const formatDate = () => {
