@@ -24,5 +24,6 @@ export default defineConfig(({ mode }) => ({
   },
   esbuild: {
     logOverride: { 'this-is-undefined-in-esm': 'silent' }
-  }
+  },
+  envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
 }));

@@ -1,11 +1,11 @@
 {
   "name": "vite_react_shadcn_ts",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "generate-build-info": "ts-node scripts/generate-build-info.ts",
+    "generate-build-info": "node scripts/generate-build-info.mjs",
     "build": "npm run generate-build-info && vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview"

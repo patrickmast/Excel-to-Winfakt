@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 // These would be set during build time through environment variables
-const DEPLOYMENT_TIMESTAMP = import.meta.env.VITE_DEPLOYMENT_TIMESTAMP || Date.now();
-const VERSION_NUMBER = import.meta.env.VITE_VERSION_NUMBER || '0';
+const DEPLOYMENT_TIMESTAMP = import.meta.env.VITE_DEPLOYMENT_TIMESTAMP || 1704063600000; // fallback to Jan 1, 2025
+console.log('Deployment timestamp:', DEPLOYMENT_TIMESTAMP);
 
 const Footer = () => {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -14,6 +14,13 @@ const Footer = () => {
     }
     return () => timeoutId && clearTimeout(timeoutId);
   }, [showTooltip]);
+
+  const getVersionNumber = () => {
+    const referenceTimestamp = 1704063600; // 2025-01-01T00:00:00.000Z
+    const seconds = Math.floor((Number(DEPLOYMENT_TIMESTAMP) / 1000) - referenceTimestamp);
+    console.log('Calculating version with timestamp:', DEPLOYMENT_TIMESTAMP);
+    return (1000000 + seconds).toString().replace(/(\d)(?=(\d{3})+$)/g, '$1.');
+  };
 
   const formatDate = () => {
     const date = new Date(Number(DEPLOYMENT_TIMESTAMP));
@@ -42,7 +49,7 @@ const Footer = () => {
               className="cursor-pointer"
               onClick={() => setShowTooltip(!showTooltip)}
             >
-              Version {VERSION_NUMBER}
+              Version {getVersionNumber()}
             </span>
             {showTooltip && (
               <span className="absolute bottom-full left-0 mb-2 px-2 py-1 bg-gray-800 text-white rounded shadow-lg whitespace-nowrap">
