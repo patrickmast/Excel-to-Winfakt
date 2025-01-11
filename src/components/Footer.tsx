@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 // These would be set during build time through environment variables
-const DEPLOYMENT_TIMESTAMP = process.env.NEXT_PUBLIC_DEPLOYMENT_TIMESTAMP || Date.now();
-const VERSION_NUMBER = process.env.NEXT_PUBLIC_VERSION_NUMBER || '0';
+const DEPLOYMENT_TIMESTAMP = import.meta.env.VITE_DEPLOYMENT_TIMESTAMP || Date.now();
+const VERSION_NUMBER = import.meta.env.VITE_VERSION_NUMBER || '0';
 
 const Footer = () => {
   const [showTooltip, setShowTooltip] = useState(false);
