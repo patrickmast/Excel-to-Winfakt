@@ -19,7 +19,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center text-xs text-gray-300">
           <span
-            className="group relative cursor-help"
+            className="group relative cursor-pointer"
             title={`Deployed at ${formatDate()}`}
           >
             Version {getVersionNumber()}
