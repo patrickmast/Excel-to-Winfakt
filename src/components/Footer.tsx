@@ -42,7 +42,7 @@ const Footer = () => {
       return { dateStr: "Deployment date unknown", timeStr: "" };
     }
 
-    const dateStr = date.toLocaleString('en-GB', {
+    const formattedDate = date.toLocaleString('en-GB', {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
@@ -55,7 +55,7 @@ const Footer = () => {
       timeZone: 'Europe/Brussels',
       hour12: false,
     });
-    return { dateStr, timeStr };
+    return { dateStr: `Deployed on ${formattedDate}`, timeStr };
   };
 
   return (
