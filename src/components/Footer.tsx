@@ -23,7 +23,7 @@ const Footer = () => {
     const secondsSinceReference = Math.floor(Number(DEPLOYMENT_TIMESTAMP) / 1000) - REFERENCE_TIMESTAMP;
 
     // Add offset to get the desired version number range
-    const versionNumber = secondsSinceReference - 31000000;
+    const versionNumber = secondsSinceReference - 31560000;
 
     // Format with dots as thousand separators
     return versionNumber.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1.');
