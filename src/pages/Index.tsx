@@ -18,7 +18,6 @@ import SavedConfigDialog from '@/components/column-mapper/SavedConfigDialog';
 import InfoDialog from '@/components/column-mapper/InfoDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
 import PageHeader from './index/PageHeader';
-import Footer from '@/components/Footer';
 
 const Index = () => {
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
@@ -104,8 +103,8 @@ const Index = () => {
         onOpenChange={setShowSavedDialog}
         configUrl={savedConfigUrl}
       />
-      
-      <InfoDialog 
+
+      <InfoDialog
         open={showInfoDialog}
         onOpenChange={setShowInfoDialog}
         configId={currentConfigId}
@@ -118,8 +117,8 @@ const Index = () => {
           onInfo={() => setShowInfoDialog(true)}
           isSaving={isSaving}
         />
-        
-        <ColumnMapper 
+
+        <ColumnMapper
           onMappingChange={handleMappingChange}
           onExport={(mapping) => {
             const mappedData = sourceData.map(row => {
@@ -143,7 +142,6 @@ const Index = () => {
           onColumnSetChange={setActiveColumnSet}
         />
       </div>
-      <Footer />
     </div>
   );
 };
@@ -156,7 +154,7 @@ const ARTIKEL_COLUMNS = [
   "Netto verkoopprijs 8", "Netto verkoopprijs 9", "Netto verkoopprijs 10", "Netto aankoopprijs",
   "Catalogusprijs", "Artikelnummer fabrikant", "Artikelnummer leverancier", "Leveranciersnummer",
   "merk", "Recupel", "Auvibel", "Bebat", "Reprobel", "Leeggoed", "Accijnzen", "Ecoboni",
-  "Barcode", "Rekeningnummer", 
+  "Barcode", "Rekeningnummer",
   ...Array.from({length: 20}, (_, i) => `Numeriek extra veld ${i + 1}`),
   ...Array.from({length: 20}, (_, i) => `Alfanumeriek extra veld ${i + 1}`),
   ...Array.from({length: 20}, (_, i) => `Logisch extra veld ${i + 1}`),

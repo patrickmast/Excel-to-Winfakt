@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MappingState } from './types';
+import VersionDisplay from '../VersionDisplay';
 
 interface ColumnMapperContentProps {
   state: MappingState;
@@ -93,11 +94,11 @@ const ColumnMapperContent = ({
   const mappedTargetColumns = new Set(Object.values(state.mapping));
 
   return (
-    <div className="space-y-8">
-      <div className="bg-white rounded-lg border border-gray-200 py-4 px-6">
+    <div>
+      <div className="bg-white rounded-lg border border-gray-200 py-4 px-6 mb-8">
         <div className="flex justify-between items-center mb-4">
-          <ConnectedColumns 
-            connectedColumns={connectedColumns} 
+          <ConnectedColumns
+            connectedColumns={connectedColumns}
             onDisconnect={handleDisconnect}
             onExport={onExport}
             onUpdateTransform={(uniqueKey, code) => {
@@ -114,13 +115,13 @@ const ColumnMapperContent = ({
           />
         </div>
       </div>
-      
-      <Card>
-        <CardContent className="p-6">
+
+      <Card className="mb-0">
+        <CardContent className="p-6 pb-4">
           <div className="grid grid-cols-2 gap-8">
             <ColumnList
               title={
-                <Header 
+                <Header
                   activeColumnSet={activeColumnSet}
                   onColumnSetChange={onColumnSetChange}
                   onDataLoaded={onDataLoaded}
@@ -163,6 +164,10 @@ const ColumnMapperContent = ({
           </div>
         </CardContent>
       </Card>
+
+      <div className="text-xs text-gray-300 ml-[0.4rem] mt-[0.2rem]">
+        <VersionDisplay />
+      </div>
     </div>
   );
 };
