@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export default defineConfig(() => ({
+const config = defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist'
@@ -15,4 +15,6 @@ export default defineConfig(() => ({
       '@': path.resolve(__dirname, './src')
     }
   }
-}));
+});
+
+export default config;
