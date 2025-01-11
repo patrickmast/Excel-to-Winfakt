@@ -10,7 +10,7 @@ const Footer = () => {
 
 
 const getVersionNumber = () => {
-  const referenceTimestamp = 1735553600 - 1000000; // Dec 30, 2024 10:13:20 UTC
+  const referenceTimestamp = 1735553600; // 2024-12-30T10:13:20.000Z
   const seconds = Math.floor((Date.now() / 1000) - referenceTimestamp);
   return seconds.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1.');
 };
