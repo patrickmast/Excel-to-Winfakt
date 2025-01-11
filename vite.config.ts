@@ -23,12 +23,7 @@ export default defineConfig(({ mode }) => ({
     target: 'esnext',
   },
   esbuild: {
-    // This will prevent TypeScript from trying to generate declaration files
-    // during development, which is causing the TS6305 errors
-    tsconfigRaw: {
-      compilerOptions: {
-        declaration: false,
-      },
-    },
-  },
+    logOverride: { 'this-is-undefined-in-esm': 'silent' },
+    tsconfigRaw: '{ "compilerOptions": { "declaration": false } }'
+  }
 }));
