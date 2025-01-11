@@ -1,8 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const config = {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export default defineConfig(() => ({
   plugins: [react()],
   build: {
     outDir: 'dist'
@@ -12,6 +15,4 @@ const config = {
       '@': path.resolve(__dirname, './src')
     }
   }
-}
-
-export default defineConfig(config)
+}));
