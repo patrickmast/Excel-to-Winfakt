@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "build:dev": "vite build --mode development"
+    "generate-build-info": "ts-node scripts/generate-build-info.ts",
+    "build": "npm run generate-build-info && vite build",
+    "build:dev": "vite build --mode development",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -84,11 +84,12 @@
     "lovable-tagger": "^1.0.19",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.11",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"
   },
   "build": {
-    "command": "npm install && npm run build"
+    "command": "npm run generate-build-info && npm run build"
   }
 }
