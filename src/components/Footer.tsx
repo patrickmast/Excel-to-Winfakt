@@ -25,12 +25,23 @@ const Footer = () => {
     // Add offset to get the desired version number range
     const versionNumber = secondsSinceReference - 31560000;
 
+    // Return "unknown" if version number is negative
+    if (versionNumber < 0) {
+      return "unknown";
+    }
+
     // Format with dots as thousand separators
     return versionNumber.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1.');
   };
 
   const formatDate = () => {
     const date = new Date(Number(DEPLOYMENT_TIMESTAMP));
+
+    // Check if date is January 1, 2024 at 00:00
+    if (date.getTime() === 1704063600000) {
+      return { dateStr: "Deployment date unknown", timeStr: "" };
+    }
+
     const dateStr = date.toLocaleString('en-GB', {
       weekday: 'long',
       day: 'numeric',
@@ -60,7 +71,7 @@ const Footer = () => {
             </span>
             {showTooltip && (
               <span className="absolute bottom-full left-0 mb-2 px-2 py-1 bg-gray-800 text-white rounded shadow-lg whitespace-nowrap">
-                Deployed on {formatDate().dateStr} at {formatDate().timeStr}
+                {formatDate().dateStr}{formatDate().timeStr ? ` at ${formatDate().timeStr}` : ''}
               </span>
             )}
           </span>
