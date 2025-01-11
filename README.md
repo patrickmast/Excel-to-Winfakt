@@ -36,11 +36,11 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
-
 - Navigate to the desired file(s).
 - Click the "Edit" button (pencil icon) at the top right of the file view.
 - Make your changes and commit the changes.
+
+
 
 **Use GitHub Codespaces**
 
@@ -52,7 +52,7 @@ npm run dev
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with:
 
 - Vite
 - TypeScript
@@ -60,10 +60,20 @@ This project is built with .
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+## Build Configuration
 
-Simply open [Lovable](https://lovable.dev/projects/5985f879-1a41-4e6f-96b6-fc5132d262ec) and click on Share -> Publish.
+When deploying to Cloudflare Workers, the Vite configuration requires the build target to be set to `esnext`:
 
-## I want to use a custom domain - is that possible?
+The key change to get the deployment working in Cloudflare was adding target: 'esnext' to the build configuration, which ensures Vite builds for modern JavaScript environments like Cloudflare Workers.
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+For reference, here's what we changed:
+
+vite.config.ts
+
+Apply
+
+// ... existing code ... build: { outDir: 'dist', chunkSizeWarningLimit: 1000, target: 'esnext',  // Added this line to target modern JS environments }, // ... existing code ...
+
+This setting tells Vite to generate modern JavaScript code without transpiling to older versions, which is ideal for environments like Cloudflare Workers that support the latest JavaScript features.
+
+vite.config.ts
