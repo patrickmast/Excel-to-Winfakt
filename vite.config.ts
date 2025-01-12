@@ -21,15 +21,9 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     chunkSizeWarningLimit: 1000,
     target: 'esnext',
-    sourcemap: true,
   },
   esbuild: {
     logOverride: { 'this-is-undefined-in-esm': 'silent' }
   },
   envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
-  optimizeDeps: {
-    esbuildOptions: {
-      target: 'esnext'
-    }
-  }
 }));

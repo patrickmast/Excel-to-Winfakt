@@ -1,12 +1,16 @@
-import React from 'react';
-import { Card } from '@/components/ui/card';
-import FileUpload from '../FileUpload';
-import ColumnList from './ColumnList';
+import { Card, CardContent } from '../ui/card';
 import ConnectedColumns from './ConnectedColumns';
-import ColumnSelector from './ColumnSelector';
+import ColumnList from './ColumnList';
+import Header from './Header';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { MappingState } from './types';
-import { Button } from '@/components/ui/button';
-import { Save, Upload } from 'lucide-react';
+import VersionDisplay from '../VersionDisplay';
 
 interface ColumnMapperContentProps {
   state: MappingState;
@@ -18,106 +22,152 @@ interface ColumnMapperContentProps {
   onExport: () => void;
 }
 
-const ColumnMapperContent: React.FC<ColumnMapperContentProps> = ({
+const ColumnMapperContent = ({
   state,
   updateState,
   targetColumns,
   activeColumnSet,
   onColumnSetChange,
   onDataLoaded,
-  onExport,
-}) => {
-  const handleFileData = (columns: string[], data: any[]) => {
-    onDataLoaded(columns, data);
+  onExport
+}: ColumnMapperContentProps) => {
+  const handleSourceColumnClick = (column: string) => {
+    if (state.selectedSourceColumn === column) {
+      updateState({ selectedSourceColumn: null });
+    } else {
+      updateState({ selectedSourceColumn: column });
+      if (state.selectedTargetColumn) {
+        const uniqueKey = `${column}_${state.connectionCounter}`;
+        updateState({
+          mapping: {
+            ...state.mapping,
+            [uniqueKey]: state.selectedTargetColumn
+          },
+          connectionCounter: state.connectionCounter + 1,
+          selectedSourceColumn: null,
+          selectedTargetColumn: null,
+          sourceSearch: '',
+          targetSearch: ''
+        });
+      }
+    }
   };
 
-  const isColumnMapped = (column: string) => {
-    return Object.entries(state.mapping).some(([key, value]) => 
-      key.split('_')[0] === column || value === column
-    );
+  const handleTargetColumnClick = (targetColumn: string) => {
+    if (state.selectedTargetColumn === targetColumn) {
+      updateState({ selectedTargetColumn: null });
+    } else {
+      updateState({ selectedTargetColumn: targetColumn });
+      if (state.selectedSourceColumn) {
+        const uniqueKey = `${state.selectedSourceColumn}_${state.connectionCounter}`;
+        updateState({
+          mapping: {
+            ...state.mapping,
+            [uniqueKey]: targetColumn
+          },
+          connectionCounter: state.connectionCounter + 1,
+          selectedSourceColumn: null,
+          selectedTargetColumn: null,
+          sourceSearch: '',
+          targetSearch: ''
+        });
+      }
+    }
   };
+
+  const handleDisconnect = (sourceColumn: string) => {
+    const newMapping = { ...state.mapping };
+    const newTransforms = { ...state.columnTransforms };
+    delete newMapping[sourceColumn];
+    delete newTransforms[sourceColumn];
+    updateState({
+      mapping: newMapping,
+      columnTransforms: newTransforms
+    });
+  };
+
+  const connectedColumns = Object.entries(state.mapping).map(([key, target]) => {
+    const sourceColumn = key.split('_')[0];
+    return [key, sourceColumn, target] as [string, string, string];
+  }).filter(([_, __, target]) => target !== '');
+
+  const mappedTargetColumns = new Set(Object.values(state.mapping));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Card className="p-4">
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Source Columns</h3>
-          <FileUpload onDataLoaded={handleFileData} currentMapping={state.mapping}>
-            <Button className="w-full">
-              <Upload className="mr-2 h-4 w-4" />
-              Upload File
-            </Button>
-          </FileUpload>
-          {state.sourceColumns.length > 0 && (
+    <div>
+      <div className="bg-white rounded-lg border border-gray-200 py-4 px-6 mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <ConnectedColumns
+            connectedColumns={connectedColumns}
+            onDisconnect={handleDisconnect}
+            onExport={onExport}
+            onUpdateTransform={(uniqueKey, code) => {
+              updateState({
+                columnTransforms: {
+                  ...state.columnTransforms,
+                  [uniqueKey]: code
+                }
+              });
+            }}
+            columnTransforms={state.columnTransforms}
+            sourceColumns={state.sourceColumns}
+            sourceData={state.sourceData}
+          />
+        </div>
+      </div>
+
+      <Card className="mb-0">
+        <CardContent className="p-6 pb-4">
+          <div className="grid grid-cols-2 gap-8">
             <ColumnList
-              title="Source file columns"
+              title={
+                <Header
+                  activeColumnSet={activeColumnSet}
+                  onColumnSetChange={onColumnSetChange}
+                  onDataLoaded={onDataLoaded}
+                  currentMapping={state.mapping}
+                />
+              }
               columns={state.sourceColumns}
               searchValue={state.sourceSearch}
               onSearchChange={(value) => updateState({ sourceSearch: value })}
               selectedColumn={state.selectedSourceColumn}
-              onColumnClick={(column) => updateState({ selectedSourceColumn: column })}
-              isColumnMapped={isColumnMapped}
+              onColumnClick={handleSourceColumnClick}
+              isColumnMapped={(column) => false}
               searchPlaceholder="Search source columns..."
+              columnTransforms={state.columnTransforms}
+              sourceData={state.sourceData}
             />
-          )}
-        </div>
-      </Card>
-
-      <Card className="p-4">
-        <ConnectedColumns
-          connectedColumns={Object.entries(state.mapping).map(([key, value]) => [
-            key,
-            key.split('_')[0],
-            value
-          ])}
-          onDisconnect={(uniqueKey) => {
-            const newMapping = { ...state.mapping };
-            delete newMapping[uniqueKey];
-            updateState({ mapping: newMapping });
-          }}
-          onUpdateTransform={(uniqueKey, code) => {
-            updateState({
-              columnTransforms: {
-                ...state.columnTransforms,
-                [uniqueKey]: code
+            <ColumnList
+              title={
+                <div className="flex items-center justify-between">
+                  <span>Winfakt columns</span>
+                  <Select value={activeColumnSet} onValueChange={onColumnSetChange}>
+                    <SelectTrigger className="w-[140px] ml-2 h-10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="artikelen">Artikelen</SelectItem>
+                      <SelectItem value="klanten">Klanten</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               }
-            });
-          }}
-          columnTransforms={state.columnTransforms}
-          sourceColumns={state.sourceColumns}
-          sourceData={state.sourceData}
-        />
+              columns={targetColumns}
+              searchValue={state.targetSearch}
+              onSearchChange={(value) => updateState({ targetSearch: value })}
+              selectedColumn={state.selectedTargetColumn}
+              onColumnClick={handleTargetColumnClick}
+              isColumnMapped={(column) => mappedTargetColumns.has(column)}
+              searchPlaceholder="Search Winfakt columns..."
+            />
+          </div>
+        </CardContent>
       </Card>
 
-      <Card className="p-4">
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Target Columns</h3>
-          <ColumnSelector
-            sourceColumns={state.sourceColumns}
-            sourceData={state.sourceData}
-            onColumnSelect={(column) => updateState({ selectedTargetColumn: column })}
-          />
-          <ColumnList
-            title="Target columns"
-            columns={targetColumns}
-            searchValue={state.targetSearch}
-            onSearchChange={(value) => updateState({ targetSearch: value })}
-            selectedColumn={state.selectedTargetColumn}
-            onColumnClick={(column) => updateState({ selectedTargetColumn: column })}
-            isColumnMapped={isColumnMapped}
-            searchPlaceholder="Search target columns..."
-          />
-          {state.sourceColumns.length > 0 && (
-            <Button 
-              className="w-full"
-              onClick={onExport}
-            >
-              <Save className="mr-2 h-4 w-4" />
-              Export
-            </Button>
-          )}
-        </div>
-      </Card>
+      <div className="text-xs text-gray-300 ml-[0.4rem] mt-[0.2rem]">
+        <VersionDisplay />
+      </div>
     </div>
   );
 };
