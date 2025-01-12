@@ -11,7 +11,7 @@ const PageHeader = ({ onSaveNew, onSave, onInfo, isSaving }: PageHeaderProps) =>
   return (
     <div className="flex items-center mb-8">
       <div className="w-32"> {/* Spacer to balance the menu width */}</div>
-      <h1 className="flex-1 text-3xl font-bold text-gray-900 text-center">CSV for Winfakt imports</h1>
+      <h1 className="flex-1 text-3xl font-bold text-gray-900 text-center sm:text-2xl md:text-3xl lg:text-4xl">CSV for Winfakt imports</h1>
       <div className="w-32 flex justify-end"> {/* Added flex justify-end */}
         <ConfigurationMenu
           onSaveNew={onSaveNew}

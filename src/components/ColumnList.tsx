@@ -44,7 +44,7 @@ const ColumnList = ({
           <div
             key={column}
             onClick={() => onColumnClick(column)}
-            className={`p-3 rounded-md cursor-pointer transition-colors ${
+            className={`p-3 rounded-md cursor-pointer transition-colors hover:bg-gray-100 ${
               selectedColumn === column
                 ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
                 : 'bg-[#F9FAFB] hover:bg-white hover:border-[#BBF7D0] border border-[#E5E7EB]'

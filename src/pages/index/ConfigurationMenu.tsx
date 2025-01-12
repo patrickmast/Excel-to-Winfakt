@@ -19,29 +19,29 @@ const ConfigurationMenu = ({ onSaveNew, onSave, onInfo, isSaving }: Configuratio
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="default" className="flex items-center gap-2">
+        <Button variant="outline" size="default" className="flex items-center gap-2" aria-label="Open menu">
           <Menu className="h-5 w-5" />
           Menu
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={onSaveNew}
           disabled={isSaving}
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="mr-2 h-4 w-4" aria-label="Add new configuration" />
           <span>Save as New</span>
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={onSave}
           disabled={isSaving}
         >
-          <Save className="mr-2 h-4 w-4" />
+          <Save className="mr-2 h-4 w-4" aria-label="Save configuration" />
           <span>Save</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onInfo}>
-          <Info className="mr-2 h-4 w-4" />
+          <Info className="mr-2 h-4 w-4" aria-label="Information" />
           <span>Info</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
