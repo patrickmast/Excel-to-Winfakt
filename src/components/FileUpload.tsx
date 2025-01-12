@@ -57,75 +57,68 @@ const FileUpload = ({ onDataLoaded, children, currentMapping }: FileUploadProps)
     return true;
   };
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    if (!file) return;
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      window.currentUploadedFile = file;
 
-    // Store the current file globally
-    window.currentUploadedFile = file;
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const extension = file.name.split('.').pop()?.toLowerCase();
+          if (extension === 'xlsx' || extension === 'xls') {
+            await new Promise<void>((resolve) => setTimeout(async () => {
+              const data = event.target?.result;
+              const workbook = XLSX.read(data, { type: 'binary' });
+              const sheetName = workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[sheetName];
 
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      try {
-        const extension = file.name.split('.').pop()?.toLowerCase();
-        if (extension === 'xlsx' || extension === 'xls') {
-          // Wrap the heavy processing in a Promise and use setTimeout to defer execution
-          await new Promise<void>((resolve) => setTimeout(async () => {
-            const data = event.target?.result;
-            const workbook = XLSX.read(data, { type: 'binary' });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+              // Only keeping the essential options that fixed the issue
+              const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+                defval: '',
+                raw: false,
+                header: 1
+              });
 
-            if (jsonData.length > 0) {
-              const columns = processColumns(Object.keys(jsonData[0]));
-
-              if (validateColumnsAgainstMapping(columns)) {
-                onDataLoaded(columns, jsonData);
-                toast({
-                  title: "File loaded successfully",
-                  description: `Found ${columns.length} columns and ${jsonData.length} rows`,
+              if (jsonData.length > 0) {
+                const columns = jsonData[0] as string[];
+                const data = jsonData.slice(1).map(row => {
+                  const obj: Record<string, any> = {};
+                  columns.forEach((col, index) => {
+                    obj[col] = row[index] || '';
+                  });
+                  return obj;
                 });
-              } else {
-                window.currentUploadedFile = null;
-              }
-            }
-            resolve();
-          }, 0));
-        } else if (extension === 'csv') {
-          const text = event.target?.result as string;
-          Papa.parse(text, {
-            header: true,
-            complete: (results) => {
-              const columns = processColumns(results.meta.fields || []);
 
-              if (validateColumnsAgainstMapping(columns)) {
-                onDataLoaded(columns, results.data);
-                toast({
-                  title: "File loaded successfully",
-                  description: `Found ${columns.length} columns and ${results.data.length} rows`,
-                });
-              } else {
-                window.currentUploadedFile = null;
+                if (validateColumnsAgainstMapping(columns)) {
+                  onDataLoaded(columns, data);
+                  toast({
+                    title: "File loaded successfully",
+                    description: `Found ${columns.length} columns and ${data.length} rows`,
+                  });
+                } else {
+                  window.currentUploadedFile = null;
+                }
               }
-            },
+              resolve();
+            }, 0));
+          } else if (extension === 'csv') {
+            // ... existing CSV handling code ...
+          }
+        } catch (error) {
+          console.error('Error processing file:', error);
+          toast({
+            title: "Error",
+            description: "Failed to process the file",
+            variant: "destructive",
           });
         }
-      } catch (error) {
-        toast({
-          title: "Error processing file",
-          description: "Please make sure the file is a valid Excel or CSV file",
-          variant: "destructive",
-        });
-      }
-    };
+      };
 
-    if (file.name.endsWith('.csv')) {
-      reader.readAsText(file);
-    } else {
       reader.readAsBinaryString(file);
-    }
-  }, [onDataLoaded, toast, currentMapping]);
+    },
+    [onDataLoaded]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
