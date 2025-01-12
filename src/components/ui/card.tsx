@@ -3,8 +3,8 @@ import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface CardGroupProps {
-  description: string;
-  number: number;
+  description?: string;
+  number?: number;
   nextCard?: { description: string; number: number; };
   isExpanded?: boolean;
   onToggle?: () => void;
@@ -13,7 +13,7 @@ interface CardGroupProps {
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & CardGroupProps
->(({ className, description, number, nextCard, isExpanded, onToggle, ...props }, ref) => {
+>(({ className, description, number, nextCard, isExpanded, onToggle, children, ...props }, ref) => {
   const hasSequentialCards = nextCard && 
     nextCard.description === description && 
     nextCard.number === number + 1;
@@ -28,25 +28,29 @@ const Card = React.forwardRef<
       )}
       {...props}
     >
-      <div className="flex items-center justify-between p-6">
-        <div>
-          <span className="text-lg font-semibold">{description}</span>
-          <span className="ml-2 text-sm text-muted-foreground">#{number}</span>
+      {description ? (
+        <div className="flex items-center justify-between p-6">
+          <div>
+            <span className="text-lg font-semibold">{description}</span>
+            <span className="ml-2 text-sm text-muted-foreground">#{number}</span>
+          </div>
+          {hasSequentialCards && (
+            <button
+              onClick={onToggle}
+              className="p-2 hover:bg-muted rounded-full transition-all duration-200"
+            >
+              <ChevronDown 
+                className={cn(
+                  "h-5 w-5 transition-transform duration-200",
+                  isExpanded && "transform rotate-180"
+                )}
+              />
+            </button>
+          )}
         </div>
-        {hasSequentialCards && (
-          <button
-            onClick={onToggle}
-            className="p-2 hover:bg-muted rounded-full transition-all duration-200"
-          >
-            <ChevronDown 
-              className={cn(
-                "h-5 w-5 transition-transform duration-200",
-                isExpanded && "transform rotate-180"
-              )}
-            />
-          </button>
-        )}
-      </div>
+      ) : (
+        children
+      )}
     </div>
   )
 })
