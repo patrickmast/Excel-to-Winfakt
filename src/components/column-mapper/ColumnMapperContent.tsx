@@ -31,6 +31,12 @@ const ColumnMapperContent: React.FC<ColumnMapperContentProps> = ({
     onDataLoaded(columns, data);
   };
 
+  const isColumnMapped = (column: string) => {
+    return Object.entries(state.mapping).some(([key, value]) => 
+      key.split('_')[0] === column || value === column
+    );
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Card className="p-4">
@@ -44,11 +50,14 @@ const ColumnMapperContent: React.FC<ColumnMapperContentProps> = ({
           </FileUpload>
           {state.sourceColumns.length > 0 && (
             <ColumnList
+              title="Source file columns"
               columns={state.sourceColumns}
-              searchTerm={state.sourceSearch}
+              searchValue={state.sourceSearch}
               onSearchChange={(value) => updateState({ sourceSearch: value })}
               selectedColumn={state.selectedSourceColumn}
-              onColumnSelect={(column) => updateState({ selectedSourceColumn: column })}
+              onColumnClick={(column) => updateState({ selectedSourceColumn: column })}
+              isColumnMapped={isColumnMapped}
+              searchPlaceholder="Search source columns..."
             />
           )}
         </div>
@@ -56,10 +65,27 @@ const ColumnMapperContent: React.FC<ColumnMapperContentProps> = ({
 
       <Card className="p-4">
         <ConnectedColumns
-          mapping={state.mapping}
+          connectedColumns={Object.entries(state.mapping).map(([key, value]) => [
+            key,
+            key.split('_')[0],
+            value
+          ])}
+          onDisconnect={(uniqueKey) => {
+            const newMapping = { ...state.mapping };
+            delete newMapping[uniqueKey];
+            updateState({ mapping: newMapping });
+          }}
+          onUpdateTransform={(uniqueKey, code) => {
+            updateState({
+              columnTransforms: {
+                ...state.columnTransforms,
+                [uniqueKey]: code
+              }
+            });
+          }}
           columnTransforms={state.columnTransforms}
-          onMappingChange={(mapping) => updateState({ mapping })}
-          onTransformChange={(transforms) => updateState({ columnTransforms: transforms })}
+          sourceColumns={state.sourceColumns}
+          sourceData={state.sourceData}
         />
       </Card>
 
@@ -67,15 +93,19 @@ const ColumnMapperContent: React.FC<ColumnMapperContentProps> = ({
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Target Columns</h3>
           <ColumnSelector
-            value={activeColumnSet}
-            onChange={onColumnSetChange}
+            sourceColumns={state.sourceColumns}
+            sourceData={state.sourceData}
+            onColumnSelect={(column) => updateState({ selectedTargetColumn: column })}
           />
           <ColumnList
+            title="Target columns"
             columns={targetColumns}
-            searchTerm={state.targetSearch}
+            searchValue={state.targetSearch}
             onSearchChange={(value) => updateState({ targetSearch: value })}
             selectedColumn={state.selectedTargetColumn}
-            onColumnSelect={(column) => updateState({ selectedTargetColumn: column })}
+            onColumnClick={(column) => updateState({ selectedTargetColumn: column })}
+            isColumnMapped={isColumnMapped}
+            searchPlaceholder="Search target columns..."
           />
           {state.sourceColumns.length > 0 && (
             <Button 
