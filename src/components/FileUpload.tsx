@@ -65,36 +65,40 @@ const FileUpload = ({ onDataLoaded, children, currentMapping }: FileUploadProps)
     window.currentUploadedFile = file;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const extension = file.name.split('.').pop()?.toLowerCase();
         if (extension === 'xlsx' || extension === 'xls') {
-          const data = event.target?.result;
-          const workbook = XLSX.read(data, { type: 'binary' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet);
-          
-          if (jsonData.length > 0) {
-            const columns = processColumns(Object.keys(jsonData[0]));
-            
-            if (validateColumnsAgainstMapping(columns)) {
-              onDataLoaded(columns, jsonData);
-              toast({
-                title: "File loaded successfully",
-                description: `Found ${columns.length} columns and ${jsonData.length} rows`,
-              });
-            } else {
-              window.currentUploadedFile = null;
+          // Wrap the heavy processing in a Promise and use setTimeout to defer execution
+          await new Promise<void>((resolve) => setTimeout(async () => {
+            const data = event.target?.result;
+            const workbook = XLSX.read(data, { type: 'binary' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+            if (jsonData.length > 0) {
+              const columns = processColumns(Object.keys(jsonData[0]));
+
+              if (validateColumnsAgainstMapping(columns)) {
+                onDataLoaded(columns, jsonData);
+                toast({
+                  title: "File loaded successfully",
+                  description: `Found ${columns.length} columns and ${jsonData.length} rows`,
+                });
+              } else {
+                window.currentUploadedFile = null;
+              }
             }
-          }
+            resolve();
+          }, 0));
         } else if (extension === 'csv') {
           const text = event.target?.result as string;
           Papa.parse(text, {
             header: true,
             complete: (results) => {
               const columns = processColumns(results.meta.fields || []);
-              
+
               if (validateColumnsAgainstMapping(columns)) {
                 onDataLoaded(columns, results.data);
                 toast({
@@ -136,9 +140,9 @@ const FileUpload = ({ onDataLoaded, children, currentMapping }: FileUploadProps)
 
   if (children) {
     return (
-      <form 
-        data-upload-form 
-        {...getRootProps()} 
+      <form
+        data-upload-form
+        {...getRootProps()}
         onClick={(e) => e.stopPropagation()}
       >
         <input {...getInputProps()} />
@@ -148,9 +152,9 @@ const FileUpload = ({ onDataLoaded, children, currentMapping }: FileUploadProps)
   }
 
   return (
-    <form 
-      data-upload-form 
-      {...getRootProps()} 
+    <form
+      data-upload-form
+      {...getRootProps()}
       className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors
         ${isDragActive ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}`}
     >
