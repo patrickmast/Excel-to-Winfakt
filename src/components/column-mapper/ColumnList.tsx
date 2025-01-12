@@ -97,9 +97,9 @@ const ColumnList = ({
                     >
                       <span className="text-sm">{group.name}</span>
                       {expandedGroups.has(group.name) ? (
-                        <ChevronDown className="h-4 w-4 ml-2" />
+                        <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
                       ) : (
-                        <ChevronRight className="h-4 w-4 ml-2" />
+                        <ChevronRight className="h-4 w-4 ml-2 text-gray-400" />
                       )}
                     </div>
                     {expandedGroups.has(group.name) && (
