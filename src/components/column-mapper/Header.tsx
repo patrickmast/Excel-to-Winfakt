@@ -16,18 +16,18 @@ interface HeaderProps {
   currentMapping?: Record<string, string>;
 }
 
-const Header = ({ 
-  activeColumnSet, 
-  onColumnSetChange, 
+const Header = ({
+  activeColumnSet,
+  onColumnSetChange,
   onDataLoaded,
-  currentMapping 
+  currentMapping
 }: HeaderProps) => {
   const hasFile = !!window.currentUploadedFile;
 
   return (
     <div className="flex items-center justify-between">
       <span>Source file columns</span>
-      <FileUpload 
+      <FileUpload
         onDataLoaded={onDataLoaded}
         currentMapping={currentMapping}
       >
@@ -38,7 +38,7 @@ const Header = ({
               <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent align="end">
             <FileSelector />
             <PreviewButton hasFile={hasFile} />
           </DropdownMenuContent>

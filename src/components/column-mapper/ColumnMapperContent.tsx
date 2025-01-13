@@ -11,6 +11,14 @@ import {
 } from "@/components/ui/select";
 import { MappingState } from './types';
 import VersionDisplay from '../VersionDisplay';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from '@/components/ui/button';
+import { ChevronDown } from 'lucide-react';
 
 interface ColumnMapperContentProps {
   state: MappingState;
@@ -142,15 +150,22 @@ const ColumnMapperContent = ({
               title={
                 <div className="flex items-center justify-between">
                   <span>Winfakt columns</span>
-                  <Select value={activeColumnSet} onValueChange={onColumnSetChange}>
-                    <SelectTrigger className="w-[140px] ml-2 h-10">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="artikelen">Artikelen</SelectItem>
-                      <SelectItem value="klanten">Klanten</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="default" className="ml-2">
+                        {activeColumnSet === 'artikelen' ? 'Artikelen' : 'Klanten'}
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-[140px]">
+                      <DropdownMenuItem onClick={() => onColumnSetChange('artikelen')}>
+                        Artikelen
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onColumnSetChange('klanten')}>
+                        Klanten
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               }
               columns={targetColumns}
