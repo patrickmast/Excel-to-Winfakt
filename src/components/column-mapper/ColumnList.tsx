@@ -1,4 +1,4 @@
-import { Input } from '@/components/ui/input';
+import { VanillaInput } from '@/components/vanilla/react/VanillaInput';
 import {
   VanillaCard,
   VanillaCardHeader,
@@ -8,6 +8,7 @@ import {
   VanillaCardDescription
 } from '@/components/vanilla/react/VanillaCard';
 import '@/components/vanilla/Card.css';
+import '@/components/vanilla/Input.css';
 import { ReactNode, useState } from 'react';
 import ColumnPreview from './ColumnPreview';
 import { identifyColumnGroups } from '@/utils/columnGroups';
@@ -58,7 +59,13 @@ const ColumnList = ({
 
   // First filter by search, then handle mapped columns at the group level
   let filteredColumns = columns
-    .filter(column => column.toLowerCase().includes(searchValue.toLowerCase()));
+    .filter(column => {
+      // For source columns, show all. For Winfakt columns, only show unmapped ones
+      const passesMapping = title === "Source file columns" || !isColumnMapped(column);
+      // Apply search filter - make sure to handle case where searchValue is undefined
+      const passesSearch = !searchValue || column.toLowerCase().includes(searchValue.toLowerCase());
+      return passesMapping && passesSearch;
+    });
 
   // Only apply grouping to Winfakt columns
   const isWinfaktList = title !== "Source file columns";
@@ -70,11 +77,11 @@ const ColumnList = ({
       <VanillaCardHeader className="px-0 pt-0">
         <VanillaCardTitle className="text-[20px]">{title}</VanillaCardTitle>
       </VanillaCardHeader>
-      <Input
+      <VanillaInput
         type="text"
         placeholder={searchPlaceholder}
-        value={searchValue}
-        onChange={(e) => onSearchChange(e.target.value)}
+        value={searchValue || ''}
+        onChange={(e: any) => onSearchChange(e.target.value)}
         className="mb-4 w-full"
       />
       <div className="space-y-2">

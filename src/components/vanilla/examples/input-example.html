@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vanilla Input Example</title>
+  <link rel="stylesheet" href="../Input.css">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .input-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <h1>Vanilla Input Examples</h1>
+
+  <div class="input-group">
+    <label for="text-input">Text Input</label>
+    <vanilla-input id="text-input" type="text" placeholder="Enter some text"></vanilla-input>
+  </div>
+
+  <div class="input-group">
+    <label for="disabled-input">Disabled Input</label>
+    <vanilla-input id="disabled-input" type="text" placeholder="Disabled input" disabled></vanilla-input>
+  </div>
+
+  <div class="input-group">
+    <label for="error-input">Input with Error</label>
+    <vanilla-input id="error-input" type="text" placeholder="Error state" aria-invalid="true"></vanilla-input>
+  </div>
+
+  <div class="input-group">
+    <label for="file-input">File Input</label>
+    <vanilla-input id="file-input" type="file"></vanilla-input>
+  </div>
+
+  <script type="module">
+    import { Input } from '../Input.js';
+
+    // Example of listening to input events
+    document.getElementById('text-input').addEventListener('input', (e) => {
+      console.log('Input value:', e.target.value);
+    });
+  </script>
+</body>
+</html>

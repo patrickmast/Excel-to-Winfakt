@@ -1,6 +1,8 @@
-import { Input } from '@/components/ui/input';
+import { VanillaInput } from '@/components/vanilla/react/VanillaInput';
 import { VanillaCardHeader, VanillaCardTitle } from '@/components/vanilla/react/VanillaCard';
 import '@/components/vanilla/react/VanillaCard.css';
+import '@/components/vanilla/Input.css';
+import '@/components/vanilla/ColumnList.css';
 
 interface ColumnListProps {
   title: string;
@@ -30,28 +32,24 @@ const ColumnList = ({
 
   return (
     <div>
-      <VanillaCardHeader className="px-0 pt-0">
+      <VanillaCardHeader className="column-list-header">
         <VanillaCardTitle>{title}</VanillaCardTitle>
       </VanillaCardHeader>
-      <Input
+      <VanillaInput
         type="text"
         placeholder={searchPlaceholder}
         value={searchValue}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="mb-4 w-full"
+        className="mb-4"
       />
-      <div className="space-y-2">
+      <div className="column-list-container">
         {filteredColumns.map(column => (
           <div
             key={column}
             onClick={() => onColumnClick(column)}
-            className={`p-3 rounded-md cursor-pointer transition-colors hover:bg-gray-100 ${
-              selectedColumn === column
-                ? 'bg-[#F0FEF5] border border-[#BBF7D0]'
-                : 'bg-[#F9FAFB] hover:bg-white hover:border-[#BBF7D0] border border-[#E5E7EB]'
-            }`}
+            className={`column-list-item ${selectedColumn === column ? 'selected' : ''}`}
           >
-            <span className="text-sm">{column}</span>
+            <span className="column-list-item-text">{column}</span>
           </div>
         ))}
       </div>

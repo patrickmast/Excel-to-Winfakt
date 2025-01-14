@@ -1,0 +1,33 @@
+.column-list-header {
+  padding: 0;
+  padding-top: 0;
+}
+
+.column-list-container {
+  margin-top: 8px;
+}
+
+.column-list-item {
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  margin-bottom: 8px;
+  border: 1px solid #E5E7EB;
+  background-color: #F9FAFB;
+}
+
+.column-list-item:hover {
+  background-color: #ffffff;
+  border-color: #BBF7D0;
+}
+
+.column-list-item.selected {
+  background-color: #F0FEF5;
+  border-color: #BBF7D0;
+}
+
+.column-list-item-text {
+  font-size: 14px;
+  line-height: 20px;
+}
