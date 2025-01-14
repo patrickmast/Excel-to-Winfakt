@@ -68,7 +68,7 @@ const ColumnList = ({
   return (
     <VanillaCard>
       <VanillaCardHeader className="px-0 pt-0">
-        <VanillaCardTitle>{title}</VanillaCardTitle>
+        <VanillaCardTitle className="text-[20px]">{title}</VanillaCardTitle>
       </VanillaCardHeader>
       <Input
         type="text"

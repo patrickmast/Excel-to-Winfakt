@@ -54,7 +54,7 @@ const ConnectedColumns = ({
 
   return (
     <VanillaCard className="w-full bg-white rounded-lg border border-gray-200 py-4">
-      <VanillaCardHeader className="px-6">
+      <VanillaCardHeader className="px-6 py-0">
         <div className="flex items-center justify-between w-full">
           <VanillaCardTitle className="text-xl font-semibold">Connected columns</VanillaCardTitle>
           {onExport && (

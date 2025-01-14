@@ -104,25 +104,23 @@ const ColumnMapperContent = ({
 
   return (
     <div>
-      <div className="bg-white rounded-lg border border-gray-200 py-4 px-6 mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <ConnectedColumns
-            connectedColumns={connectedColumns}
-            onDisconnect={handleDisconnect}
-            onExport={onExport}
-            onUpdateTransform={(uniqueKey, code) => {
-              updateState({
-                columnTransforms: {
-                  ...state.columnTransforms,
-                  [uniqueKey]: code
-                }
-              });
-            }}
-            columnTransforms={state.columnTransforms}
-            sourceColumns={state.sourceColumns}
-            sourceData={state.sourceData}
-          />
-        </div>
+      <div className="mb-8">
+        <ConnectedColumns
+          connectedColumns={connectedColumns}
+          onDisconnect={handleDisconnect}
+          onExport={onExport}
+          onUpdateTransform={(uniqueKey, code) => {
+            updateState({
+              columnTransforms: {
+                ...state.columnTransforms,
+                [uniqueKey]: code
+              }
+            });
+          }}
+          columnTransforms={state.columnTransforms}
+          sourceColumns={state.sourceColumns}
+          sourceData={state.sourceData}
+        />
       </div>
 
       <VanillaCard className="mb-0">
