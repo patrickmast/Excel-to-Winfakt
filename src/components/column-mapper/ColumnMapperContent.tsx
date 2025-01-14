@@ -3,13 +3,6 @@ import '@/components/vanilla/Card.css';
 import ConnectedColumns from './ConnectedColumns';
 import ColumnList from './ColumnList';
 import Header from './Header';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { MappingState } from './types';
 import VersionDisplay from '../VersionDisplay';
 import {
