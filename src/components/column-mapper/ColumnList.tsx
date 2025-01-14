@@ -1,5 +1,13 @@
 import { Input } from '@/components/ui/input';
-import { CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  VanillaCard,
+  VanillaCardHeader,
+  VanillaCardTitle,
+  VanillaCardContent,
+  VanillaCardFooter,
+  VanillaCardDescription
+} from '@/components/vanilla/react/VanillaCard';
+import '@/components/vanilla/Card.css';
 import { ReactNode, useState } from 'react';
 import ColumnPreview from './ColumnPreview';
 import { identifyColumnGroups } from '@/utils/columnGroups';
@@ -58,10 +66,10 @@ const ColumnList = ({
   const groupedColumns = new Set(columnGroups.flatMap(g => g.columns));
 
   return (
-    <div>
-      <CardHeader className="px-0 pt-0">
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
+    <VanillaCard>
+      <VanillaCardHeader className="px-0 pt-0">
+        <VanillaCardTitle>{title}</VanillaCardTitle>
+      </VanillaCardHeader>
       <Input
         type="text"
         placeholder={searchPlaceholder}
@@ -148,7 +156,7 @@ const ColumnList = ({
           ))
         )}
       </div>
-    </div>
+    </VanillaCard>
   );
 };
 

@@ -1,0 +1,49 @@
+.vanilla-card {
+  background: #ffffff;
+  border-radius: 0.5rem;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.vanilla-card:hover {
+  box-shadow: none;
+}
+
+.vanilla-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 1.5rem;
+}
+
+.vanilla-card-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: #111827;
+}
+
+.vanilla-card-description {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.vanilla-card-content {
+  padding: 1.5rem;
+  padding-top: 0;
+}
+
+.vanilla-card-content.p-6.pb-4 {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #ffffff;
+}
+
+.vanilla-card-footer {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  padding-top: 0;
+}

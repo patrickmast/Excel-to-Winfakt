@@ -1,0 +1,37 @@
+.vanilla-hover-card {
+  position: relative;
+  display: inline-block;
+}
+
+.vanilla-hover-card-trigger {
+  cursor: pointer;
+}
+
+.vanilla-hover-card-content {
+  display: none;
+  position: absolute;
+  z-index: 50;
+  min-width: 16rem;
+  padding: 1rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  animation: hover-card-fade-in 0.2s ease-out;
+}
+
+.vanilla-hover-card-trigger:hover + .vanilla-hover-card-content,
+.vanilla-hover-card-content:hover {
+  display: block;
+}
+
+@keyframes hover-card-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

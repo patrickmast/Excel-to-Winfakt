@@ -1,4 +1,5 @@
-import { Card, CardContent } from '../ui/card';
+import { VanillaCard, VanillaCardContent } from '../vanilla/react/VanillaCard';
+import '@/components/vanilla/Card.css';
 import ConnectedColumns from './ConnectedColumns';
 import ColumnList from './ColumnList';
 import Header from './Header';
@@ -124,8 +125,8 @@ const ColumnMapperContent = ({
         </div>
       </div>
 
-      <Card className="mb-0">
-        <CardContent className="p-6 pb-4">
+      <VanillaCard className="mb-0">
+        <VanillaCardContent className="p-6 pb-4">
           <div className="grid grid-cols-2 gap-8">
             <ColumnList
               title={
@@ -177,8 +178,8 @@ const ColumnMapperContent = ({
               searchPlaceholder="Search Winfakt columns..."
             />
           </div>
-        </CardContent>
-      </Card>
+        </VanillaCardContent>
+      </VanillaCard>
 
       <div className="text-xs text-gray-300 ml-[0.4rem] mt-[0.2rem]">
         <VersionDisplay />

@@ -1,19 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { VanillaHoverCard, VanillaHoverCardTrigger, VanillaHoverCardContent } from './vanilla/react/VanillaHoverCard';
 
-// These would be set during build time through environment variables
-const DEPLOYMENT_TIMESTAMP = import.meta.env.VITE_DEPLOYMENT_TIMESTAMP || 1704063600000; // fallback to Jan 1, 2025
+const DEPLOYMENT_TIMESTAMP = import.meta.env.VITE_DEPLOYMENT_TIMESTAMP || '1704063600000';
 
 const VersionDisplay = () => {
-  const [showTooltip, setShowTooltip] = useState(false);
-
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    if (showTooltip) {
-      timeoutId = setTimeout(() => setShowTooltip(false), 4000);
-    }
-    return () => timeoutId && clearTimeout(timeoutId);
-  }, [showTooltip]);
-
   const getVersionNumber = () => {
     const REFERENCE_TIMESTAMP = 1704063600; // Jan 1, 2025 00:00:00 UTC
     const secondsSinceReference = Math.floor(Number(DEPLOYMENT_TIMESTAMP) / 1000) - REFERENCE_TIMESTAMP;
@@ -50,19 +40,18 @@ const VersionDisplay = () => {
   };
 
   return (
-    <span className="relative">
-      <span
-        className="cursor-pointer"
-        onClick={() => setShowTooltip(!showTooltip)}
-      >
-        Version {getVersionNumber()}
-      </span>
-      {showTooltip && (
-        <span className="absolute bottom-full left-0 mb-2 px-2 py-1 bg-gray-800 text-white rounded shadow-lg whitespace-nowrap">
+    <VanillaHoverCard>
+      <VanillaHoverCardTrigger>
+        <span className="cursor-pointer">
+          Version {getVersionNumber()}
+        </span>
+      </VanillaHoverCardTrigger>
+      <VanillaHoverCardContent>
+        <span className="whitespace-nowrap">
           {formatDate().dateStr}{formatDate().timeStr ? ` at ${formatDate().timeStr}` : ''}
         </span>
-      )}
-    </span>
+      </VanillaHoverCardContent>
+    </VanillaHoverCard>
   );
 };
 

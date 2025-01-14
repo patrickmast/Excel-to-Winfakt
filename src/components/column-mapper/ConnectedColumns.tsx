@@ -2,7 +2,7 @@ import { ArrowRight, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useState } from 'react';
 import ColumnSettingsDialog from './ColumnSettingsDialog';
-import { CardTitle } from '../ui/card';
+import { VanillaCard, VanillaCardContent, VanillaCardHeader, VanillaCardTitle } from '../vanilla/react/VanillaCard';
 import ColumnPreview from './ColumnPreview';
 
 interface ConnectedColumnsProps {
@@ -15,9 +15,9 @@ interface ConnectedColumnsProps {
   sourceData?: any[];
 }
 
-const ConnectedColumns = ({ 
-  connectedColumns, 
-  onDisconnect, 
+const ConnectedColumns = ({
+  connectedColumns,
+  onDisconnect,
   onExport,
   onUpdateTransform,
   columnTransforms = {},
@@ -53,25 +53,27 @@ const ConnectedColumns = ({
   };
 
   return (
-    <div className="w-full bg-white rounded-lg border border-gray-200 py-4">
-      <div className="flex items-center justify-between w-full px-6">
-        <CardTitle className="text-xl font-semibold">Connected columns</CardTitle>
-        {onExport && (
-          <Button 
-            onClick={onExport}
-            className="bg-blue-600 hover:bg-blue-700"
-            disabled={connectedColumns.length === 0}
-          >
-            Export CSV
-          </Button>
-        )}
-      </div>
-      
+    <VanillaCard className="w-full bg-white rounded-lg border border-gray-200 py-4">
+      <VanillaCardHeader className="px-6">
+        <div className="flex items-center justify-between w-full">
+          <VanillaCardTitle className="text-xl font-semibold">Connected columns</VanillaCardTitle>
+          {onExport && (
+            <Button
+              onClick={onExport}
+              className="bg-blue-600 hover:bg-blue-700"
+              disabled={connectedColumns.length === 0}
+            >
+              Export CSV
+            </Button>
+          )}
+        </div>
+      </VanillaCardHeader>
+
       {connectedColumns.length > 0 && (
-        <div className="w-full space-y-2 mt-4 px-6">
+        <VanillaCardContent className="w-full space-y-2 mt-4 px-6">
           {connectedColumns.map(([uniqueKey, sourceColumn, targetColumn]) => (
-            <div 
-              key={uniqueKey} 
+            <div
+              key={uniqueKey}
               className="flex items-center gap-4"
             >
               <div className="flex-1 min-w-0">
@@ -84,8 +86,8 @@ const ConnectedColumns = ({
               </div>
               <div className="flex-shrink-0 group">
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:hidden" />
-                <X 
-                  className="h-4 w-4 text-red-500 hidden group-hover:block cursor-pointer" 
+                <X
+                  className="h-4 w-4 text-red-500 hidden group-hover:block cursor-pointer"
                   onClick={() => handleDisconnect(uniqueKey)}
                 />
               </div>
@@ -97,7 +99,7 @@ const ConnectedColumns = ({
               </div>
             </div>
           ))}
-        </div>
+        </VanillaCardContent>
       )}
       {selectedColumn && (
         <ColumnSettingsDialog
@@ -113,7 +115,7 @@ const ConnectedColumns = ({
           sourceData={sourceData}
         />
       )}
-    </div>
+    </VanillaCard>
   );
 };
 

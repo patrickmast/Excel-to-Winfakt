@@ -1,5 +1,6 @@
 import { Input } from '@/components/ui/input';
-import { CardHeader, CardTitle } from '@/components/ui/card';
+import { VanillaCardHeader, VanillaCardTitle } from '@/components/vanilla/react/VanillaCard';
+import '@/components/vanilla/react/VanillaCard.css';
 
 interface ColumnListProps {
   title: string;
@@ -29,9 +30,9 @@ const ColumnList = ({
 
   return (
     <div>
-      <CardHeader className="px-0 pt-0">
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
+      <VanillaCardHeader className="px-0 pt-0">
+        <VanillaCardTitle>{title}</VanillaCardTitle>
+      </VanillaCardHeader>
       <Input
         type="text"
         placeholder={searchPlaceholder}
