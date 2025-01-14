@@ -50,7 +50,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
 
       const row = sourceData.length > 0 ? sourceData[0] : {};
       const value = row[columnName];
-      
+
       const result = new Function('row', 'value', `return ${expressionCode}`)(row, value);
       setTestResult(String(result));
       setActiveTab('result');
@@ -77,10 +77,10 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
             and select a column from the menu to insert it in your code.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          <Tabs 
-            defaultValue="expression" 
+          <Tabs
+            defaultValue="expression"
             className="flex-1 flex flex-col"
             value={activeTab}
             onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions' | 'Source columns')}
@@ -93,10 +93,10 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
               <TabsTrigger value="functions">Functions</TabsTrigger>
               <TabsTrigger value="Source columns">Source columns</TabsTrigger>
             </TabsList>
-            
-            <div className="flex-1 overflow-hidden">
+
+            <div className="flex-1 overflow-hidden -mt-3">
               <TabsContent value="expression" className="h-full m-0 data-[state=active]:flex">
-                <ExpressionEditor 
+                <ExpressionEditor
                   value={expressionCode}
                   onChange={setExpressionCode}
                   result={null}
@@ -104,7 +104,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
                 />
               </TabsContent>
               <TabsContent value="result" className="h-full m-0 data-[state=active]:flex">
-                <ExpressionEditor 
+                <ExpressionEditor
                   value={expressionCode}
                   onChange={setExpressionCode}
                   result={testResult}
