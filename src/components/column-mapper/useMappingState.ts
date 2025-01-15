@@ -11,7 +11,8 @@ export const useMappingState = (onMappingChange: (mapping: Record<string, string
     selectedTargetColumn: null,
     connectionCounter: 0,
     sourceColumns: [],
-    sourceData: []
+    sourceData: [],
+    isLoading: false
   });
 
   useEffect(() => {
@@ -19,7 +20,9 @@ export const useMappingState = (onMappingChange: (mapping: Record<string, string
   }, [state.mapping, onMappingChange]);
 
   const updateState = (updates: Partial<MappingState>) => {
-    setState(prev => ({ ...prev, ...updates }));
+    setState(prevState => {
+      return { ...prevState, ...updates };
+    });
   };
 
   return [state, updateState] as const;

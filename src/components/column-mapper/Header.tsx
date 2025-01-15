@@ -5,46 +5,61 @@ import { VanillaCard } from '../vanilla/react/VanillaCard';
 import { VanillaDialog } from '../vanilla/react/VanillaDialog';
 import Papa from 'papaparse';
 import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
+
+// @ts-ignore
+const XLSX = window.XLSX;
 
 interface HeaderProps {
   activeColumnSet: 'artikelen' | 'klanten';
   onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
   onDataLoaded: (columns: string[], data: any[]) => void;
   currentMapping: Record<string, string>;
+  isLoading: boolean;
+  onLoadingChange: (loading: boolean) => void;
 }
 
 const Header = ({
   activeColumnSet,
   onColumnSetChange,
   onDataLoaded,
-  currentMapping
+  currentMapping,
+  isLoading,
+  onLoadingChange
 }: HeaderProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewContentRef = useRef<string>('');
   const [showPreview, setShowPreview] = useState(false);
+  const { toast } = useToast();
 
   const handleFileSelect = async (file: File) => {
+    onLoadingChange(true);
+
     if (file.name.endsWith('.csv')) {
       Papa.parse(file, {
         header: false,
         skipEmptyLines: true,
         complete: (results) => {
-          if (results.data && results.data.length > 1) {
-            const headers = results.data[0] as string[];
-            const data = results.data.slice(1).map((row: unknown[]) => {
-              const obj: Record<string, string> = {};
-              headers.forEach((header: string, index: number) => {
-                obj[header] = String(row[index] ?? '');
+          try {
+            if (results.data && results.data.length > 1) {
+              const headers = results.data[0] as string[];
+              const data = results.data.slice(1).map((row: unknown[]) => {
+                const obj: Record<string, string> = {};
+                headers.forEach((header: string, index: number) => {
+                  obj[header] = String(row[index] ?? '');
+                });
+                return obj;
               });
-              return obj;
-            });
-            onDataLoaded(headers, data);
-          } else {
-            toast({
-              title: "Error",
-              description: "The CSV file appears to be empty or missing headers.",
-              variant: "destructive"
-            });
+              onDataLoaded(headers, data);
+            } else {
+              toast({
+                title: "Error",
+                description: "The CSV file appears to be empty or missing headers.",
+                variant: "destructive"
+              });
+            }
+          } finally {
+            onLoadingChange(false);
           }
         },
         error: (error) => {
@@ -54,11 +69,21 @@ const Header = ({
             description: "Failed to parse CSV file. Please check the file format.",
             variant: "destructive"
           });
+          onLoadingChange(false);
         }
       });
     } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-      // For Excel files, we'll need to use a library like xlsx
-      import('xlsx').then((XLSX) => {
+      if (!XLSX) {
+        toast({
+          title: "Error",
+          description: "Excel support is not available. Please use CSV files instead.",
+          variant: "destructive"
+        });
+        onLoadingChange(false);
+        return;
+      }
+
+      try {
         const reader = new FileReader();
         reader.onload = (e) => {
           try {
@@ -92,23 +117,27 @@ const Header = ({
               description: "Failed to parse Excel file. Please check the file format.",
               variant: "destructive"
             });
+          } finally {
+            onLoadingChange(false);
           }
         };
         reader.readAsArrayBuffer(file);
-      }).catch(error => {
-        console.error('Error loading xlsx library:', error);
+      } catch (error) {
+        console.error('Error loading Excel file:', error);
         toast({
           title: "Error",
-          description: "Failed to load Excel parser. Please try again.",
+          description: "Failed to load Excel file. Please try again.",
           variant: "destructive"
         });
-      });
+        onLoadingChange(false);
+      }
     } else {
       toast({
         title: "Error",
         description: "Please select a CSV or Excel file.",
         variant: "destructive"
       });
+      onLoadingChange(false);
     }
   };
 
@@ -150,9 +179,25 @@ const Header = ({
       <VanillaMenu
         items={[
           {
-            label: 'Select file',
-            onClick: handleSelectFile,
-            icon: (
+            label: isLoading ? 'Loading...' : 'Select file',
+            onClick: isLoading ? undefined : handleSelectFile,
+            disabled: isLoading,
+            icon: isLoading ? (
+              <svg
+                className="animate-spin"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+            ) : (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -172,7 +217,7 @@ const Header = ({
           {
             label: 'Preview file',
             onClick: handlePreviewFile,
-            disabled: !hasFileSelected,
+            disabled: !hasFileSelected || isLoading,
             icon: (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +237,7 @@ const Header = ({
           }
         ]}
       >
-        Source file
+        {isLoading ? 'Loading...' : 'Source file'}
       </VanillaMenu>
 
       <VanillaDialog

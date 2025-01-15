@@ -17,6 +17,7 @@ export interface MappingState {
   connectionCounter: number;
   sourceColumns: string[];
   sourceData: any[];
+  isLoading: boolean;
 }
 
 export interface ConfigurationSettings {

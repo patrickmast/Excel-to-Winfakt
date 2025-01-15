@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { VanillaCard, VanillaCardContent } from '../vanilla/react/VanillaCard';
 import '@/components/vanilla/Card.css';
 import ConnectedColumns from './ConnectedColumns';
@@ -27,7 +28,15 @@ const ColumnMapperContent = ({
   onDataLoaded,
   onExport
 }: ColumnMapperContentProps) => {
-  const handleSourceColumnClick = (column: string) => {
+  const handleDataLoaded = useCallback((columns: string[], data: any[]) => {
+    onDataLoaded(columns, data);
+  }, [onDataLoaded]);
+
+  const handleLoadingChange = useCallback((loading: boolean) => {
+    updateState({ isLoading: loading });
+  }, [updateState]);
+
+  const handleSourceColumnClick = useCallback((column: string) => {
     if (state.selectedSourceColumn === column) {
       updateState({ selectedSourceColumn: null });
     } else {
@@ -45,9 +54,9 @@ const ColumnMapperContent = ({
         });
       }
     }
-  };
+  }, [state.selectedSourceColumn, state.selectedTargetColumn, state.connectionCounter, state.mapping, updateState]);
 
-  const handleTargetColumnClick = (targetColumn: string) => {
+  const handleTargetColumnClick = useCallback((targetColumn: string) => {
     if (state.selectedTargetColumn === targetColumn) {
       updateState({ selectedTargetColumn: null });
     } else {
@@ -65,9 +74,9 @@ const ColumnMapperContent = ({
         });
       }
     }
-  };
+  }, [state.selectedTargetColumn, state.selectedSourceColumn, state.connectionCounter, state.mapping, updateState]);
 
-  const handleDisconnect = (sourceColumn: string) => {
+  const handleDisconnect = useCallback((sourceColumn: string) => {
     const newMapping = { ...state.mapping };
     const newTransforms = { ...state.columnTransforms };
     delete newMapping[sourceColumn];
@@ -76,7 +85,11 @@ const ColumnMapperContent = ({
       mapping: newMapping,
       columnTransforms: newTransforms
     });
-  };
+  }, [state.mapping, state.columnTransforms, updateState]);
+
+  const handleSearchChange = useCallback((type: 'source' | 'target', value: string) => {
+    updateState(type === 'source' ? { sourceSearch: value } : { targetSearch: value });
+  }, [updateState]);
 
   const connectedColumns = Object.entries(state.mapping).map(([key, target]) => {
     const sourceColumn = key.split('_')[0];
@@ -161,13 +174,15 @@ const ColumnMapperContent = ({
                 <Header
                   activeColumnSet={activeColumnSet}
                   onColumnSetChange={onColumnSetChange}
-                  onDataLoaded={onDataLoaded}
+                  onDataLoaded={handleDataLoaded}
                   currentMapping={state.mapping}
+                  isLoading={state.isLoading}
+                  onLoadingChange={handleLoadingChange}
                 />
               }
               columns={state.sourceColumns}
               searchValue={state.sourceSearch}
-              onSearchChange={(value) => updateState({ sourceSearch: value })}
+              onSearchChange={(value) => handleSearchChange('source', value)}
               selectedColumn={state.selectedSourceColumn}
               onColumnClick={handleSourceColumnClick}
               isColumnMapped={(column) => false}
@@ -192,7 +207,7 @@ const ColumnMapperContent = ({
               }
               columns={targetColumns}
               searchValue={state.targetSearch}
-              onSearchChange={(value) => updateState({ targetSearch: value })}
+              onSearchChange={(value) => handleSearchChange('target', value)}
               selectedColumn={state.selectedTargetColumn}
               onColumnClick={handleTargetColumnClick}
               isColumnMapped={(column) => mappedTargetColumns.has(column)}
