@@ -110,7 +110,7 @@ const Index = () => {
         configId={currentConfigId}
       />
 
-      <div className="max-w-7xl mx-auto px-4 py-8 flex-grow">
+      <div className="container mx-auto px-4 py-8 flex-grow">
         <PageHeader
           onSaveNew={() => handleSaveConfiguration(true)}
           onSave={() => handleSaveConfiguration(false)}
