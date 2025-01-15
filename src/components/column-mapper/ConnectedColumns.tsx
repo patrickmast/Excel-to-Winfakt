@@ -4,6 +4,7 @@ import { useState } from 'react';
 import ColumnSettingsDialog from './ColumnSettingsDialog';
 import { VanillaCard, VanillaCardContent, VanillaCardHeader, VanillaCardTitle } from '../vanilla/react/VanillaCard';
 import ColumnPreview from './ColumnPreview';
+import '../vanilla/Button.css';
 
 interface ConnectedColumnsProps {
   connectedColumns: [string, string, string][]; // [uniqueKey, sourceColumn, targetColumn]
@@ -58,13 +59,14 @@ const ConnectedColumns = ({
         <div className="flex items-center justify-between w-full">
           <VanillaCardTitle className="text-xl font-semibold">Connected columns</VanillaCardTitle>
           {onExport && (
-            <Button
+            <button
+              data-component="button"
               onClick={onExport}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="button button--primary-blue"
               disabled={connectedColumns.length === 0}
             >
               Export CSV
-            </Button>
+            </button>
           )}
         </div>
       </VanillaCardHeader>
