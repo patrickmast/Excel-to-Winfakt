@@ -16,18 +16,18 @@ interface InfoDialogProps {
 
 const InfoDialog = ({ open, onOpenChange, configId }: InfoDialogProps) => {
   if (!open) return null;
-  
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>About CSV Transformer</AlertDialogTitle>
           <AlertDialogDescription>
-            Version 1.0.0
+            <p>Version 1.0.0</p>
             {configId && (
-              <div className="mt-2">
+              <p className="mt-2">
                 Configuration ID: {configId}
-              </div>
+              </p>
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>

@@ -25,8 +25,8 @@ const FunctionRow = ({ name, description }: FunctionRowProps) => {
   };
 
   return (
-    <TableRow>
-      <TableCell>
+    <TableRow className="last:mb-2">
+      <TableCell className="py-1">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -34,9 +34,9 @@ const FunctionRow = ({ name, description }: FunctionRowProps) => {
                 variant="ghost"
                 size="icon"
                 onClick={copyToClipboard}
-                className="h-8 w-8"
+                className="h-6 w-6"
               >
-                <Copy className="h-4 w-4" />
+                <Copy className="h-3 w-3" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -45,8 +45,8 @@ const FunctionRow = ({ name, description }: FunctionRowProps) => {
           </Tooltip>
         </TooltipProvider>
       </TableCell>
-      <TableCell className="font-mono">{name}</TableCell>
-      <TableCell>{description}</TableCell>
+      <TableCell className="py-1">{name}</TableCell>
+      <TableCell className="font-mono text-sm py-1">{description}</TableCell>
     </TableRow>
   );
 };

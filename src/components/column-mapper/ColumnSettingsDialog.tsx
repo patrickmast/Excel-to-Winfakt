@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Dialog,
-  DialogContent,
+  DialogContentWithoutClose,
   DialogHeader,
   DialogTitle,
   DialogDescription,
@@ -69,8 +69,8 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[625px] h-[90vh] max-h-[700px] flex flex-col p-0">
-        <DialogHeader className="p-6 pb-2">
+      <DialogContentWithoutClose className="max-w-[625px] h-[90vh] max-h-[700px] flex flex-col p-0">
+        <DialogHeader className="p-6 pb-0 flex-shrink-0 space-y-3">
           <DialogTitle>Settings for {columnName}</DialogTitle>
           <DialogDescription>
             Enter JavaScript code to transform the value. Use 'value' for the current column's value,
@@ -78,23 +78,26 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0">
           <Tabs
             defaultValue="expression"
-            className="flex-1 flex flex-col"
+            className="flex-1 flex flex-col min-h-0"
             value={activeTab}
             onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions' | 'Source columns')}
           >
-            <TabsList className="h-10 px-6 justify-start space-x-8 bg-transparent">
+            <TabsList className="h-10 px-6 justify-start space-x-8 bg-transparent flex-shrink-0">
               <TabsTrigger value="expression">Expression</TabsTrigger>
               <TabsTrigger value="result" className="flex items-center gap-2">
-                Result <PlayIcon className="h-4 w-4 cursor-pointer hover:text-primary" onClick={testExpression} />
+                Result <PlayIcon
+                  className={`h-4 w-4 cursor-pointer hover:text-primary ${activeTab === 'result' ? 'text-[#048F01]' : ''}`}
+                  onClick={testExpression}
+                />
               </TabsTrigger>
               <TabsTrigger value="functions">Functions</TabsTrigger>
               <TabsTrigger value="Source columns">Source columns</TabsTrigger>
             </TabsList>
 
-            <div className="flex-1 overflow-hidden -mt-3">
+            <div className="flex-1 overflow-hidden -mt-3 mb-[-1rem]">
               <TabsContent value="expression" className="h-full m-0 data-[state=active]:flex">
                 <ExpressionEditor
                   value={expressionCode}
@@ -125,7 +128,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
           </Tabs>
         </div>
 
-        <div className="flex justify-end space-x-2 p-4 border-t">
+        <div className="flex justify-end space-x-2 p-4 border-t flex-shrink-0">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
@@ -133,7 +136,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
             Save
           </Button>
         </div>
-      </DialogContent>
+      </DialogContentWithoutClose>
     </Dialog>
   );
 };

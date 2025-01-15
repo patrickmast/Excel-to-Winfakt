@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Table, TableBody, TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
 import {
@@ -29,45 +29,42 @@ const ColumnSelector: React.FC<ColumnSelectorProps> = ({
   };
 
   return (
-    <div className="flex-1 p-4">
-      <ScrollArea className="h-full w-full rounded-md border">
-        <Table>
-          <TableHeader className="sticky top-0 bg-background z-10">
-            <TableRow>
-              <TableHead className="w-[50px]"></TableHead>
-              <TableHead>Column Name</TableHead>
-              <TableHead>Value</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sourceColumns.map((col) => (
-              <TableRow key={col}>
-                <TableCell>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => onColumnSelect(col)}
-                          className="h-8 w-8"
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Copy</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </TableCell>
-                <TableCell>{col}</TableCell>
-                <TableCell className="font-mono text-sm">{getFirstValue(col)}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </ScrollArea>
+    <div className="flex-1 p-4 flex">
+      <div className="flex flex-1 min-h-[80px] rounded-md border border-input bg-background">
+        <ScrollArea className="flex-1 pb-2">
+          <div className="pt-1">
+            <Table>
+              <TableBody>
+                {sourceColumns.map((col) => (
+                  <TableRow key={col}>
+                    <TableCell className="py-1">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => onColumnSelect(col)}
+                              className="h-6 w-6"
+                            >
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Copy</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableCell>
+                    <TableCell className="py-1">{col}</TableCell>
+                    <TableCell className="font-mono text-sm py-1">{getFirstValue(col)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 };
