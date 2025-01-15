@@ -5,14 +5,8 @@ import ColumnList from './ColumnList';
 import Header from './Header';
 import { MappingState } from './types';
 import VersionDisplay from '../VersionDisplay';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from '@/components/ui/button';
-import { ChevronDown } from 'lucide-react';
+import { VanillaMenu } from '../vanilla/react/VanillaMenu';
+import '@/components/vanilla/Menu.css';
 
 interface ColumnMapperContentProps {
   state: MappingState;
@@ -95,6 +89,53 @@ const ColumnMapperContent = ({
 
   const mappedTargetColumns = new Set(Object.values(state.mapping));
 
+  const columnSetItems = [
+    {
+      value: 'artikelen',
+      label: 'Artikelen',
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+          {activeColumnSet === 'artikelen' && (
+            <path d="M9 12l2 2 4-4" />
+          )}
+        </svg>
+      )
+    },
+    {
+      value: 'klanten',
+      label: 'Klanten',
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+          {activeColumnSet === 'klanten' && (
+            <path d="M9 12l2 2 4-4" />
+          )}
+        </svg>
+      )
+    }
+  ];
+
   return (
     <div>
       <div className="mb-8">
@@ -142,22 +183,15 @@ const ColumnMapperContent = ({
               title={
                 <div className="flex items-center justify-between">
                   <span>Winfakt columns</span>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="default" className="ml-2">
-                        {activeColumnSet === 'artikelen' ? 'Artikelen' : 'Klanten'}
-                        <ChevronDown className="ml-2 h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-[140px]">
-                      <DropdownMenuItem onClick={() => onColumnSetChange('artikelen')}>
-                        Artikelen
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onColumnSetChange('klanten')}>
-                        Klanten
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <VanillaMenu
+                    items={columnSetItems.map(item => ({
+                      label: item.label,
+                      icon: item.icon,
+                      onClick: () => onColumnSetChange(item.value as 'artikelen' | 'klanten')
+                    }))}
+                  >
+                    {activeColumnSet === 'artikelen' ? 'Artikelen' : 'Klanten'}
+                  </VanillaMenu>
                 </div>
               }
               columns={targetColumns}
