@@ -78,14 +78,14 @@ const ConfigurationMenu = ({ onSaveNew, onSave, onInfo, isSaving }: Configuratio
           )
         }
       ]}
+      isConfigMenu={true}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
+        width="22"
+        height="22"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -94,7 +94,6 @@ const ConfigurationMenu = ({ onSaveNew, onSave, onInfo, isSaving }: Configuratio
         <line x1="4" x2="20" y1="6" y2="6" />
         <line x1="4" x2="20" y1="18" y2="18" />
       </svg>
-      Menu
     </VanillaMenu>
   );
 };
