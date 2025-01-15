@@ -1,7 +1,19 @@
 export class Input extends HTMLElement {
   constructor() {
     super();
+    this.container = document.createElement('div');
+    this.container.className = 'vanilla-input-container';
     this.input = document.createElement('input');
+    this.clearButton = document.createElement('button');
+    this.clearButton.className = 'vanilla-input-clear';
+    this.clearButton.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="m15 9-6 6"/>
+        <path d="m9 9 6 6"/>
+      </svg>
+    `;
+    this.clearButton.style.display = 'none';
 
     // Copy attributes from custom element to input
     Array.from(this.attributes).forEach(attr => {
@@ -25,7 +37,18 @@ export class Input extends HTMLElement {
           }
         });
         this.dispatchEvent(event);
+
+        // Show/hide clear button based on input value
+        this.clearButton.style.display = this.input.value ? 'flex' : 'none';
       });
+    });
+
+    // Handle clear button click
+    this.clearButton.addEventListener('click', () => {
+      this.input.value = '';
+      this.clearButton.style.display = 'none';
+      this.input.focus();
+      this.input.dispatchEvent(new Event('input', { bubbles: true }));
     });
   }
 
@@ -43,7 +66,9 @@ export class Input extends HTMLElement {
   }
 
   connectedCallback() {
-    this.appendChild(this.input);
+    this.container.appendChild(this.input);
+    this.container.appendChild(this.clearButton);
+    this.appendChild(this.container);
   }
 
   // Proxy common input properties

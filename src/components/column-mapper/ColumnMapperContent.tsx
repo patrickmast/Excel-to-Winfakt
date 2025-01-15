@@ -41,9 +41,7 @@ const ColumnMapperContent = ({
           },
           connectionCounter: state.connectionCounter + 1,
           selectedSourceColumn: null,
-          selectedTargetColumn: null,
-          sourceSearch: '',
-          targetSearch: ''
+          selectedTargetColumn: null
         });
       }
     }
@@ -63,9 +61,7 @@ const ColumnMapperContent = ({
           },
           connectionCounter: state.connectionCounter + 1,
           selectedSourceColumn: null,
-          selectedTargetColumn: null,
-          sourceSearch: '',
-          targetSearch: ''
+          selectedTargetColumn: null
         });
       }
     }

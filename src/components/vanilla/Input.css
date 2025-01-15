@@ -9,6 +9,40 @@ react-vanilla-input {
   width: 100%;
 }
 
+/* Input container styles */
+.vanilla-input-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Clear button styles */
+.vanilla-input-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  line-height: 0;
+}
+
+.vanilla-input-clear:hover {
+  color: #6b7280;
+}
+
+.vanilla-input-clear svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
 /* Input element styles */
 .vanilla-input {
   display: flex;
@@ -18,6 +52,7 @@ react-vanilla-input {
   border: 1px solid #e5e7eb;
   background-color: #ffffff;
   padding: 8px 12px;
+  padding-right: 34px;
   font-size: 14px;
   line-height: 20px;
   color: #1f2937;
