@@ -3,6 +3,8 @@ import { VanillaMenu } from '../vanilla/react/VanillaMenu';
 import '@/components/vanilla/Menu.css';
 import { VanillaCard } from '../vanilla/react/VanillaCard';
 import { VanillaDialog } from '../vanilla/react/VanillaDialog';
+import Papa from 'papaparse';
+import { toast } from '@/components/ui/use-toast';
 
 interface HeaderProps {
   activeColumnSet: 'artikelen' | 'klanten';
@@ -22,17 +24,92 @@ const Header = ({
   const [showPreview, setShowPreview] = useState(false);
 
   const handleFileSelect = async (file: File) => {
-    const text = await file.text();
-    const rows = text.split('\n').map(row => row.split(','));
-    const headers = rows[0];
-    const data = rows.slice(1).map(row => {
-      const obj: Record<string, string> = {};
-      headers.forEach((header, index) => {
-        obj[header] = row[index];
+    if (file.name.endsWith('.csv')) {
+      Papa.parse(file, {
+        header: false,
+        skipEmptyLines: true,
+        complete: (results) => {
+          if (results.data && results.data.length > 1) {
+            const headers = results.data[0] as string[];
+            const data = results.data.slice(1).map((row: unknown[]) => {
+              const obj: Record<string, string> = {};
+              headers.forEach((header: string, index: number) => {
+                obj[header] = String(row[index] ?? '');
+              });
+              return obj;
+            });
+            onDataLoaded(headers, data);
+          } else {
+            toast({
+              title: "Error",
+              description: "The CSV file appears to be empty or missing headers.",
+              variant: "destructive"
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error parsing CSV:', error);
+          toast({
+            title: "Error",
+            description: "Failed to parse CSV file. Please check the file format.",
+            variant: "destructive"
+          });
+        }
       });
-      return obj;
-    });
-    onDataLoaded(headers, data);
+    } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+      // For Excel files, we'll need to use a library like xlsx
+      import('xlsx').then((XLSX) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = e.target?.result;
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as unknown[][];
+
+            if (rawData && rawData.length > 1) {
+              const headers = rawData[0].map(String);
+              const jsonData = rawData.slice(1).map(row => {
+                const obj: Record<string, string> = {};
+                headers.forEach((header: string, index: number) => {
+                  obj[header] = String(row[index] ?? '');
+                });
+                return obj;
+              });
+              onDataLoaded(headers, jsonData);
+            } else {
+              toast({
+                title: "Error",
+                description: "The Excel file appears to be empty or missing headers.",
+                variant: "destructive"
+              });
+            }
+          } catch (error) {
+            console.error('Error parsing Excel:', error);
+            toast({
+              title: "Error",
+              description: "Failed to parse Excel file. Please check the file format.",
+              variant: "destructive"
+            });
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }).catch(error => {
+        console.error('Error loading xlsx library:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load Excel parser. Please try again.",
+          variant: "destructive"
+        });
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Please select a CSV or Excel file.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +143,7 @@ const Header = ({
       <input
         ref={fileInputRef}
         type="file"
-        accept=".csv"
+        accept=".csv,.xlsx,.xls"
         onChange={handleFileChange}
         style={{ display: 'none' }}
       />

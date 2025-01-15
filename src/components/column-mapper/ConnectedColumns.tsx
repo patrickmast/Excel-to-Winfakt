@@ -1,4 +1,4 @@
-import { ArrowRight, X } from 'lucide-react';
+import { ArrowRight, X, Download } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useState } from 'react';
 import ColumnSettingsDialog from './ColumnSettingsDialog';
@@ -59,14 +59,14 @@ const ConnectedColumns = ({
         <div className="flex items-center justify-between w-full">
           <VanillaCardTitle className="text-xl font-semibold">Connected columns</VanillaCardTitle>
           {onExport && (
-            <button
-              data-component="button"
+            <Button
               onClick={onExport}
-              className="button button--primary-blue"
               disabled={connectedColumns.length === 0}
+              className="bg-[#1C86EF] hover:bg-[#0E5DA8] text-white"
             >
+              <Download className="h-4 w-4" />
               Export CSV
-            </button>
+            </Button>
           )}
         </div>
       </VanillaCardHeader>
