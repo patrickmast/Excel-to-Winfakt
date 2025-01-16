@@ -87,6 +87,7 @@ const ColumnList = ({
       <div className="space-y-2">
         {isWinfaktList ? (
           filteredColumns.map(column => {
+            if (!column) return null; // Skip empty columns
             // Find if this column belongs to a group
             const group = columnGroups.find(g => g.columns.includes(column));
 
@@ -102,10 +103,10 @@ const ColumnList = ({
                 }
 
                 // Filter out mapped columns from the group
-                const unmappedGroupColumns = group.columns.filter(col => !isColumnMapped(col));
+                const unmappedGroupColumns = group.columns.filter(col => !isColumnMapped(col) && col);
 
-                return (
-                  <div key={column}>
+                return unmappedGroupColumns.length > 0 ? (
+                  <div key={group.name}>
                     <div
                       onClick={() => toggleGroup(group.name)}
                       className="p-3 rounded-md cursor-pointer transition-colors bg-[#F9FAFB] hover:bg-[#F0FFF6] hover:border-[#BBF7D0] border border-[#E5E7EB] flex items-center justify-between"
@@ -132,7 +133,7 @@ const ColumnList = ({
                       </div>
                     )}
                   </div>
-                );
+                ) : null;
               }
               // Always skip other columns in the group
               return null;
@@ -151,7 +152,7 @@ const ColumnList = ({
             ) : null;
           }).filter(Boolean)
         ) : (
-          filteredColumns.map(column => (
+          filteredColumns.filter(column => column).map(column => (
             <ColumnPreview
               key={column}
               columnName={column}

@@ -7,8 +7,20 @@ import Papa from 'papaparse';
 import { toast } from '@/components/ui/use-toast';
 import { useToast } from '@/components/ui/use-toast';
 
+// Add XLSX to window type
+declare global {
+  interface Window {
+    XLSX: any;
+  }
+}
+
 // @ts-ignore
 const XLSX = window.XLSX;
+
+// Add a function to check if XLSX is loaded
+const isXLSXLoaded = () => {
+  return typeof window.XLSX !== 'undefined';
+};
 
 interface HeaderProps {
   activeColumnSet: string;
@@ -33,9 +45,17 @@ const Header = ({
   const { toast } = useToast();
 
   const handleFileSelect = async (file: File) => {
+    console.log('handleFileSelect started');
+    console.log('File name:', file.name);
+    console.log('File type:', file.type);
+    console.log('Ends with xlsx:', file.name.endsWith('.xlsx'));
+    console.log('Ends with xls:', file.name.endsWith('.xls'));
+
     onLoadingChange(true);
 
-    if (file.name.endsWith('.csv')) {
+    const lowerFileName = file.name.toLowerCase();
+    if (lowerFileName.endsWith('.csv')) {
+      console.log('Processing as CSV file');
       Papa.parse(file, {
         header: false,
         skipEmptyLines: true,
@@ -72,26 +92,45 @@ const Header = ({
           onLoadingChange(false);
         }
       });
-    } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-      if (!XLSX) {
+    } else if (lowerFileName.endsWith('.xlsx') || lowerFileName.endsWith('.xls')) {
+      console.log('Starting Excel file load process');
+      if (!isXLSXLoaded()) {
+        console.log('XLSX not loaded, waiting...');
         toast({
-          title: "Error",
-          description: "Excel support is not available. Please use CSV files instead.",
-          variant: "destructive"
+          title: "Loading Excel Support",
+          description: "Please wait while Excel support is being loaded...",
         });
-        onLoadingChange(false);
-        return;
+
+        // Wait for a short time to see if XLSX loads
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        if (!isXLSXLoaded()) {
+          console.log('XLSX still not loaded after waiting');
+          toast({
+            title: "Error",
+            description: "Excel support could not be loaded. Please try refreshing the page or use CSV files instead.",
+            variant: "destructive"
+          });
+          onLoadingChange(false);
+          return;
+        }
       }
+      console.log('XLSX loaded successfully');
 
       try {
         const reader = new FileReader();
         reader.onload = (e) => {
           try {
+            console.log('File read successfully, attempting to parse');
             const data = e.target?.result;
+            console.log('Data type:', typeof data);
             const workbook = XLSX.read(data, { type: 'array' });
+            console.log('Workbook loaded:', workbook.SheetNames);
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
+            console.log('Worksheet loaded');
             const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as unknown[][];
+            console.log('Raw data loaded:', rawData.length, 'rows');
 
             if (rawData && rawData.length > 1) {
               const headers = rawData[0].map(String);
@@ -142,14 +181,22 @@ const Header = ({
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('handleFileChange triggered');
     const file = e.target.files?.[0];
     if (file) {
+      console.log('File selected:', file.name, file.type);
       handleFileSelect(file);
     }
   };
 
   const handleSelectFile = () => {
-    fileInputRef.current?.click();
+    console.log('handleSelectFile triggered');
+    if (fileInputRef.current) {
+      console.log('File input found, clicking...');
+      fileInputRef.current.click();
+    } else {
+      console.log('File input ref is null');
+    }
   };
 
   const handlePreviewFile = () => {
@@ -175,6 +222,7 @@ const Header = ({
         accept=".csv,.xlsx,.xls"
         onChange={handleFileChange}
         style={{ display: 'none' }}
+        data-testid="file-input"
       />
       <VanillaMenu
         items={[
