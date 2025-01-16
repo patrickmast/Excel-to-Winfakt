@@ -23,11 +23,11 @@ const InfoDialog = ({ open, onOpenChange, configId }: InfoDialogProps) => {
         <AlertDialogHeader>
           <AlertDialogTitle>About CSV Transformer</AlertDialogTitle>
           <AlertDialogDescription>
-            <p>Version 1.0.0</p>
+            Version 1.0.0
             {configId && (
-              <p className="mt-2">
+              <div className="mt-2">
                 Configuration ID: {configId}
-              </p>
+              </div>
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>

@@ -128,7 +128,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
           </Tabs>
         </div>
 
-        <div className="flex justify-end space-x-2 p-4 border-t flex-shrink-0">
+        <div className="flex justify-end space-x-2 p-4 flex-shrink-0">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
