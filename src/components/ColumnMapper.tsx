@@ -28,10 +28,11 @@ const ColumnMapper = ({
     });
   }, [activeColumnSet]);
 
-  const handleFileData = useCallback((columns: string[], data: any[]) => {
+  const handleFileData = useCallback((columns: string[], data: any[], sourceFilename: string) => {
     updateState({
       sourceColumns: columns,
       sourceData: data,
+      sourceFilename: sourceFilename,
       mapping: {},
       columnTransforms: {},
       selectedSourceColumn: null,
@@ -64,12 +65,14 @@ const ColumnMapper = ({
       return newRow;
     });
 
-    downloadCSV(transformedData, 'converted.csv');
+    const outputFilename = state.sourceFilename ? state.sourceFilename.replace(/\.[^/.]+$/, '.CSV') : 'converted.CSV';
+    downloadCSV(transformedData, outputFilename);
+    onExport(state.mapping);
     toast({
       title: "Export successful",
       description: "Your file has been converted and downloaded",
     });
-  }, [state.sourceData, state.mapping, state.columnTransforms]);
+  }, [state.sourceData, state.mapping, state.columnTransforms, state.sourceFilename, onExport]);
 
   const handleSaveConfiguration = useCallback(async () => {
     const result = await saveConfiguration(

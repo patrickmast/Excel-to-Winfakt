@@ -8,16 +8,16 @@ export interface ColumnMapperProps {
 }
 
 export interface MappingState {
-  mapping: Record<string, string>;
-  columnTransforms: Record<string, string>;
-  sourceSearch: string;
-  targetSearch: string;
-  selectedSourceColumn: string | null;
-  selectedTargetColumn: string | null;
-  connectionCounter: number;
   sourceColumns: string[];
   sourceData: any[];
-  isLoading: boolean;
+  sourceFilename?: string;
+  mapping: Record<string, string>;
+  columnTransforms: Record<string, string>;
+  selectedSourceColumn: string | null;
+  selectedTargetColumn: string | null;
+  sourceSearch: string;
+  targetSearch: string;
+  connectionCounter: number;
 }
 
 export interface ConfigurationSettings {

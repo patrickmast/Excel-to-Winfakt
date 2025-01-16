@@ -11,10 +11,10 @@ import { useToast } from '@/components/ui/use-toast';
 const XLSX = window.XLSX;
 
 interface HeaderProps {
-  activeColumnSet: 'artikelen' | 'klanten';
-  onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
-  onDataLoaded: (columns: string[], data: any[]) => void;
-  currentMapping: Record<string, string>;
+  activeColumnSet: string;
+  onColumnSetChange: (columnSet: string) => void;
+  onDataLoaded: (headers: string[], data: any[], sourceFilename: string) => void;
+  currentMapping?: Record<string, string>;
   isLoading: boolean;
   onLoadingChange: (loading: boolean) => void;
 }
@@ -50,7 +50,7 @@ const Header = ({
                 });
                 return obj;
               });
-              onDataLoaded(headers, data);
+              onDataLoaded(headers, data, file.name);
             } else {
               toast({
                 title: "Error",
@@ -102,7 +102,7 @@ const Header = ({
                 });
                 return obj;
               });
-              onDataLoaded(headers, jsonData);
+              onDataLoaded(headers, jsonData, file.name);
             } else {
               toast({
                 title: "Error",
