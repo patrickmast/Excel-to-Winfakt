@@ -14,7 +14,8 @@ const ColumnMapper = ({
   onExport,
   onDataLoaded,
   activeColumnSet,
-  onColumnSetChange
+  onColumnSetChange,
+  onSourceFileChange
 }: ColumnMapperProps) => {
   const [state, updateState] = useMappingState(onMappingChange);
   const { saveConfiguration, isSaving } = useConfiguration();
@@ -42,7 +43,11 @@ const ColumnMapper = ({
       connectionCounter: 0
     });
     onDataLoaded(data);
-  }, [onDataLoaded]);
+    onSourceFileChange?.({
+      filename: sourceFilename,
+      rowCount: data.length
+    });
+  }, [onDataLoaded, onSourceFileChange]);
 
   const handleExport = useCallback(() => {
     const transformedData = state.sourceData.map(row => {

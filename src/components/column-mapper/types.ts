@@ -5,6 +5,7 @@ export interface ColumnMapperProps {
   onDataLoaded: (data: any[]) => void;
   activeColumnSet: 'artikelen' | 'klanten';
   onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
+  onSourceFileChange?: (info: { filename: string; rowCount: number }) => void;
 }
 
 export interface MappingState {

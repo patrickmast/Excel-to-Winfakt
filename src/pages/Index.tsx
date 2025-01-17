@@ -30,6 +30,7 @@ const Index = () => {
   const [savedConfigUrl, setSavedConfigUrl] = useState('');
   const [searchParams] = useSearchParams();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
+  const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number } | null>(null);
 
   useEffect(() => {
     const loadSavedConfiguration = async () => {
@@ -108,6 +109,8 @@ const Index = () => {
         open={showInfoDialog}
         onOpenChange={setShowInfoDialog}
         configId={currentConfigId}
+        sourceFileName={sourceFileInfo?.filename}
+        sourceRowCount={sourceFileInfo?.rowCount}
       />
 
       <div className="container mx-auto px-4 py-8 flex-grow">
@@ -140,6 +143,7 @@ const Index = () => {
           targetColumns={activeColumnSet === 'artikelen' ? ARTIKEL_COLUMNS : KLANTEN_COLUMNS}
           activeColumnSet={activeColumnSet}
           onColumnSetChange={setActiveColumnSet}
+          onSourceFileChange={setSourceFileInfo}
         />
       </div>
     </div>
