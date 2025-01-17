@@ -5,7 +5,7 @@ export interface ColumnMapperProps {
   onDataLoaded: (data: any[]) => void;
   activeColumnSet: 'artikelen' | 'klanten';
   onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
-  onSourceFileChange?: (info: { filename: string; rowCount: number }) => void;
+  onSourceFileChange?: (info: { filename: string; rowCount: number; worksheetName?: string }) => void;
 }
 
 export interface MappingState {
@@ -19,6 +19,7 @@ export interface MappingState {
   sourceSearch: string;
   targetSearch: string;
   connectionCounter: number;
+  isLoading?: boolean;
 }
 
 export interface ConfigurationSettings {

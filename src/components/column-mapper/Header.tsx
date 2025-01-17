@@ -25,7 +25,7 @@ const isXLSXLoaded = () => {
 interface HeaderProps {
   activeColumnSet: string;
   onColumnSetChange: (columnSet: string) => void;
-  onDataLoaded: (headers: string[], data: any[], sourceFilename: string) => void;
+  onDataLoaded: (headers: string[], data: any[], sourceFilename: string, worksheetName: string) => void;
   currentMapping?: Record<string, string>;
   isLoading: boolean;
   onLoadingChange: (loading: boolean) => void;
@@ -48,7 +48,7 @@ const Header = ({
   const [currentWorksheet, setCurrentWorksheet] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const processExcelWorksheet = (workbook: any, sheetName: string) => {
+  const processExcelWorksheet = (workbook: any, sheetName: string, fileName: string) => {
     try {
       const worksheet = workbook.Sheets[sheetName];
       console.log('Processing worksheet:', sheetName);
@@ -65,7 +65,7 @@ const Header = ({
           });
           return obj;
         });
-        onDataLoaded(headers, jsonData, currentWorkbook.fileName);
+        onDataLoaded(headers, jsonData, fileName, sheetName);
       } else {
         toast({
           title: "Error",
@@ -83,14 +83,12 @@ const Header = ({
     } finally {
       onLoadingChange(false);
       setShowSheetSelector(false);
-      // Don't clear the workbook so we can switch sheets later
-      // setCurrentWorkbook(null);
     }
   };
 
   const handleSheetSelect = (sheetName: string) => {
     if (currentWorkbook) {
-      processExcelWorksheet(currentWorkbook, sheetName);
+      processExcelWorksheet(currentWorkbook, sheetName, currentWorkbook.fileName);
     }
   };
 
@@ -118,7 +116,7 @@ const Header = ({
                 });
                 return obj;
               });
-              onDataLoaded(headers, data, file.name);
+              onDataLoaded(headers, data, file.name, undefined);
             } else {
               toast({
                 title: "Error",
@@ -192,7 +190,7 @@ const Header = ({
               console.log('Single sheet found, processing directly');
               const firstSheet = workbook.SheetNames[0];
               setCurrentWorksheet(firstSheet);
-              processExcelWorksheet(workbook, firstSheet);
+              processExcelWorksheet(workbook, firstSheet, file.name);
             }
           } catch (error) {
             console.error('Error parsing Excel:', error);

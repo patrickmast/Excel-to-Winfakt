@@ -30,7 +30,7 @@ const Index = () => {
   const [savedConfigUrl, setSavedConfigUrl] = useState('');
   const [searchParams] = useSearchParams();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
-  const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number } | null>(null);
+  const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number; worksheetName?: string } | null>(null);
 
   useEffect(() => {
     const loadSavedConfiguration = async () => {
@@ -111,6 +111,7 @@ const Index = () => {
         configId={currentConfigId}
         sourceFileName={sourceFileInfo?.filename}
         sourceRowCount={sourceFileInfo?.rowCount}
+        worksheetName={sourceFileInfo?.worksheetName}
       />
 
       <div className="container mx-auto px-4 py-8 flex-grow">

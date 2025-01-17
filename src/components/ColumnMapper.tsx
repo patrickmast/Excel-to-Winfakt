@@ -29,7 +29,12 @@ const ColumnMapper = ({
     });
   }, [activeColumnSet]);
 
-  const handleFileData = useCallback((columns: string[], data: any[], sourceFilename: string) => {
+  const handleFileData = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string) => {
+    onSourceFileChange?.({
+      filename: '',
+      rowCount: 0
+    });
+
     updateState({
       sourceColumns: columns,
       sourceData: data,
@@ -43,9 +48,11 @@ const ColumnMapper = ({
       connectionCounter: 0
     });
     onDataLoaded(data);
+
     onSourceFileChange?.({
       filename: sourceFilename,
-      rowCount: data.length
+      rowCount: data.length,
+      worksheetName
     });
   }, [onDataLoaded, onSourceFileChange]);
 

@@ -15,7 +15,7 @@ interface ColumnMapperContentProps {
   targetColumns: string[];
   activeColumnSet: string;
   onColumnSetChange: (columnSet: string) => void;
-  onDataLoaded: (columns: string[], data: any[], sourceFilename: string) => void;
+  onDataLoaded: (columns: string[], data: any[], sourceFilename: string, worksheetName?: string) => void;
   onExport: () => void;
 }
 
@@ -28,8 +28,8 @@ const ColumnMapperContent = ({
   onDataLoaded,
   onExport
 }: ColumnMapperContentProps) => {
-  const handleDataLoaded = useCallback((columns: string[], data: any[], sourceFilename: string) => {
-    onDataLoaded(columns, data, sourceFilename);
+  const handleDataLoaded = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string) => {
+    onDataLoaded(columns, data, sourceFilename, worksheetName);
   }, [onDataLoaded]);
 
   const handleLoadingChange = useCallback((loading: boolean) => {

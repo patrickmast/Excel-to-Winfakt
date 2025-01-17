@@ -16,9 +16,10 @@ interface InfoDialogProps {
   configId?: string | null;
   sourceFileName?: string;
   sourceRowCount?: number;
+  worksheetName?: string;
 }
 
-const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCount }: InfoDialogProps) => {
+const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCount, worksheetName }: InfoDialogProps) => {
   if (!open) return null;
 
   const getVersionNumber = () => {
@@ -65,42 +66,45 @@ const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCou
           <AlertDialogTitle className="text-2xl font-bold">
             CSV for Winfakt imports
           </AlertDialogTitle>
+          <AlertDialogDescription className="sr-only">
+            Information about the current CSV file and application configuration
+          </AlertDialogDescription>
         </AlertDialogHeader>
 
         <div className="py-4">
-          <AlertDialogDescription className="space-y-3">
-            <div className="space-y-3">
-              {sourceFileName && (
-                <div className="flex items-center">
-                  <span className="font-medium min-w-[120px]">Source file:</span>
-                  <span>{sourceFileName}</span>
-                </div>
-              )}
-              {sourceRowCount !== undefined && (
-                <div className="flex items-center">
-                  <span className="font-medium min-w-[120px]">Available rows:</span>
-                  <span>{sourceRowCount.toLocaleString('de-DE')}</span>
-                </div>
-              )}
-              {configId && (
-                <div className="flex items-center">
-                  <span className="font-medium min-w-[120px]">Config ID:</span>
-                  <span>{configId}</span>
-                </div>
-              )}
+          <div className="space-y-3">
+            <div className="flex items-center">
+              <span className="font-medium min-w-[120px]">Source file:</span>
+              <span>{sourceFileName || 'None'}</span>
             </div>
+            {worksheetName && (
+              <div className="flex items-center">
+                <span className="font-medium min-w-[120px]">Worksheet:</span>
+                <span>{worksheetName}</span>
+              </div>
+            )}
+            <div className="flex items-center">
+              <span className="font-medium min-w-[120px]">Available rows:</span>
+              <span>{(sourceRowCount || 0).toLocaleString('de-DE')}</span>
+            </div>
+            {configId && (
+              <div className="flex items-center">
+                <span className="font-medium min-w-[120px]">Config ID:</span>
+                <span>{configId}</span>
+              </div>
+            )}
+          </div>
 
-            <div className="text-xs text-muted-foreground mt-6 pt-4 border-t space-y-1">
-              <div className="flex items-center">
-                <span className="min-w-[120px]">Version:</span>
-                <span>{getVersionNumber()}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="min-w-[120px]">Deployed:</span>
-                <span>{dateStr}{timeStr ? ` at ${timeStr}` : ''}</span>
-              </div>
+          <div className="text-xs text-muted-foreground mt-6 pt-4 border-t space-y-1">
+            <div className="flex items-center">
+              <span className="min-w-[120px]">Version:</span>
+              <span>{getVersionNumber()}</span>
             </div>
-          </AlertDialogDescription>
+            <div className="flex items-center">
+              <span className="min-w-[120px]">Deployed:</span>
+              <span>{dateStr}{timeStr ? ` at ${timeStr}` : ''}</span>
+            </div>
+          </div>
         </div>
 
         <AlertDialogFooter>
