@@ -21,7 +21,6 @@ const isXLSXLoaded = () => {
 };
 
 interface HeaderProps {
-  onFileSelect: (file: File) => void;
   activeColumnSet: string;
   onColumnSetChange: (columnSet: string) => void;
   onDataLoaded: (headers: string[], data: any[], sourceFilename: string) => void;
@@ -30,7 +29,7 @@ interface HeaderProps {
   onLoadingChange: (loading: boolean) => void;
 }
 
-export function Header({ onFileSelect, onColumnSetChange, onDataLoaded, currentMapping, isLoading, onLoadingChange }: HeaderProps) {
+export function Header({ onColumnSetChange, onDataLoaded, currentMapping, isLoading, onLoadingChange }: HeaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewContentRef = useRef<string>('');
   const [showPreview, setShowPreview] = useState(false);
@@ -38,7 +37,6 @@ export function Header({ onFileSelect, onColumnSetChange, onDataLoaded, currentM
   const [availableSheets, setAvailableSheets] = useState<string[]>([]);
   const [currentWorkbook, setCurrentWorkbook] = useState<any>(null);
   const [currentWorksheet, setCurrentWorksheet] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const processExcelWorksheet = (workbook: any, sheetName: string) => {
     try {
@@ -242,8 +240,6 @@ export function Header({ onFileSelect, onColumnSetChange, onDataLoaded, currentM
     }
   };
 
-  const hasFileSelected = fileInputRef.current?.files?.length > 0;
-
   return (
     <header className="header">
       <input
@@ -291,53 +287,11 @@ export function Header({ onFileSelect, onColumnSetChange, onDataLoaded, currentM
                 <polyline points="13 2 13 9 20 9" />
               </svg>
             )
-          },
-          {
-            label: 'Select worksheet',
-            onClick: () => setShowSheetSelector(true),
-            disabled: !currentWorkbook || currentWorkbook.SheetNames.length <= 1,
-            icon: (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M3 6h18" />
-                <path d="M3 12h18" />
-                <path d="M3 18h18" />
-              </svg>
-            )
           }
         ]}
       >
         Source file
       </VanillaMenu>
-
-      <VanillaDialog
-        open={showPreview}
-        onOpenChange={setShowPreview}
-        title="File Preview"
-      >
-        <pre style={{
-          whiteSpace: 'pre-wrap',
-          wordWrap: 'break-word',
-          maxHeight: '60vh',
-          overflow: 'auto',
-          padding: '1rem',
-          backgroundColor: '#f9fafb',
-          borderRadius: '0.375rem',
-          fontSize: '0.875rem',
-          lineHeight: '1.5'
-        }}>
-          {previewContentRef.current}
-        </pre>
-      </VanillaDialog>
 
       {showSheetSelector && (
         <div className="worksheet-selector-overlay" onClick={() => setShowSheetSelector(false)}>
