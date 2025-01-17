@@ -6,6 +6,7 @@ import { VanillaDialog } from '../vanilla/react/VanillaDialog';
 import Papa from 'papaparse';
 import { toast } from '@/components/ui/use-toast';
 import { useToast } from '@/components/ui/use-toast';
+import { parseDBF } from '@/utils/dbfParser';
 
 // Add XLSX to window type
 declare global {
@@ -212,10 +213,69 @@ const Header = ({
         });
         onLoadingChange(false);
       }
+    } else if (lowerFileName.endsWith('.dbf') || lowerFileName.endsWith('.soc')) {
+      console.log('Processing as DBF/SOC file');
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const arrayBuffer = e.target?.result as ArrayBuffer;
+
+          // Check for associated SMT file
+          const baseName = file.name.slice(0, -4); // Remove .dbf or .soc extension
+          const fileInput = fileInputRef.current;
+          const smtFile = fileInput?.files && Array.from(fileInput.files).find(
+            f => f.name.toLowerCase() === `${baseName}.smt`
+          );
+
+          let memoData: ArrayBuffer | undefined;
+
+          // If SMT file exists, load it
+          if (smtFile) {
+            const smtReader = new FileReader();
+            memoData = await new Promise<ArrayBuffer>((resolve, reject) => {
+              smtReader.onload = (e) => {
+                const result = e.target?.result;
+                if (result instanceof ArrayBuffer) {
+                  resolve(result);
+                } else {
+                  reject(new Error('Failed to read SMT file'));
+                }
+              };
+              smtReader.onerror = reject;
+              smtReader.readAsArrayBuffer(smtFile);
+            });
+          }
+
+          // Read the DBF file
+          const records = await parseDBF(arrayBuffer, memoData);
+
+          if (records && records.length > 0) {
+            // Get headers from the first record's keys
+            const headers = Object.keys(records[0]);
+            onDataLoaded(headers, records, file.name, undefined);
+          } else {
+            toast({
+              title: "Error",
+              description: "The DBF file appears to be empty or invalid.",
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error('Error parsing DBF:', error);
+          toast({
+            title: "Error",
+            description: "Failed to parse DBF file. Please check the file format.",
+            variant: "destructive"
+          });
+        } finally {
+          onLoadingChange(false);
+        }
+      };
+      reader.readAsArrayBuffer(file);
     } else {
       toast({
         title: "Error",
-        description: "Please select a CSV or Excel file.",
+        description: "Please select a CSV, Excel, DBF, or SOC file.",
         variant: "destructive"
       });
       onLoadingChange(false);
@@ -261,7 +321,7 @@ const Header = ({
       <input
         ref={fileInputRef}
         type="file"
-        accept=".csv,.xlsx,.xls"
+        accept=".csv,.xlsx,.xls,.dbf,.soc"
         onChange={handleFileChange}
         style={{ display: 'none' }}
         data-testid="file-input"
