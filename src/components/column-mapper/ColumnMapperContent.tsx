@@ -2,25 +2,17 @@ import React from 'react';
 import ConnectedColumns from './ConnectedColumns';
 import ColumnList from './ColumnList';
 import { Header } from './Header';
-import { MappingState } from './types';
+import { ColumnMapperContentProps } from './types';
 import VersionDisplay from '../VersionDisplay';
 
-interface ColumnMapperContentProps {
-  activeColumnSet: string;
-  onColumnSetChange: (columnSet: string) => void;
-  onDataLoaded: (columns: string[], data: any[], sourceFilename: string) => void;
-  currentMapping: Record<string, string>;
-  isLoading: boolean;
-  onLoadingChange: (loading: boolean) => void;
-}
-
 const ColumnMapperContent: React.FC<ColumnMapperContentProps> = ({
+  state,
+  updateState,
+  targetColumns,
   activeColumnSet,
   onColumnSetChange,
   onDataLoaded,
-  currentMapping,
-  isLoading,
-  onLoadingChange,
+  onExport
 }) => {
   const handleFileSelect = (file: File) => {
     // Handle file selection if needed
@@ -33,23 +25,43 @@ const ColumnMapperContent: React.FC<ColumnMapperContentProps> = ({
         activeColumnSet={activeColumnSet}
         onColumnSetChange={onColumnSetChange}
         onDataLoaded={onDataLoaded}
-        currentMapping={currentMapping}
-        isLoading={isLoading}
-        onLoadingChange={onLoadingChange}
+        currentMapping={state.mapping}
+        isLoading={state.isLoading}
+        onLoadingChange={(loading) => updateState({ isLoading: loading })}
         onFileSelect={handleFileSelect}
       />
       <ConnectedColumns
+        connectedColumns={Object.entries(state.mapping).map(([uniqueKey, target]) => [uniqueKey, uniqueKey.split('_')[0], target])}
+        sourceColumns={state.sourceColumns}
+        sourceData={state.sourceData}
+        columnTransforms={state.columnTransforms}
+        onUpdateTransform={(uniqueKey, code) => 
+          updateState({ 
+            columnTransforms: { ...state.columnTransforms, [uniqueKey]: code } 
+          })
+        }
+        onDisconnect={(uniqueKey) => {
+          const newMapping = { ...state.mapping };
+          delete newMapping[uniqueKey];
+          updateState({ mapping: newMapping });
+        }}
         activeColumnSet={activeColumnSet}
-        currentMapping={currentMapping}
+        currentMapping={state.mapping}
         onColumnSetChange={onColumnSetChange}
-        onDataLoaded={onDataLoaded}
-        isLoading={isLoading}
-        onLoadingChange={onLoadingChange}
+        onExport={onExport}
       />
       <ColumnList
-        currentMapping={currentMapping}
+        title="Connected Columns"
+        columns={state.sourceColumns}
+        searchValue={state.sourceSearch}
+        onSearchChange={(value) => updateState({ sourceSearch: value })}
+        selectedColumn={state.selectedSourceColumn}
+        onColumnClick={(column) => updateState({ selectedSourceColumn: column })}
+        isColumnMapped={(column) => Object.keys(state.mapping).includes(column)}
+        searchPlaceholder="Search columns..."
+        currentMapping={state.mapping}
         onColumnSetChange={onColumnSetChange}
-        isLoading={isLoading}
+        isLoading={state.isLoading}
       />
       <VersionDisplay />
     </div>
