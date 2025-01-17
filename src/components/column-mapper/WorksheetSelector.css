@@ -1,0 +1,71 @@
+.worksheet-selector-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.worksheet-selector-dialog {
+  background-color: white;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 32rem;
+  width: 100%;
+  margin: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.worksheet-selector-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 16px;
+}
+
+.worksheet-selector-description {
+  font-size: 14px;
+  color: #6B7280;
+  margin-bottom: 16px;
+}
+
+.worksheet-selector-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.worksheet-button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 16px;
+  background-color: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.worksheet-button:hover {
+  background-color: #F9FAFB;
+}
+
+.worksheet-button-icon {
+  width: 20px;
+  flex-shrink: 0;
+  margin-right: 8px;
+  color: #10B981;
+}
+
+.worksheet-button-text {
+  margin-left: 8px;
+  color: #111827;
+}
+
+.worksheet-button.selected {
+  background-color: #F3F4F6;
+  border-color: #D1D5DB;
+}

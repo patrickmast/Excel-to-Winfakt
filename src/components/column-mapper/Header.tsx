@@ -1,11 +1,11 @@
-import { useRef, useState } from 'react';
-import { VanillaMenu } from '../vanilla/react/VanillaMenu';
+import React, { useState, useRef } from 'react';
+import { VanillaMenu } from '@/components/vanilla/react/VanillaMenu';
+import { VanillaDialog } from '@/components/vanilla/react/VanillaDialog';
 import '@/components/vanilla/Menu.css';
-import { VanillaCard } from '../vanilla/react/VanillaCard';
-import { VanillaDialog } from '../vanilla/react/VanillaDialog';
-import Papa from 'papaparse';
+import './WorksheetSelector.css';
 import { toast } from '@/components/ui/use-toast';
 import { useToast } from '@/components/ui/use-toast';
+import Papa from 'papaparse';
 
 // Add XLSX to window type
 declare global {
@@ -23,6 +23,7 @@ const isXLSXLoaded = () => {
 };
 
 interface HeaderProps {
+  onFileSelect: (file: File) => void;
   activeColumnSet: string;
   onColumnSetChange: (columnSet: string) => void;
   onDataLoaded: (headers: string[], data: any[], sourceFilename: string) => void;
@@ -31,14 +32,7 @@ interface HeaderProps {
   onLoadingChange: (loading: boolean) => void;
 }
 
-const Header = ({
-  activeColumnSet,
-  onColumnSetChange,
-  onDataLoaded,
-  currentMapping,
-  isLoading,
-  onLoadingChange
-}: HeaderProps) => {
+export function Header({ onFileSelect, onColumnSetChange, onDataLoaded, currentMapping, isLoading, onLoadingChange }: HeaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewContentRef = useRef<string>('');
   const [showPreview, setShowPreview] = useState(false);
@@ -258,16 +252,15 @@ const Header = ({
   const hasFileSelected = fileInputRef.current?.files?.length > 0;
 
   return (
-    <div className="flex items-center justify-between">
-      <span>Source file columns</span>
+    <header className="header">
       <input
-        ref={fileInputRef}
         type="file"
-        accept=".csv,.xlsx,.xls"
+        ref={fileInputRef}
         onChange={handleFileChange}
+        accept=".csv,.xlsx,.xls"
         style={{ display: 'none' }}
-        data-testid="file-input"
       />
+
       <VanillaMenu
         items={[
           {
@@ -327,31 +320,10 @@ const Header = ({
                 <path d="M3 18h18" />
               </svg>
             )
-          },
-          {
-            label: 'Preview file',
-            onClick: handlePreviewFile,
-            disabled: !hasFileSelected || isLoading,
-            icon: (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            )
           }
         ]}
       >
-        {isLoading ? 'Loading...' : 'Source file'}
+        Source file
       </VanillaMenu>
 
       <VanillaDialog
@@ -375,52 +347,44 @@ const Header = ({
       </VanillaDialog>
 
       {showSheetSelector && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75" onClick={() => setShowSheetSelector(false)} />
-            <div className="relative bg-white rounded-lg p-6 max-w-lg w-full mx-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Select Worksheet
-              </h3>
-              <p className="text-sm text-gray-500 mb-4">
-                This Excel file contains {availableSheets.length} worksheets. Please select which one you'd like to use:
-              </p>
-              <div className="space-y-2">
-                {availableSheets.map((sheetName) => (
-                  <button
-                    key={sheetName}
-                    type="button"
-                    onClick={() => handleSheetSelect(sheetName)}
-                    className="w-full text-left px-4 py-2 text-sm bg-white hover:bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    <div className="flex items-center">
-                      <div className="w-5 flex-shrink-0">
-                        {currentWorksheet === sheetName ? (
-                          <svg
-                            className="h-4 w-4 text-green-500"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        ) : null}
-                      </div>
-                      <span className="ml-2">{sheetName}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
+        <div className="worksheet-selector-overlay" onClick={() => setShowSheetSelector(false)}>
+          <div className="worksheet-selector-dialog" onClick={e => e.stopPropagation()}>
+            <h3 className="worksheet-selector-title">
+              Select Worksheet
+            </h3>
+            <p className="worksheet-selector-description">
+              This Excel file contains {availableSheets.length} worksheets. Please select which one you'd like to use:
+            </p>
+            <div className="worksheet-selector-list">
+              {availableSheets.map((sheetName) => (
+                <button
+                  key={sheetName}
+                  type="button"
+                  onClick={() => handleSheetSelect(sheetName)}
+                  className={`worksheet-button ${currentWorksheet === sheetName ? 'selected' : ''}`}
+                >
+                  <div className="worksheet-button-icon">
+                    {currentWorksheet === sheetName ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    ) : null}
+                  </div>
+                  <span className="worksheet-button-text">{sheetName}</span>
+                </button>
+              ))}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </header>
   );
-};
-
-export default Header;
+}
