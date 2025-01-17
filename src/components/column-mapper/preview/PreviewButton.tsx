@@ -2,6 +2,12 @@ import { Eye } from 'lucide-react';
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useToast } from '@/hooks/use-toast';
 
+declare global {
+  interface Window {
+    currentUploadedFile?: File;
+  }
+}
+
 interface PreviewButtonProps {
   hasFile: boolean;
 }
@@ -22,10 +28,8 @@ const PreviewButton = ({ hasFile }: PreviewButtonProps) => {
     }
 
     try {
-      // Create a unique ID for the file using timestamp and random string
       const fileId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       
-      // Store the file in localStorage (temporary solution)
       const reader = new FileReader();
       reader.onload = function(e) {
         const fileData = {
@@ -37,7 +41,6 @@ const PreviewButton = ({ hasFile }: PreviewButtonProps) => {
         };
         localStorage.setItem(`preview_${fileId}`, JSON.stringify(fileData));
         
-        // Open preview in new window
         const previewUrl = `/preview?fileId=${fileId}&filename=${encodeURIComponent(currentFile.name)}`;
         window.open(previewUrl, '_blank');
       };

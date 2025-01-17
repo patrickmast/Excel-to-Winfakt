@@ -18,6 +18,7 @@ export interface MappingState {
   sourceSearch: string;
   targetSearch: string;
   connectionCounter: number;
+  isLoading: boolean;
 }
 
 export interface ConfigurationSettings {

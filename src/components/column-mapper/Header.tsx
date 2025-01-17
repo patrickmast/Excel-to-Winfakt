@@ -1,16 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { VanillaMenu } from '@/components/vanilla/react/VanillaMenu';
-import { VanillaDialog } from '@/components/vanilla/react/VanillaDialog';
-import '@/components/vanilla/Menu.css';
-import './WorksheetSelector.css';
-import { toast } from '@/components/ui/use-toast';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import Papa from 'papaparse';
+import './WorksheetSelector.css';
 
 // Add XLSX to window type
 declare global {
   interface Window {
     XLSX: any;
+    currentUploadedFile?: File;
   }
 }
 
@@ -77,8 +75,6 @@ export function Header({ onFileSelect, onColumnSetChange, onDataLoaded, currentM
     } finally {
       onLoadingChange(false);
       setShowSheetSelector(false);
-      // Don't clear the workbook so we can switch sheets later
-      // setCurrentWorkbook(null);
     }
   };
 
@@ -169,20 +165,17 @@ export function Header({ onFileSelect, onColumnSetChange, onDataLoaded, currentM
             console.log('Workbook loaded:', workbook.SheetNames);
             console.log('Number of sheets:', workbook.SheetNames.length);
 
-            // Store the workbook and filename for later use
             workbook.fileName = file.name;
             setCurrentWorkbook(workbook);
 
             if (workbook.SheetNames.length > 1) {
-              // Multiple sheets found, show selector
               console.log('Multiple sheets found:', workbook.SheetNames);
-              const sheets = [...workbook.SheetNames]; // Create a new array from SheetNames
+              const sheets = [...workbook.SheetNames];
               console.log('Setting available sheets:', sheets);
               setAvailableSheets(sheets);
               setShowSheetSelector(true);
               console.log('Dialog should be shown now, showSheetSelector:', true);
             } else {
-              // Only one sheet, process it directly
               console.log('Single sheet found, processing directly');
               const firstSheet = workbook.SheetNames[0];
               setCurrentWorksheet(firstSheet);

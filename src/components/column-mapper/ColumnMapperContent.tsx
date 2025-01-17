@@ -3,7 +3,7 @@ import { VanillaCard, VanillaCardContent } from '../vanilla/react/VanillaCard';
 import '@/components/vanilla/Card.css';
 import ConnectedColumns from './ConnectedColumns';
 import ColumnList from './ColumnList';
-import Header from './Header';
+import { Header } from './Header';
 import { MappingState } from './types';
 import VersionDisplay from '../VersionDisplay';
 import { VanillaMenu } from '../vanilla/react/VanillaMenu';
