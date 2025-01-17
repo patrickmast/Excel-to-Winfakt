@@ -46,7 +46,6 @@ const Index = () => {
         if (error) throw error;
         if (!config) return;
 
-        // Set the configuration
         setCurrentConfigId(config.id);
         const settings = config.settings as unknown as ConfigurationSettings;
         if (settings?.mapping) {

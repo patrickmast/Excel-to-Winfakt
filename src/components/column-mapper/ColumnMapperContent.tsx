@@ -15,7 +15,6 @@ const ColumnMapperContent: React.FC<ColumnMapperContentProps> = ({
   onExport
 }) => {
   const handleFileSelect = (file: File) => {
-    // Handle file selection if needed
     console.log('File selected:', file);
   };
 
