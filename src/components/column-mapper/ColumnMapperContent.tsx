@@ -59,9 +59,6 @@ const ColumnMapperContent: React.FC<ColumnMapperContentProps> = ({
         onColumnClick={(column) => updateState({ selectedSourceColumn: column })}
         isColumnMapped={(column) => Object.keys(state.mapping).includes(column)}
         searchPlaceholder="Search columns..."
-        currentMapping={state.mapping}
-        onColumnSetChange={onColumnSetChange}
-        isLoading={state.isLoading}
       />
       <VersionDisplay />
     </div>

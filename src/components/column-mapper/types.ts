@@ -1,12 +1,3 @@
-export interface ColumnMapperProps {
-  targetColumns: string[];
-  onMappingChange: (mapping: Record<string, string>) => void;
-  onExport: (mapping: Record<string, string>) => void;
-  onDataLoaded: (data: any[]) => void;
-  activeColumnSet: 'artikelen' | 'klanten';
-  onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
-}
-
 export interface MappingState {
   sourceColumns: string[];
   sourceData: any[];
@@ -19,6 +10,11 @@ export interface MappingState {
   targetSearch: string;
   connectionCounter: number;
   isLoading: boolean;
+}
+
+export interface ConfigurationSettings {
+  mapping: Record<string, string>;
+  columnTransforms: Record<string, string>;
 }
 
 export interface ColumnMapperContentProps {
@@ -53,7 +49,4 @@ export interface ColumnListProps {
   onColumnClick: (column: string) => void;
   isColumnMapped: (column: string) => boolean;
   searchPlaceholder: string;
-  currentMapping: Record<string, string>;
-  onColumnSetChange: (value: string) => void;
-  isLoading: boolean;
 }
