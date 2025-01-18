@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Dialog,
-  DialogContentWithoutClose,
+  DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
@@ -68,8 +68,8 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContentWithoutClose className="max-w-[625px] h-[90vh] max-h-[700px] flex flex-col p-0">
+    <Dialog open={isOpen} onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-[625px] h-[90vh] max-h-[700px] flex flex-col p-0">
         <DialogHeader className="p-6 pb-0 flex-shrink-0 space-y-3">
           <DialogTitle>Settings for {columnName}</DialogTitle>
           <DialogDescription>
@@ -136,7 +136,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
             Save
           </Button>
         </div>
-      </DialogContentWithoutClose>
+      </DialogContent>
     </Dialog>
   );
 };

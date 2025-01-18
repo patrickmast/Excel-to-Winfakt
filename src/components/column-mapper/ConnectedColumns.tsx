@@ -1,10 +1,12 @@
-import { ArrowRight, X, Download } from 'lucide-react';
-import { Button } from '../ui/button';
+import { ArrowRight, X, Download, Filter } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import ColumnSettingsDialog from './ColumnSettingsDialog';
 import { VanillaCard, VanillaCardContent, VanillaCardHeader, VanillaCardTitle } from '../vanilla/react/VanillaCard';
 import ColumnPreview from './ColumnPreview';
 import '../vanilla/Button.css';
+import { FilterDialog, CompoundFilter, SingleCondition } from './FilterDialog';
+import { Badge } from '@/components/ui/badge';
 
 interface ConnectedColumnsProps {
   connectedColumns: [string, string, string][]; // [uniqueKey, sourceColumn, targetColumn]
@@ -26,10 +28,135 @@ const ConnectedColumns = ({
   sourceData = []
 }: ConnectedColumnsProps) => {
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
+  const [showFilterDialog, setShowFilterDialog] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<CompoundFilter | null>(null);
 
   const handleDisconnect = (uniqueKey: string) => {
     if (onDisconnect) {
       onDisconnect(uniqueKey);
+    }
+  };
+
+  const handleApplyFilter = (filter: CompoundFilter) => {
+    setActiveFilter(filter);
+  };
+
+  const handleExport = () => {
+    if (!onExport) return;
+
+    // If there's an active filter, apply it before exporting
+    if (activeFilter && sourceData) {
+      let filteredData;
+
+      if (activeFilter.advancedMode && activeFilter.expression) {
+        try {
+          // Create a safe function from the expression
+          const filterFn = new Function('row', `
+            const getValue = (val) => {
+              if (val === null || val === undefined) return '';
+              if (val instanceof Date) return val;
+              if (typeof val === 'boolean') return val;
+              if (typeof val === 'number') return val;
+              // Try to parse date strings
+              if (typeof val === 'string') {
+                const date = new Date(val);
+                if (!isNaN(date.getTime())) return date;
+              }
+              return String(val);
+            };
+            return ${activeFilter.expression};
+          `);
+          filteredData = sourceData.filter(row => {
+            try {
+              return filterFn(row);
+            } catch (err) {
+              console.error('Error evaluating filter expression for row:', err);
+              return false;
+            }
+          });
+        } catch (err) {
+          console.error('Error creating filter function:', err);
+          return;
+        }
+      } else {
+        filteredData = sourceData.filter(row => {
+          // OR groups - if any group matches, include the row
+          return activeFilter.groups.some(group => {
+            // AND conditions - all conditions in the group must match
+            return group.conditions.every(condition => {
+              function getValue(val: any): any {
+                if (val === null || val === undefined) return '';
+                if (val instanceof Date) return val;
+                if (typeof val === 'boolean') return val;
+                if (typeof val === 'number') return val;
+                // Try to parse date strings
+                if (typeof val === 'string') {
+                  const date = new Date(val);
+                  if (!isNaN(date.getTime())) return date;
+                }
+                return String(val);
+              }
+
+              const value = getValue(row[condition.column]);
+              const typedFilterValue: any = (() => {
+                if (typeof value === 'number') return Number(condition.value);
+                if (value instanceof Date) return new Date(condition.value);
+                if (typeof value === 'boolean') return condition.value === 'true';
+                return condition.value;
+              })();
+
+              function compareValues(a: any, b: any): number {
+                if (a instanceof Date && b instanceof Date) {
+                  return a.getTime() - b.getTime();
+                }
+                if (typeof a === 'number' && typeof b === 'number') {
+                  return a - b;
+                }
+                return String(a).localeCompare(String(b));
+              }
+
+              switch (condition.operator) {
+                case 'equals':
+                  if (value instanceof Date && typedFilterValue instanceof Date) {
+                    return value.getTime() === typedFilterValue.getTime();
+                  }
+                  return value === typedFilterValue;
+                case 'contains':
+                  return String(value).includes(String(typedFilterValue));
+                case 'startsWith':
+                  return String(value).startsWith(String(typedFilterValue));
+                case 'endsWith':
+                  return String(value).endsWith(String(typedFilterValue));
+                case 'greaterThan':
+                  return compareValues(value, typedFilterValue) > 0;
+                case 'lessThan':
+                  return compareValues(value, typedFilterValue) < 0;
+                case 'isEmpty':
+                  if (value instanceof Date) return false;
+                  if (typeof value === 'boolean') return false;
+                  if (typeof value === 'number') return false;
+                  return !value || String(value).trim() === '';
+                case 'isNotEmpty':
+                  if (value instanceof Date) return true;
+                  if (typeof value === 'boolean') return true;
+                  if (typeof value === 'number') return true;
+                  return value && String(value).trim() !== '';
+                default:
+                  return true;
+              }
+            });
+          });
+        });
+      }
+
+      // Replace sourceData with filtered data temporarily
+      const originalData = sourceData;
+      (sourceData as any[]) = filteredData;
+      onExport();
+      // Restore original data
+      (sourceData as any[]) = originalData;
+    } else {
+      onExport();
     }
   };
 
@@ -58,16 +185,27 @@ const ConnectedColumns = ({
       <VanillaCardHeader className="px-6 py-0">
         <div className="flex items-center justify-between w-full">
           <VanillaCardTitle className="text-xl font-semibold">Connected columns</VanillaCardTitle>
-          {onExport && (
+          <div className="flex gap-2">
             <Button
-              onClick={onExport}
+              onClick={() => setShowFilterDialog(true)}
               disabled={connectedColumns.length === 0}
-              className="bg-[#1C86EF] hover:bg-[#0E5DA8] text-white"
+              variant="outline"
+              className={activeFilter ? "border-blue-500 text-blue-500" : ""}
             >
-              <Download className="h-4 w-4" />
-              Export CSV
+              <Filter className="h-4 w-4 mr-2" />
+              {activeFilter ? "Filter Active" : "Filter"}
             </Button>
-          )}
+            {onExport && (
+              <Button
+                onClick={handleExport}
+                disabled={connectedColumns.length === 0}
+                className="bg-[#1C86EF] hover:bg-[#0E5DA8] text-white"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export CSV
+              </Button>
+            )}
+          </div>
         </div>
       </VanillaCardHeader>
 
@@ -117,6 +255,13 @@ const ConnectedColumns = ({
           sourceData={sourceData}
         />
       )}
+      <FilterDialog
+        isOpen={showFilterDialog}
+        onClose={() => setShowFilterDialog(false)}
+        sourceColumns={sourceColumns}
+        onApplyFilter={handleApplyFilter}
+        sourceData={sourceData}
+      />
     </VanillaCard>
   );
 };
