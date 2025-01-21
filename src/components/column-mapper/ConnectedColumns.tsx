@@ -7,6 +7,7 @@ import ColumnPreview from './ColumnPreview';
 import '../vanilla/Button.css';
 import { FilterDialog, CompoundFilter, SingleCondition } from './FilterDialog';
 import { Badge } from '@/components/ui/badge';
+import { ExportButton } from '@/components/ui/export-button';
 
 interface ConnectedColumnsProps {
   connectedColumns: [string, string, string][]; // [uniqueKey, sourceColumn, targetColumn]
@@ -232,14 +233,10 @@ const ConnectedColumns = ({
               {activeFilter ? "Filter Active" : "Filter"}
             </Button>
             {onExport && (
-              <Button
+              <ExportButton
                 onClick={handleExport}
                 disabled={connectedColumns.length === 0}
-                className="bg-[#1C86EF] hover:bg-[#0E5DA8] text-white"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
+              />
             )}
           </div>
         </div>
