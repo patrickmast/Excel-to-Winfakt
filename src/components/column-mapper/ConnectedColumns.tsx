@@ -79,82 +79,118 @@ const ConnectedColumns = ({
           return;
         }
       } else {
+        // Basic mode filtering
         filteredData = sourceData.filter(row => {
-          // OR groups - if any group matches, include the row
-          return activeFilter.groups.some(group => {
-            // AND conditions - all conditions in the group must match
-            return group.conditions.every(condition => {
-              function getValue(val: any): any {
-                if (val === null || val === undefined) return '';
-                if (val instanceof Date) return val;
-                if (typeof val === 'boolean') return val;
-                if (typeof val === 'number') return val;
-                // Try to parse date strings
-                if (typeof val === 'string') {
-                  const date = new Date(val);
-                  if (!isNaN(date.getTime())) return date;
-                }
-                return String(val);
+          // Skip rows that don't match our filter criteria
+          const shouldKeepRow = activeFilter.groups.every(group => {
+            const groupResult = group.type === 'AND'
+              ? group.conditions.every(condition => evaluateCondition(condition, row))
+              : group.conditions.some(condition => evaluateCondition(condition, row));
+            return groupResult;
+          });
+
+          console.log('Row decision:', {
+            row,
+            shouldKeep: shouldKeepRow
+          });
+
+          return shouldKeepRow;
+        });
+
+        function evaluateCondition(condition: SingleCondition, row: any) {
+          function getValue(val: any): any {
+            if (val === null || val === undefined) return '';
+            if (val instanceof Date) return val;
+            if (typeof val === 'boolean') return val;
+            if (typeof val === 'number') return val;
+            // Try to parse date strings
+            if (typeof val === 'string') {
+              const date = new Date(val);
+              if (!isNaN(date.getTime())) return date;
+            }
+            return String(val);
+          }
+
+          const value = getValue(row[condition.column]);
+          const typedFilterValue: any = (() => {
+            if (typeof value === 'number') return Number(condition.value);
+            if (value instanceof Date) return new Date(condition.value);
+            if (typeof value === 'boolean') return condition.value === 'true';
+            return condition.value;
+          })();
+
+          function compareValues(a: any, b: any): number {
+            if (a instanceof Date && b instanceof Date) {
+              return a.getTime() - b.getTime();
+            }
+            if (typeof a === 'number' && typeof b === 'number') {
+              return a - b;
+            }
+            return String(a).localeCompare(String(b));
+          }
+
+          switch (condition.operator) {
+            case 'equals':
+              if (value instanceof Date && typedFilterValue instanceof Date) {
+                return value.getTime() === typedFilterValue.getTime();
               }
-
-              const value = getValue(row[condition.column]);
-              const typedFilterValue: any = (() => {
-                if (typeof value === 'number') return Number(condition.value);
-                if (value instanceof Date) return new Date(condition.value);
-                if (typeof value === 'boolean') return condition.value === 'true';
-                return condition.value;
-              })();
-
-              function compareValues(a: any, b: any): number {
-                if (a instanceof Date && b instanceof Date) {
-                  return a.getTime() - b.getTime();
-                }
-                if (typeof a === 'number' && typeof b === 'number') {
-                  return a - b;
-                }
-                return String(a).localeCompare(String(b));
-              }
-
-              switch (condition.operator) {
-                case 'equals':
-                  if (value instanceof Date && typedFilterValue instanceof Date) {
-                    return value.getTime() === typedFilterValue.getTime();
-                  }
-                  return value === typedFilterValue;
-                case 'contains':
-                  return String(value).includes(String(typedFilterValue));
-                case 'startsWith':
-                  return String(value).startsWith(String(typedFilterValue));
-                case 'endsWith':
-                  return String(value).endsWith(String(typedFilterValue));
-                case 'greaterThan':
-                  return compareValues(value, typedFilterValue) > 0;
-                case 'lessThan':
-                  return compareValues(value, typedFilterValue) < 0;
-                case 'isEmpty':
-                  if (value instanceof Date) return false;
-                  if (typeof value === 'boolean') return false;
-                  if (typeof value === 'number') return false;
-                  return !value || String(value).trim() === '';
-                case 'isNotEmpty':
+              return value === typedFilterValue;
+            case 'contains':
+              return String(value).includes(String(typedFilterValue));
+            case 'startsWith':
+              return String(value).startsWith(String(typedFilterValue));
+            case 'endsWith':
+              return String(value).endsWith(String(typedFilterValue));
+            case 'greaterThan':
+              return compareValues(value, typedFilterValue) > 0;
+            case 'lessThan':
+              return compareValues(value, typedFilterValue) < 0;
+            case 'isEmpty':
+              if (value instanceof Date) return false;
+              if (typeof value === 'boolean') return false;
+              if (typeof value === 'number') return false;
+              return !value || String(value).trim() === '';
+            case 'isNotEmpty':
+              // Debug logging
+              console.log('isNotEmpty check for column:', condition.column, {
+                rawValue: row[condition.column],
+                valueAfterGetValue: value,
+                isDate: value instanceof Date,
+                isBoolean: typeof value === 'boolean',
+                isNumber: typeof value === 'number',
+                stringValue: String(value),
+                stringValueTrimmed: String(value).trim(),
+                wouldPass: (() => {
                   if (value instanceof Date) return true;
                   if (typeof value === 'boolean') return true;
                   if (typeof value === 'number') return true;
-                  return value && String(value).trim() !== '';
-                default:
-                  return true;
-              }
-            });
-          });
-        });
+                  const str = String(value);
+                  return str !== '' && str.trim() !== '';
+                })()
+              });
+
+              // Special cases for non-string types
+              if (value instanceof Date) return true;
+              if (typeof value === 'boolean') return true;
+              if (typeof value === 'number') return true;
+              // For everything else, convert to string and check if it's non-empty after trimming
+              const stringValue = String(value);
+              return stringValue !== '' && stringValue.trim() !== '';
+            default:
+              return true;
+          }
+        }
       }
 
-      // Replace sourceData with filtered data temporarily
-      const originalData = sourceData;
-      (sourceData as any[]) = filteredData;
+      console.log('Filtered data:', {
+        originalLength: sourceData.length,
+        filteredLength: filteredData.length,
+        filteredData
+      });
+
+      // Create a new array for filtered data to avoid reference issues
+      const exportData = [...filteredData];
       onExport();
-      // Restore original data
-      (sourceData as any[]) = originalData;
     } else {
       onExport();
     }
@@ -188,7 +224,7 @@ const ConnectedColumns = ({
           <div className="flex gap-2">
             <Button
               onClick={() => setShowFilterDialog(true)}
-              disabled={connectedColumns.length === 0}
+              disabled={true}
               variant="outline"
               className={activeFilter ? "border-blue-500 text-blue-500" : ""}
             >

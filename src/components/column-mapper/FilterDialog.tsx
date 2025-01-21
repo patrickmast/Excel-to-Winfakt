@@ -74,8 +74,8 @@ const FilterCondition = ({ condition, onChange, onRemove, sourceColumns, showRem
           onChange={(e) => onChange({ ...condition, column: e.target.value })}
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          {sourceColumns.map((column) => (
-            <option key={column} value={column}>{column}</option>
+          {sourceColumns.map((column, index) => (
+            <option key={`${column}-${index}`} value={column}>{column}</option>
           ))}
         </select>
         <select
@@ -337,10 +337,10 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
   const isValid = isAdvancedMode
     ? expression.trim() !== '' && hasBeenTested && testResult !== null && testError === null
     : (groups.length > 0 && groups.every(group =>
-        group.conditions.every(condition =>
+        group.conditions.length > 0 && group.conditions.every(condition =>
           condition.column && (
-            ['isEmpty', 'isNotEmpty'].includes(condition.operator) ||
-            condition.value.trim() !== ''
+            condition.operator === 'isEmpty' || condition.operator === 'isNotEmpty' ||
+            (condition.value !== undefined && condition.value.trim() !== '')
           )
         )
       ));

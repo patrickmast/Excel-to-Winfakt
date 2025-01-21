@@ -124,21 +124,9 @@ const Index = () => {
 
         <ColumnMapper
           onMappingChange={handleMappingChange}
-          onExport={(mapping) => {
-            const mappedData = sourceData.map(row => {
-              const newRow: Record<string, any> = {};
-              Object.entries(mapping).forEach(([source, target]) => {
-                if (source && target) {
-                  newRow[target] = row[source];
-                }
-              });
-              return newRow;
-            });
-            downloadCSV(mappedData, 'converted.csv');
-            toast({
-              title: "Export successful",
-              description: "Your file has been converted and downloaded",
-            });
+          onExport={() => {
+            // Just notify about the mapping change
+            handleMappingChange(columnMapping);
           }}
           onDataLoaded={setSourceData}
           targetColumns={activeColumnSet === 'artikelen' ? ARTIKEL_COLUMNS : KLANTEN_COLUMNS}
@@ -152,31 +140,157 @@ const Index = () => {
 };
 
 const ARTIKEL_COLUMNS = [
+  // Basic fields
   "Actief?", "Stock verwerken?", "Artikelnummer", "Omschrijving", "Omschrijving NL",
   "Omschrijving GB", "Omschrijving DE", "Omschrijving FR", "Omschrijving TR",
-  "BTW-percentage", "Netto verkoopprijs 1", "Netto verkoopprijs 2", "Netto verkoopprijs 3",
+  "BTW-percentage",
+
+  // Price fields
+  "Netto verkoopprijs 1", "Netto verkoopprijs 2", "Netto verkoopprijs 3",
   "Netto verkoopprijs 4", "Netto verkoopprijs 5", "Netto verkoopprijs 6", "Netto verkoopprijs 7",
   "Netto verkoopprijs 8", "Netto verkoopprijs 9", "Netto verkoopprijs 10", "Netto aankoopprijs",
-  "Catalogusprijs", "Artikelnummer fabrikant", "Artikelnummer leverancier", "Leveranciersnummer",
+  "Catalogusprijs",
+
+  // Product identification fields
+  "Artikelnummer fabrikant", "Artikelnummer leverancier", "Leveranciersnummer",
   "merk", "Recupel", "Auvibel", "Bebat", "Reprobel", "Leeggoed", "Accijnzen", "Ecoboni",
   "Barcode", "Rekeningnummer",
+
+  // Extra numeric fields
   ...Array.from({length: 20}, (_, i) => `Numeriek extra veld ${i + 1}`),
+
+  // Extra alphanumeric fields
   ...Array.from({length: 20}, (_, i) => `Alfanumeriek extra veld ${i + 1}`),
+
+  // Extra logical fields
   ...Array.from({length: 20}, (_, i) => `Logisch extra veld ${i + 1}`),
+
+  // Stock location fields
   ...Array.from({length: 9}, (_, i) => `Voorraad locatie ${i + 1}`),
   ...Array.from({length: 9}, (_, i) => `Voorraad locatie ${i + 1} toevoegen`),
+
+  // Additional fields
   "Is beginstock", "Hoofdgroep", "Subgroep", "Eenheid", "Korting uitgeschakeld",
-  "Gemarkeerd voor label printer", "Aantal 2", "intrastat-excnt", "intrastat-extreg",
-  "intrastat-extgo", "intrastat-exweight", "intrastat-excntori"
+  "Gemarkeerd voor label printer", "Aantal 2",
+
+  // Intrastat fields
+  "Intrastat, lidstaat van herkomst", "Intrastat, standaard gewest",
+  "Intrastat, goederencode", "Intrastat, gewicht per eenheid", "Intrastat, land van oorsprong",
+
+  // Price date ranges
+  ...Array.from({length: 10}, (_, i) => [
+    `Prijs ${i + 1}, datum van`,
+    `Prijs ${i + 1}, datum tot`
+  ]).flat(),
+
+  // Minimum stock fields
+  "Minimum voorraad (ja/nee)", "Minimum voorraad (aantal)"
 ];
 
 const KLANTEN_COLUMNS = [
-  "nr", "company-name", "firstname", "lastname", "address-line-1", "postal", "city",
-  "country-code", "email", "lng", "info", "phone", "mobile", "vat", "payment-days",
-  "payment-end-month",
-  ...Array.from({length: 20}, (_, i) => `ev-num-${i + 1}`),
-  ...Array.from({length: 20}, (_, i) => `ev-text-${i + 1}`),
-  ...Array.from({length: 20}, (_, i) => `ev-bool-${i + 1}`)
+  "Actief?",
+  "Contactnummer",
+  "Info",
+  "Btw-nummer",
+  "Standaard betalingstermijn",
+  "Ondernemingsnummer",
+  "Maximum herinnering",
+  "Bedrijfsnaam",
+  "Achternaam",
+  "Voornaam",
+  "Adres",
+  "Adreslijn 2",
+  "Nummer",
+  "Bus",
+  "Postcode",
+  "E-mail",
+  "Telefoon",
+  "gsm",
+  "Fax",
+  "Stad",
+  "Taal",
+  "Landcode",
+  "Betaling einde maand?",
+  "Numeriek extra veld 1",
+  "Numeriek extra veld 2",
+  "Numeriek extra veld 3",
+  "Numeriek extra veld 4",
+  "Numeriek extra veld 5",
+  "Numeriek extra veld 6",
+  "Numeriek extra veld 7",
+  "Numeriek extra veld 8",
+  "Numeriek extra veld 9",
+  "Numeriek extra veld 10",
+  "Numeriek extra veld 11",
+  "Numeriek extra veld 12",
+  "Numeriek extra veld 13",
+  "Numeriek extra veld 14",
+  "Numeriek extra veld 15",
+  "Numeriek extra veld 16",
+  "Numeriek extra veld 17",
+  "Numeriek extra veld 18",
+  "Numeriek extra veld 19",
+  "Numeriek extra veld 20",
+  "Alfanumeriek extra veld 1",
+  "Alfanumeriek extra veld 2",
+  "Alfanumeriek extra veld 3",
+  "Alfanumeriek extra veld 4",
+  "Alfanumeriek extra veld 5",
+  "Alfanumeriek extra veld 6",
+  "Alfanumeriek extra veld 7",
+  "Alfanumeriek extra veld 8",
+  "Alfanumeriek extra veld 9",
+  "Alfanumeriek extra veld 10",
+  "Alfanumeriek extra veld 11",
+  "Alfanumeriek extra veld 12",
+  "Alfanumeriek extra veld 13",
+  "Alfanumeriek extra veld 14",
+  "Alfanumeriek extra veld 15",
+  "Alfanumeriek extra veld 16",
+  "Alfanumeriek extra veld 17",
+  "Alfanumeriek extra veld 18",
+  "Alfanumeriek extra veld 19",
+  "Alfanumeriek extra veld 20",
+  "Logisch extra veld 1",
+  "Logisch extra veld 2",
+  "Logisch extra veld 3",
+  "Logisch extra veld 4",
+  "Logisch extra veld 5",
+  "Logisch extra veld 6",
+  "Logisch extra veld 7",
+  "Logisch extra veld 8",
+  "Logisch extra veld 9",
+  "Logisch extra veld 10",
+  "Logisch extra veld 11",
+  "Logisch extra veld 12",
+  "Logisch extra veld 13",
+  "Logisch extra veld 14",
+  "Logisch extra veld 15",
+  "Logisch extra veld 16",
+  "Logisch extra veld 17",
+  "Logisch extra veld 18",
+  "Logisch extra veld 19",
+  "Logisch extra veld 20",
+  "Tijd veld 1",
+  "Tijd veld 2",
+  "Tijd veld 3",
+  "Tijd veld 4",
+  "Tijd veld 5",
+  "Tijd veld 6",
+  "Tijd veld 7",
+  "Tijd veld 8",
+  "Tijd veld 9",
+  "Tijd veld 10",
+  "Tijd veld 11",
+  "Tijd veld 12",
+  "Tijd veld 13",
+  "Tijd veld 14",
+  "Tijd veld 15",
+  "Tijd veld 16",
+  "Tijd veld 17",
+  "Tijd veld 18",
+  "Tijd veld 19",
+  "Tijd veld 20"
 ];
 
 export default Index;
