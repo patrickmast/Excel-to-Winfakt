@@ -91,6 +91,14 @@ const ColumnMapperContent = ({
     updateState(type === 'source' ? { sourceSearch: value } : { targetSearch: value });
   }, [updateState]);
 
+  const handleReorder = useCallback((newOrder: [string, string, string][]) => {
+    const newMapping: Record<string, string> = {};
+    newOrder.forEach(([key, _, target]) => {
+      newMapping[key] = target;
+    });
+    updateState({ mapping: newMapping });
+  }, [updateState]);
+
   const connectedColumns = Object.entries(state.mapping).map(([key, target]) => {
     const sourceColumn = key.split('_')[0];
     return [key, sourceColumn, target] as [string, string, string];
@@ -160,6 +168,7 @@ const ColumnMapperContent = ({
               }
             });
           }}
+          onReorder={handleReorder}
           columnTransforms={state.columnTransforms}
           sourceColumns={state.sourceColumns}
           sourceData={state.sourceData}
