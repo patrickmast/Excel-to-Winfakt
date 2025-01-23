@@ -56,8 +56,11 @@ const ColumnMapper = ({
     });
   }, [onDataLoaded, onSourceFileChange]);
 
-  const handleExport = useCallback(() => {
-    const transformedData = state.sourceData.map(row => {
+  const handleExport = useCallback((filteredData?: any[]) => {
+    // Use filtered data if provided, otherwise use all source data
+    const dataToTransform = filteredData || state.sourceData;
+
+    const transformedData = dataToTransform.map(row => {
       const newRow: Record<string, any> = {};
       Object.entries(state.mapping).forEach(([uniqueKey, target]) => {
         const sourceColumn = uniqueKey.split('_')[0];
@@ -82,7 +85,7 @@ const ColumnMapper = ({
     onExport(state.mapping);
     toast({
       title: "Export successful",
-      description: "Your file has been converted and downloaded",
+      description: `Your file has been converted and downloaded (${transformedData.length} rows)`,
     });
   }, [state.sourceData, state.mapping, state.columnTransforms, state.sourceFilename, onExport]);
 

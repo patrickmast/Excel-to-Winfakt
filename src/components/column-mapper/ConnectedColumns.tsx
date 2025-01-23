@@ -12,7 +12,7 @@ import { ExportButton } from '@/components/ui/export-button';
 interface ConnectedColumnsProps {
   connectedColumns: [string, string, string][]; // [uniqueKey, sourceColumn, targetColumn]
   onDisconnect?: (source: string) => void;
-  onExport?: () => void;
+  onExport?: (filteredData?: any[]) => void;
   onUpdateTransform?: (uniqueKey: string, code: string) => void;
   columnTransforms?: Record<string, string>;
   sourceColumns: string[];
@@ -189,10 +189,10 @@ const ConnectedColumns = ({
         filteredData
       });
 
-      // Create a new array for filtered data to avoid reference issues
-      const exportData = [...filteredData];
-      onExport();
+      // Pass filtered data to export
+      onExport(filteredData);
     } else {
+      // No filter active, export all data
       onExport();
     }
   };
