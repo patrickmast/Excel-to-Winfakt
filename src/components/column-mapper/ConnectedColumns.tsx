@@ -225,7 +225,6 @@ const ConnectedColumns = ({
           <div className="flex gap-2">
             <Button
               onClick={() => setShowFilterDialog(true)}
-              disabled={true}
               variant="outline"
               className={activeFilter ? "border-blue-500 text-blue-500" : ""}
             >
