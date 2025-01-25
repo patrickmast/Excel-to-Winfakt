@@ -7,6 +7,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { useEffect, useState } from 'react';
 
 const DEPLOYMENT_TIMESTAMP = import.meta.env.VITE_DEPLOYMENT_TIMESTAMP || '1704063600000';
 
@@ -20,11 +21,31 @@ interface InfoDialogProps {
 }
 
 const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCount, worksheetName }: InfoDialogProps) => {
+  const [lastModified, setLastModified] = useState<string>(DEPLOYMENT_TIMESTAMP);
+
+  useEffect(() => {
+    if (import.meta.env.DEV && open) {
+      const fetchLastModified = async () => {
+        try {
+          const response = await fetch('/api/last-modified');
+          const data = await response.json();
+          setLastModified(data.timestamp.toString());
+        } catch (error) {
+          console.error('Failed to fetch last modified time:', error);
+        }
+      };
+
+      fetchLastModified();
+      const interval = setInterval(fetchLastModified, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [open]);
+
   if (!open) return null;
 
   const getVersionNumber = () => {
     const REFERENCE_TIMESTAMP = 1704063600; // Jan 1, 2025 00:00:00 UTC
-    const secondsSinceReference = Math.floor(Number(DEPLOYMENT_TIMESTAMP) / 1000) - REFERENCE_TIMESTAMP;
+    const secondsSinceReference = Math.floor(Number(lastModified) / 1000) - REFERENCE_TIMESTAMP;
     const versionNumber = secondsSinceReference - 31560000;
 
     if (versionNumber < 0) {
@@ -35,7 +56,7 @@ const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCou
   };
 
   const formatDate = () => {
-    const date = new Date(Number(DEPLOYMENT_TIMESTAMP));
+    const date = new Date(Number(lastModified));
 
     if (date.getTime() === 1704063600000) {
       return { dateStr: "Deployment date unknown", timeStr: "" };
@@ -51,10 +72,21 @@ const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCou
     const timeStr = date.toLocaleString('en-GB', {
       hour: '2-digit',
       minute: '2-digit',
+      second: '2-digit',
       timeZone: 'Europe/Brussels',
       hour12: false,
     });
-    return { dateStr: formattedDate, timeStr };
+    
+    if (import.meta.env.DEV) {
+      return { 
+        dateStr: formattedDate,
+        timeStr
+      };
+    }
+    return { 
+      dateStr: `Deployed on ${formattedDate}`,
+      timeStr
+    };
   };
 
   const { dateStr, timeStr } = formatDate();
@@ -101,7 +133,7 @@ const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCou
               <span>{getVersionNumber()}</span>
             </div>
             <div className="flex items-center">
-              <span className="min-w-[120px]">Deployed:</span>
+              <span className="min-w-[120px]">{import.meta.env.DEV ? 'Last modified:' : 'Deployed:'}</span>
               <span>{dateStr}{timeStr ? ` at ${timeStr}` : ''}</span>
             </div>
           </div>
