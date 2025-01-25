@@ -62,7 +62,7 @@ const VersionDisplay = () => {
     <VanillaHoverCard>
       <VanillaHoverCardTrigger>
         <span className="cursor-pointer" title={tooltipText}>
-          Latest Build: {lastModified}
+          Last modified: {lastModified}
         </span>
       </VanillaHoverCardTrigger>
       <VanillaHoverCardContent>
