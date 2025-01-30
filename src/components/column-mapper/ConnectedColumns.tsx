@@ -1,6 +1,7 @@
 import { ArrowRight, X, Download, Filter, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ColumnSettingsDialog from './ColumnSettingsDialog';
 import { VanillaCard, VanillaCardContent, VanillaCardHeader, VanillaCardTitle } from '../vanilla/react/VanillaCard';
 import ColumnPreview from './ColumnPreview';
@@ -114,6 +115,9 @@ const ConnectedColumns = ({
   sourceColumns = [],
   sourceData = []
 }: ConnectedColumnsProps) => {
+  const [searchParams] = useSearchParams();
+  const filterParam = searchParams.get('ShowFilter');
+  const showFilter = !filterParam || filterParam.toLowerCase() === 'yes';
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
   const [showFilterDialog, setShowFilterDialog] = useState(false);
   const [activeFilter, setActiveFilter] = useState<CompoundFilter | null>(null);
@@ -328,14 +332,16 @@ const ConnectedColumns = ({
         <div className="flex items-center justify-between w-full">
           <VanillaCardTitle className="text-xl font-semibold">Connected columns</VanillaCardTitle>
           <div className="flex gap-2">
-            <Button
-              onClick={() => setShowFilterDialog(true)}
-              variant="outline"
-              className={activeFilter ? "border-blue-500 text-blue-500" : ""}
-            >
-              <Filter className="h-4 w-4 mr-2" />
-              {activeFilter ? "Filter Active" : "Filter"}
-            </Button>
+            {showFilter && (
+              <Button
+                onClick={() => setShowFilterDialog(true)}
+                variant="outline"
+                className={activeFilter ? "border-blue-500 text-blue-500" : ""}
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                {activeFilter ? "Filter Active" : "Filter"}
+              </Button>
+            )}
             {onExport && (
               <ExportButton
                 onClick={handleExport}
