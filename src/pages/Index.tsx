@@ -177,14 +177,14 @@ const ARTIKEL_COLUMNS = [
   "Intrastat, lidstaat van herkomst", "Intrastat, standaard gewest",
   "Intrastat, goederencode", "Intrastat, gewicht per eenheid", "Intrastat, land van oorsprong",
 
+  // Minimum stock fields
+  "Minimum voorraad (ja/nee)", "Minimum voorraad (aantal)", "Minimum bestelhoeveelheid",
+
   // Price date ranges
   ...Array.from({length: 10}, (_, i) => [
     `Prijs ${i + 1}, datum van`,
     `Prijs ${i + 1}, datum tot`
   ]).flat(),
-
-  // Minimum stock fields
-  "Minimum voorraad (ja/nee)", "Minimum voorraad (aantal)"
 ];
 
 const KLANTEN_COLUMNS = [
