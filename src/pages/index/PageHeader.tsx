@@ -6,10 +6,11 @@ interface PageHeaderProps {
   onSaveNew: () => void;
   onSave: () => void;
   onInfo: () => void;
+  onClearSettings: () => void;
   isSaving: boolean;
 }
 
-const PageHeader = ({ onSaveNew, onSave, onInfo, isSaving }: PageHeaderProps) => {
+const PageHeader = ({ onSaveNew, onSave, onInfo, onClearSettings, isSaving }: PageHeaderProps) => {
   const [searchParams] = useSearchParams();
   const h1Param = searchParams.get('ShowH1');
   const showH1 = !h1Param || h1Param.toLowerCase() === 'yes';
@@ -38,6 +39,7 @@ const PageHeader = ({ onSaveNew, onSave, onInfo, isSaving }: PageHeaderProps) =>
               onSaveNew={onSaveNew}
               onSave={onSave}
               onInfo={onInfo}
+              onClearSettings={onClearSettings}
               isSaving={isSaving}
             />
           )}

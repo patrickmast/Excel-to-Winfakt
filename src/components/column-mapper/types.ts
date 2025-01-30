@@ -6,6 +6,7 @@ export interface ColumnMapperProps {
   activeColumnSet: 'artikelen' | 'klanten';
   onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
   onSourceFileChange?: (info: { filename: string; rowCount: number; worksheetName?: string }) => void;
+  shouldReset?: boolean;
 }
 
 export interface MappingState {

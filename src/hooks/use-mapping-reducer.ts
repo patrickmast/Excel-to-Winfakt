@@ -21,6 +21,8 @@ const initialState: MappingState = {
   isLoading: false
 };
 
+const STORAGE_KEY = 'csv-transformer-state';
+
 function mappingReducer(state: MappingState, action: MappingAction): MappingState {
   switch (action.type) {
     case 'LOAD_CONFIGURATION':
@@ -58,6 +60,16 @@ function mappingReducer(state: MappingState, action: MappingAction): MappingStat
       };
 
     case 'RESET_STATE':
+      console.log('Reducer: RESET_STATE action received');
+      console.log('Current state:', state);
+      console.log('Resetting to initial state:', initialState);
+      // Clear local storage
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        console.log('Local storage cleared');
+      } catch (error) {
+        console.error('Error clearing local storage:', error);
+      }
       return {
         ...initialState
       };
@@ -86,8 +98,10 @@ export function useMappingReducer() {
       dispatch({ type: 'SET_MAPPING', payload: mapping }),
     setSourceData: (columns: string[], data: any[], filename?: string, worksheetName?: string) =>
       dispatch({ type: 'SET_SOURCE_DATA', payload: { columns, data, filename, worksheetName } }),
-    resetState: () =>
-      dispatch({ type: 'RESET_STATE' }),
+    resetState: () => {
+      console.log('resetState helper called - dispatching RESET_STATE action');
+      dispatch({ type: 'RESET_STATE' });
+    },
     updateTransforms: (transforms: Record<string, string>) =>
       dispatch({ type: 'UPDATE_TRANSFORMS', payload: transforms })
   };

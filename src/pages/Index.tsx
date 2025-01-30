@@ -25,7 +25,8 @@ const Index = () => {
     state: mappingState,
     loadConfiguration,
     setMapping,
-    setSourceData
+    setSourceData,
+    resetState
   } = useMappingReducer();
 
   const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
@@ -37,6 +38,7 @@ const Index = () => {
   const [searchParams] = useSearchParams();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number; worksheetName?: string } | null>(null);
+  const [shouldResetMapper, setShouldResetMapper] = useState(false);
 
   const handleLoadConfiguration = useCallback(async (id: string) => {
     try {
@@ -115,6 +117,39 @@ const Index = () => {
     }
   };
 
+  const handleClearSettings = useCallback(() => {
+    console.log('Clear settings clicked - starting reset process');
+
+    // Reset main state first
+    resetState();
+    console.log('Main state reset called');
+
+    // Clear related state
+    setSourceFileInfo(null);
+    setCurrentConfigId(null);
+    console.log('Related state cleared');
+
+    // Trigger ColumnMapper reset
+    setShouldResetMapper(true);
+    console.log('ColumnMapper reset triggered');
+
+    // Show toast notification
+    toast({
+      title: "Settings Cleared",
+      description: "All settings have been reset to default",
+      duration: 3000,
+      variant: "default"
+    });
+    console.log('Toast notification sent');
+  }, [resetState, toast]);
+
+  // Reset the shouldResetMapper flag after it's been used
+  useEffect(() => {
+    if (shouldResetMapper) {
+      setShouldResetMapper(false);
+    }
+  }, [shouldResetMapper]);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <SavedConfigDialog
@@ -137,6 +172,7 @@ const Index = () => {
           onSaveNew={() => handleSaveConfiguration(true)}
           onSave={() => handleSaveConfiguration(false)}
           onInfo={() => setShowInfoDialog(true)}
+          onClearSettings={handleClearSettings}
           isSaving={isSaving}
         />
 
@@ -146,12 +182,14 @@ const Index = () => {
             handleMappingChange(mappingState.mapping);
           }}
           onDataLoaded={(data) => {
-            setSourceData(mappingState.sourceColumns, data);
+            const columns = data.length > 0 ? mappingState.sourceColumns : [];
+            setSourceData(columns, data);
           }}
           targetColumns={activeColumnSet === 'artikelen' ? ARTIKEL_COLUMNS : KLANTEN_COLUMNS}
           activeColumnSet={activeColumnSet}
           onColumnSetChange={setActiveColumnSet}
           onSourceFileChange={setSourceFileInfo}
+          shouldReset={shouldResetMapper}
         />
       </div>
     </div>

@@ -8,6 +8,8 @@ import ColumnMapperContent from './column-mapper/ColumnMapperContent';
 import { downloadCSV } from '@/utils/csvUtils';
 import { MappingState } from './column-mapper/types';
 
+const STORAGE_KEY = 'csv-transformer-state';
+
 const ColumnMapper = ({
   targetColumns,
   onMappingChange,
@@ -15,12 +17,40 @@ const ColumnMapper = ({
   onDataLoaded,
   activeColumnSet,
   onColumnSetChange,
-  onSourceFileChange
+  onSourceFileChange,
+  shouldReset
 }: ColumnMapperProps) => {
   const [state, updateState] = useMappingState(onMappingChange);
   const { saveConfiguration, isSaving } = useConfiguration();
   const [showSavedDialog, setShowSavedDialog] = useState(false);
   const [savedConfigUrl, setSavedConfigUrl] = useState('');
+
+  // Reset function
+  const resetColumnMapper = useCallback(() => {
+    console.log('ColumnMapper: Direct reset called');
+    updateState({
+      mapping: {},
+      columnTransforms: {},
+      sourceColumns: [],
+      sourceData: [],
+      sourceFilename: '',
+      sourceSearch: '',
+      targetSearch: '',
+      selectedSourceColumn: null,
+      selectedTargetColumn: null,
+      connectionCounter: 0,
+      isLoading: false
+    });
+    // Clear local storage directly
+    localStorage.removeItem(STORAGE_KEY);
+  }, [updateState]);
+
+  // Only reset when shouldReset changes to true
+  useEffect(() => {
+    if (shouldReset) {
+      resetColumnMapper();
+    }
+  }, [shouldReset, resetColumnMapper]);
 
   const handleFileData = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string) => {
     // Update state first
