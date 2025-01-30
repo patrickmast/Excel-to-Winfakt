@@ -118,35 +118,25 @@ const Index = () => {
   };
 
   const handleClearSettings = useCallback(() => {
-    console.log('Clear settings clicked - starting reset process');
-
-    // Reset main state first
+    // Reset all state
     resetState();
-    console.log('Main state reset called');
-
-    // Clear related state
     setSourceFileInfo(null);
     setCurrentConfigId(null);
-    console.log('Related state cleared');
-
-    // Trigger ColumnMapper reset
     setShouldResetMapper(true);
-    console.log('ColumnMapper reset triggered');
 
-    // Show toast notification
     toast({
       title: "Settings Cleared",
       description: "All settings have been reset to default",
       duration: 3000,
       variant: "default"
     });
-    console.log('Toast notification sent');
   }, [resetState, toast]);
 
-  // Reset the shouldResetMapper flag after it's been used
+  // Reset the flag after a short delay to allow the reset to complete
   useEffect(() => {
     if (shouldResetMapper) {
-      setShouldResetMapper(false);
+      const timer = setTimeout(() => setShouldResetMapper(false), 100);
+      return () => clearTimeout(timer);
     }
   }, [shouldResetMapper]);
 
