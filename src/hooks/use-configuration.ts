@@ -1,24 +1,39 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './use-toast';
+import { MappingState } from '@/components/column-mapper/types';
+
+type SaveableState = Pick<MappingState, 'mapping' | 'columnTransforms' | 'sourceColumns' | 'connectionCounter' | 'sourceFilename'>;
 
 export const useConfiguration = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const saveConfiguration = async (
-    mapping: Record<string, string>, 
-    columnTransforms: Record<string, string>,
+    state: SaveableState,
     isNewConfig: boolean = true
   ) => {
+    // Return early if no mapping exists
+    if (!state.mapping || Object.keys(state.mapping).length === 0) {
+      toast({
+        title: "Error",
+        description: "No mapping configuration to save",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     setIsSaving(true);
-    
+
     try {
       const { data, error } = await supabase
         .from('shared_configurations')
         .insert({
           settings: {
-            mapping,
-            columnTransforms,
+            mapping: state.mapping,
+            columnTransforms: state.columnTransforms,
+            sourceColumns: state.sourceColumns,
+            connectionCounter: state.connectionCounter,
+            sourceFilename: state.sourceFilename
           },
         })
         .select()

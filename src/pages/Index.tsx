@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ColumnMapper from '../components/ColumnMapper';
 import { useToast } from '../components/ui/use-toast';
 import { downloadCSV } from '../utils/csvUtils';
@@ -18,10 +18,16 @@ import SavedConfigDialog from '@/components/column-mapper/SavedConfigDialog';
 import InfoDialog from '@/components/column-mapper/InfoDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
 import PageHeader from './index/PageHeader';
+import { useMappingReducer } from '@/hooks/use-mapping-reducer';
 
 const Index = () => {
-  const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
-  const [sourceData, setSourceData] = useState<any[]>([]);
+  const {
+    state: mappingState,
+    loadConfiguration,
+    setMapping,
+    setSourceData
+  } = useMappingReducer();
+
   const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
   const { toast } = useToast();
   const { saveConfiguration, isSaving } = useConfiguration();
@@ -32,55 +38,67 @@ const Index = () => {
   const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number; worksheetName?: string } | null>(null);
 
-  useEffect(() => {
-    const loadSavedConfiguration = async () => {
-      const id = searchParams.get('id');
-      if (!id) return;
+  const handleLoadConfiguration = useCallback(async (id: string) => {
+    try {
+      const { data: config, error } = await supabase
+        .from('shared_configurations')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-      try {
-        const { data: config, error } = await supabase
-          .from('shared_configurations')
-          .select('*')
-          .eq('id', id)
-          .single();
+      if (error) throw error;
+      if (!config) return;
 
-        if (error) throw error;
-        if (!config) return;
+      setCurrentConfigId(config.id);
+      const settings = config.settings as unknown as ConfigurationSettings;
 
-        // Set the configuration
-        setCurrentConfigId(config.id);
-        const settings = config.settings as unknown as ConfigurationSettings;
-        if (settings?.mapping) {
-          setColumnMapping(settings.mapping);
-        }
+      // Load all state properties in a single atomic update
+      loadConfiguration(settings);
 
-        toast({
-          title: "Configuration loaded",
-          description: "The saved configuration has been loaded successfully. Please select your source file.",
-        });
-      } catch (error) {
-        console.error('Error loading configuration:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load the saved configuration",
-          variant: "destructive",
+      // Update source file info if available
+      if (settings.sourceColumns) {
+        setSourceFileInfo({
+          filename: settings.sourceFilename || '',
+          rowCount: settings.sourceData?.length || 0,
+          worksheetName: settings.worksheetName
         });
       }
-    };
 
-    loadSavedConfiguration();
-  }, [searchParams, toast]);
+      toast({
+        title: "Configuration loaded",
+        description: "The saved configuration has been loaded successfully.",
+      });
+    } catch (error) {
+      console.error('Error loading configuration:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load the saved configuration",
+        variant: "destructive",
+      });
+    }
+  }, [loadConfiguration, toast]);
+
+  useEffect(() => {
+    const id = searchParams.get('id');
+    if (id) {
+      handleLoadConfiguration(id);
+    }
+  }, [searchParams, handleLoadConfiguration]);
 
   const handleMappingChange = (mapping: Record<string, string>) => {
-    setColumnMapping(mapping);
+    setMapping(mapping);
   };
 
   const handleSaveConfiguration = async (isNewConfig: boolean = true) => {
-    const result = await saveConfiguration(
-      columnMapping,
-      {},
-      isNewConfig
-    );
+    // Save the entire mapping state
+    const result = await saveConfiguration({
+      mapping: mappingState.mapping,
+      columnTransforms: mappingState.columnTransforms,
+      sourceColumns: mappingState.sourceColumns,
+      sourceData: mappingState.sourceData,
+      connectionCounter: mappingState.connectionCounter,
+      sourceFilename: mappingState.sourceFilename
+    }, isNewConfig);
 
     if (result) {
       setCurrentConfigId(result.id);
@@ -125,10 +143,11 @@ const Index = () => {
         <ColumnMapper
           onMappingChange={handleMappingChange}
           onExport={() => {
-            // Just notify about the mapping change
-            handleMappingChange(columnMapping);
+            handleMappingChange(mappingState.mapping);
           }}
-          onDataLoaded={setSourceData}
+          onDataLoaded={(data) => {
+            setSourceData(mappingState.sourceColumns, data);
+          }}
           targetColumns={activeColumnSet === 'artikelen' ? ARTIKEL_COLUMNS : KLANTEN_COLUMNS}
           activeColumnSet={activeColumnSet}
           onColumnSetChange={setActiveColumnSet}

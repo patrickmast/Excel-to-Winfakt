@@ -25,4 +25,9 @@ export interface MappingState {
 export interface ConfigurationSettings {
   mapping: Record<string, string>;
   columnTransforms?: Record<string, string>;
+  sourceColumns?: string[];
+  sourceData?: any[];
+  connectionCounter?: number;
+  sourceFilename?: string;
+  worksheetName?: string;
 }

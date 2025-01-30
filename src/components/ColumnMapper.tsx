@@ -22,39 +22,26 @@ const ColumnMapper = ({
   const [showSavedDialog, setShowSavedDialog] = useState(false);
   const [savedConfigUrl, setSavedConfigUrl] = useState('');
 
-  useEffect(() => {
-    updateState({
-      mapping: {},
-      columnTransforms: {}
-    });
-  }, [activeColumnSet]);
-
   const handleFileData = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string) => {
-    onSourceFileChange?.({
-      filename: '',
-      rowCount: 0
-    });
-
+    // Update state first
     updateState({
       sourceColumns: columns,
       sourceData: data,
       sourceFilename: sourceFilename,
-      mapping: {},
-      columnTransforms: {},
       selectedSourceColumn: null,
       selectedTargetColumn: null,
       sourceSearch: '',
-      targetSearch: '',
-      connectionCounter: 0
+      targetSearch: ''
     });
-    onDataLoaded(data);
 
+    // Then notify parent components
+    onDataLoaded(data);
     onSourceFileChange?.({
       filename: sourceFilename,
       rowCount: data.length,
       worksheetName
     });
-  }, [onDataLoaded, onSourceFileChange]);
+  }, [onDataLoaded, onSourceFileChange, updateState]);
 
   const handleExport = useCallback((filteredData?: any[]) => {
     // Use filtered data if provided, otherwise use all source data
@@ -90,17 +77,20 @@ const ColumnMapper = ({
   }, [state.sourceData, state.mapping, state.columnTransforms, state.sourceFilename, onExport]);
 
   const handleSaveConfiguration = useCallback(async () => {
-    const result = await saveConfiguration(
-      state.mapping,
-      state.columnTransforms
-    );
+    const result = await saveConfiguration({
+      mapping: state.mapping,
+      columnTransforms: state.columnTransforms,
+      sourceColumns: state.sourceColumns,
+      connectionCounter: state.connectionCounter,
+      sourceFilename: state.sourceFilename
+    });
 
     if (result) {
       const configUrl = `${window.location.origin}/preview/${result.id}`;
       setSavedConfigUrl(configUrl);
       setShowSavedDialog(true);
     }
-  }, [state.mapping, state.columnTransforms, saveConfiguration]);
+  }, [state.mapping, state.columnTransforms, state.sourceColumns, state.connectionCounter, state.sourceFilename, saveConfiguration]);
 
   return (
     <>
