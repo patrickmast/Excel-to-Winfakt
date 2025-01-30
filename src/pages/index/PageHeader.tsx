@@ -11,7 +11,10 @@ interface PageHeaderProps {
 
 const PageHeader = ({ onSaveNew, onSave, onInfo, isSaving }: PageHeaderProps) => {
   const [searchParams] = useSearchParams();
-  const showH1 = searchParams.get('ShowH1')?.toLowerCase() === 'yes';
+  const h1Param = searchParams.get('ShowH1');
+  const showH1 = !h1Param || h1Param.toLowerCase() === 'yes';
+  const menuParam = searchParams.get('ShowMenu');
+  const showMenu = !menuParam || menuParam.toLowerCase() === 'yes';
 
   return (
     <div className="flex flex-col">
@@ -30,12 +33,14 @@ const PageHeader = ({ onSaveNew, onSave, onInfo, isSaving }: PageHeaderProps) =>
         )}
         {!showH1 && <div className="flex-1" />}
         <div className="w-32 flex justify-end"> {/* Added flex justify-end */}
-          <ConfigurationMenu
-            onSaveNew={onSaveNew}
-            onSave={onSave}
-            onInfo={onInfo}
-            isSaving={isSaving}
-          />
+          {showMenu && (
+            <ConfigurationMenu
+              onSaveNew={onSaveNew}
+              onSave={onSave}
+              onInfo={onInfo}
+              isSaving={isSaving}
+            />
+          )}
         </div>
       </div>
       <BuildTimestamp />
