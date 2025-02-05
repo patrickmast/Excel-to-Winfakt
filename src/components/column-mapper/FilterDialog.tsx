@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, X, Code, Play, HelpCircle } from 'lucide-react';
+import { Plus, X, Code, Play, HelpCircle, Trash2 } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -162,23 +162,53 @@ const ExamplesTab = () => {
 };
 
 export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, sourceData = [], initialFilter }: FilterDialogProps) => {
-  const [groups, setGroups] = useState<FilterGroup[]>(() => 
-    initialFilter?.groups ?? [{
-      conditions: [{
-        column: sourceColumns[0] || '',
-        operator: 'equals',
-        value: ''
-      }],
-      type: 'AND'
-    }]
+  const defaultCondition = {
+    column: sourceColumns[0] || '',
+    operator: 'equals',
+    value: ''
+  };
+  const defaultGroup = {
+    conditions: [defaultCondition],
+    type: 'AND'
+  };
+
+  const [groups, setGroups] = useState<FilterGroup[]>(() =>
+    initialFilter?.groups ?? [defaultGroup]
   );
-  
+
   const [isAdvancedMode, setIsAdvancedMode] = useState(initialFilter?.advancedMode ?? false);
   const [expression, setExpression] = useState(initialFilter?.expression ?? '');
   const [activeTab, setActiveTab] = useState<'expression' | 'examples'>('expression');
   const [testResult, setTestResult] = useState<string | null>(null);
   const [testError, setTestError] = useState<string | null>(null);
   const [hasBeenTested, setHasBeenTested] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  const resetToDefault = () => {
+    setGroups([defaultGroup]);
+    setIsAdvancedMode(false);
+    setExpression('');
+    setShowClearConfirm(false);
+  };
+
+  const isFilterEmpty = useMemo(() => {
+    if (isAdvancedMode) {
+      return !expression.trim();
+    }
+    
+    // Check if we have the default state
+    if (groups.length !== 1) return false;
+    const group = groups[0];
+    if (group.conditions.length !== 1) return false;
+    const condition = group.conditions[0];
+    
+    return (
+      group.type === 'AND' &&
+      (!condition.column || condition.column === sourceColumns[0]) &&
+      condition.operator === 'equals' &&
+      !condition.value.trim()
+    );
+  }, [isAdvancedMode, expression, groups, sourceColumns]);
 
   useEffect(() => {
     if (isOpen && initialFilter) {
@@ -363,21 +393,21 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader className="pb-0">
-          <DialogTitle className="flex items-center justify-between px-4 pb-2">
+      <DialogContent className="sm:max-w-[600px] border-none">
+        <DialogHeader className="bg-[#1e2838] -mx-6 -mt-6 px-6 py-4 rounded-t-lg">
+          <DialogTitle className="flex items-center justify-between text-white text-lg font-semibold">
             <span>Filter Rows</span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setIsAdvancedMode(!isAdvancedMode)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white hover:text-white border-0 transition-colors"
             >
               <Code className="h-4 w-4" />
               {isAdvancedMode ? 'Switch to Basic' : 'Switch to Advanced'}
             </Button>
           </DialogTitle>
-          <DialogDescription className="px-4 pb-1">
+          <DialogDescription className="text-gray-300 mt-1">
             {isAdvancedMode
               ? "Create a custom JavaScript filter expression to filter rows based on their values. Write a JavaScript expression that returns true for rows that should be included. Use row[\"Column Name\"] to access column values."
               : "Create filter conditions to filter rows based on their values."}
@@ -608,32 +638,78 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
             </Button>
           </div>
         )}
-        <DialogFooter className="flex w-full gap-x-2 px-4 py-2">
-          <div className="flex gap-x-2 w-full">
-            {isAdvancedMode && (
-              <Button
-                onClick={handleTest}
-                disabled={!expression.trim()}
-                variant={expression.trim() ? undefined : "outline"}
-                className={`flex items-center gap-2 rounded-md ${
-                  expression.trim() ? 'bg-green-600 hover:bg-green-700 text-white' : ''
-                }`}
-              >
-                <Play className="h-4 w-4" />
-                Test
-              </Button>
-            )}
-            <div className="flex gap-x-2 ml-auto">
-              <Button variant="outline" onClick={onClose}>Cancel</Button>
-              <Button
-                onClick={handleApply}
-                disabled={!isValid}
-                className="bg-gray-500 hover:bg-gray-600 text-white"
-              >
-                Apply Filter
-              </Button>
+        <DialogFooter className="p-5 bg-gray-50 flex justify-end gap-3 -mx-6 -mb-6 rounded-b-lg">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isFilterEmpty}
+            onClick={() => {
+              if (!showClearConfirm) {
+                setShowClearConfirm(true);
+                return;
+              }
+            }}
+            className="border-slate-200 mr-auto hover:text-red-600 relative disabled:opacity-50"
+          >
+            <div className="flex items-center gap-2">
+              <span>Clear Filter</span>
+              {showClearConfirm && (
+                <div className="flex gap-1 border-l pl-2 ml-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 px-2 hover:bg-red-100 hover:text-red-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      resetToDefault();
+                      onApplyFilter(null);
+                      onClose();
+                    }}
+                  >
+                    Yes
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 px-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowClearConfirm(false);
+                    }}
+                  >
+                    No
+                  </Button>
+                </div>
+              )}
             </div>
-          </div>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="border-slate-200"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            onClick={handleApply}
+            disabled={!isValid}
+            className="bg-blue-500 hover:bg-blue-600 text-white"
+          >
+            Apply Filter
+          </Button>
+          {isAdvancedMode && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleTest}
+              className="absolute left-6"
+            >
+              <Play className="h-4 w-4 mr-2" />
+              Test Expression
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
