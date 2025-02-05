@@ -233,7 +233,7 @@ const ConnectedColumns = ({
         </div>
       </VanillaCardHeader>
       {connectedColumns.length > 0 && (
-        <VanillaCardContent className="w-full space-y-2 mt-4 px-8">
+        <VanillaCardContent className="w-full space-y-2 mt-4 px-6">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
