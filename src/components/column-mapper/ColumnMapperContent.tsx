@@ -55,7 +55,14 @@ const ColumnMapperContent = ({
 
   const handleDataLoaded = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number) => {
     onDataLoaded(columns, data, sourceFilename, worksheetName, fileSize);
-  }, [onDataLoaded]);
+    updateState({
+      sourceColumns: columns,
+      sourceData: data,
+      sourceFilename,
+      worksheetName,
+      fileSize
+    });
+  }, [onDataLoaded, updateState]);
 
   const handleLoadingChange = useCallback((loading: boolean) => {
     updateState({ isLoading: loading });
