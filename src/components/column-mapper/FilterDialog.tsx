@@ -124,34 +124,34 @@ const ExamplesTab = () => {
         <div className="space-y-3">
           <div>
             <div className="font-medium text-muted-foreground mb-1">Numbers:</div>
-            <code className="text-xs block bg-muted p-2 rounded">{'row["NR"] > 100'}</code>
+            <code className="text-xs block bg-muted p-2 rounded">{'col["NR"] > 100'}</code>
           </div>
           <div>
             <div className="font-medium text-muted-foreground mb-1">Dates:</div>
-            <code className="text-xs block bg-muted p-2 rounded">{'row["Date"] > new Date("2024-01-01")'}</code>
+            <code className="text-xs block bg-muted p-2 rounded">{'col["Date"] > new Date("2024-01-01")'}</code>
           </div>
           <div>
             <div className="font-medium text-muted-foreground mb-1">Booleans:</div>
-            <code className="text-xs block bg-muted p-2 rounded">{'row["Active"] === true'}</code>
+            <code className="text-xs block bg-muted p-2 rounded">{'col["Active"] === true'}</code>
           </div>
           <div>
             <div className="font-medium text-muted-foreground mb-1">Strings:</div>
-            <code className="text-xs block bg-muted p-2 rounded">{'row["Name"].includes("John")'}</code>
+            <code className="text-xs block bg-muted p-2 rounded">{'col["Name"].includes("John")'}</code>
           </div>
           <div className="mt-6 text-sm text-muted-foreground">
             <p className="mb-2">Additional examples:</p>
             <div className="space-y-3">
               <div>
                 <div className="font-medium text-muted-foreground mb-1">Number range:</div>
-                <code className="text-xs block bg-muted p-2 rounded">{'row["Amount"] >= 100 && row["Amount"] <= 1000'}</code>
+                <code className="text-xs block bg-muted p-2 rounded">{'col["Amount"] >= 100 && col["Amount"] <= 1000'}</code>
               </div>
               <div>
                 <div className="font-medium text-muted-foreground mb-1">Complex string condition:</div>
-                <code className="text-xs block bg-muted p-2 rounded">{'row["Status"].toLowerCase().includes("pending") && row["Priority"] === "high"'}</code>
+                <code className="text-xs block bg-muted p-2 rounded">{'col["Status"].toLowerCase().includes("pending") && col["Priority"] === "high"'}</code>
               </div>
               <div>
                 <div className="font-medium text-muted-foreground mb-1">Empty check:</div>
-                <code className="text-xs block bg-muted p-2 rounded">{'!row["Notes"] || row["Notes"].trim() === ""'}</code>
+                <code className="text-xs block bg-muted p-2 rounded">{'!col["Notes"] || col["Notes"].trim() === ""'}</code>
               </div>
             </div>
           </div>
@@ -434,9 +434,9 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                               </Tooltip>
                             </TooltipProvider>
                           </div>
-                          <code className="text-xs block bg-muted p-2 rounded">{'row["NR"] > 100'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'row["Price"] >= 10 && row["Price"] <= 20'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'Number(row["Quantity"]) !== 0'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded">{'col["NR"] > 100'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'col["Price"] >= 10 && col["Price"] <= 20'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'Number(col["Quantity"]) !== 0'}</code>
                         </div>
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
@@ -452,9 +452,9 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                               </Tooltip>
                             </TooltipProvider>
                           </div>
-                          <code className="text-xs block bg-muted p-2 rounded">{'row["Date"] > new Date("2024-01-01")'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'new Date(row["StartDate"]) <= new Date(row["EndDate"])'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'new Date(row["Date"]).getFullYear() === 2024'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded">{'col["Date"] > new Date("2024-01-01")'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'new Date(col["StartDate"]) <= new Date(col["EndDate"])'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'new Date(col["Date"]).getFullYear() === 2024'}</code>
                         </div>
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
@@ -470,9 +470,9 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                               </Tooltip>
                             </TooltipProvider>
                           </div>
-                          <code className="text-xs block bg-muted p-2 rounded">{'row["Active"] === true'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'!row["Deleted"]'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'row["Status"] === "1" || row["Active"] === true'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded">{'col["Active"] === true'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'!col["Deleted"]'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'col["Status"] === "1" || col["Active"] === true'}</code>
                         </div>
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
@@ -488,9 +488,9 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                               </Tooltip>
                             </TooltipProvider>
                           </div>
-                          <code className="text-xs block bg-muted p-2 rounded">{'row["Name"].includes("John")'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'row["Email"].toLowerCase().endsWith("@gmail.com")'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'row["Phone"].replace(/[^0-9]/g, "").length === 10'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded">{'col["Name"].includes("John")'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'col["Email"].toLowerCase().endsWith("@gmail.com")'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'col["Phone"].replace(/[^0-9]/g, "").length === 10'}</code>
                         </div>
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
@@ -506,9 +506,9 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                               </Tooltip>
                             </TooltipProvider>
                           </div>
-                          <code className="text-xs block bg-muted p-2 rounded">{'!row["Notes"] || row["Notes"].trim() === ""'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'row["Optional"] !== null && row["Optional"] !== undefined'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'row["Required"]?.length > 0'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded">{'!col["Notes"] || col["Notes"].trim() === ""'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'col["Optional"] !== null && col["Optional"] !== undefined'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'col["Required"]?.length > 0'}</code>
                         </div>
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
@@ -524,9 +524,9 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                               </Tooltip>
                             </TooltipProvider>
                           </div>
-                          <code className="text-xs block bg-muted p-2 rounded">{'row["Status"].toLowerCase().includes("pending") && row["Priority"] === "high"'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'Number(row["Total"]) > 1000 || (row["VIP"] === true && Number(row["Total"]) > 500)'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'["draft", "review"].includes(row["Status"].toLowerCase())'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded">{'col["Status"].toLowerCase().includes("pending") && col["Priority"] === "high"'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'Number(col["Total"]) > 1000 || (col["VIP"] === true && Number(col["Total"]) > 500)'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'["draft", "review"].includes(col["Status"].toLowerCase())'}</code>
                         </div>
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
@@ -542,9 +542,9 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                               </Tooltip>
                             </TooltipProvider>
                           </div>
-                          <code className="text-xs block bg-muted p-2 rounded">{'Number(row["Actual"]) > Number(row["Target"]) * 1.1'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'row["Password"] === row["ConfirmPassword"]'}</code>
-                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'row["EndDate"] > row["StartDate"] && row["Status"] !== "Cancelled"'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded">{'Number(col["Actual"]) > Number(col["Target"]) * 1.1'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'col["Password"] === col["ConfirmPassword"]'}</code>
+                          <code className="text-xs block bg-muted p-2 rounded mt-1">{'col["EndDate"] > col["StartDate"] && col["Status"] !== "Cancelled"'}</code>
                         </div>
                       </div>
                     </div>

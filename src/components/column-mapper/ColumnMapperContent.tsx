@@ -194,13 +194,26 @@ const ColumnMapperContent = ({
     // If no export filename is set, use the source filename
     const exportFilename = state.exportFilename || state.sourceFilename;
     
+    // Transform the data to use WinFakt columns
+    const transformedData = state.sourceData.map(row => {
+      const newRow: Record<string, any> = {};
+      // For each mapping (source -> target), copy the data using target column as key
+      Object.entries(state.mapping).forEach(([sourceKey, targetColumn]) => {
+        const sourceColumn = sourceKey.split('_')[0]; // Remove the counter suffix
+        newRow[targetColumn] = row[sourceColumn];
+      });
+      return newRow;
+    });
+    
     downloadCSV(
-      state.sourceData, 
+      transformedData, 
       exportFilename, 
       state.sourceFilename, 
       state.worksheetName, 
       state.fileSize
     );
+    
+    onExport();
   };
 
   return (

@@ -36,26 +36,28 @@ const ColumnSelector: React.FC<ColumnSelectorProps> = ({
                 {columns?.map((col) => (
                   <TableRow key={col}>
                     <TableCell className="py-1">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => onColumnClick(col)}
-                              className="h-6 w-6"
-                            >
-                              <Copy className="h-3 w-3" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Copy</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <div className="flex items-center gap-2">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => onColumnClick(col)}
+                                className="h-6 w-6"
+                              >
+                                <Copy className="h-3 w-3" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Click to copy column reference
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <span>{col}</span>
+                      </div>
                     </TableCell>
-                    <TableCell className="py-1">{col}</TableCell>
-                    <TableCell className="font-mono text-sm py-1">{getFirstValue(col)}</TableCell>
+                    <TableCell className="py-1">{getFirstValue(col)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

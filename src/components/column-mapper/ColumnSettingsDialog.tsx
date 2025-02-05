@@ -35,6 +35,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
   const [activeTab, setActiveTab] = useState<'expression' | 'result' | 'functions' | 'Source columns'>('expression');
   const [testResult, setTestResult] = useState<string | null>(null);
   const [testError, setTestError] = useState<string | null>(null);
+  const [referenceStyle, setReferenceStyle] = useState<'name' | 'letter' | 'number'>('name');
 
   const handleSave = () => {
     onSave(expressionCode);
@@ -59,8 +60,54 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
     }
   };
 
-  const copyToClipboard = (columnName: string) => {
-    const text = `row["${columnName}"]`;
+  // Convert number to Excel column letter (1 -> A, 2 -> B, etc.)
+  const getExcelColumnLetter = (columnNumber: number): string => {
+    let dividend = columnNumber;
+    let columnName = '';
+    let modulo;
+
+    while (dividend > 0) {
+      modulo = (dividend - 1) % 26;
+      columnName = String.fromCharCode(65 + modulo) + columnName;
+      dividend = Math.floor((dividend - modulo) / 26);
+    }
+
+    return columnName;
+  };
+
+  const generateColumnReference = (
+    columnName: string,
+    index: number,
+    style: 'name' | 'letter' | 'number'
+  ): string => {
+    if (style === 'name') {
+      if (!columnName) {
+        console.warn('Attempted to copy empty column name');
+        return '';
+      }
+
+      // First normalize all types of whitespace to spaces
+      const sanitizedColumnName = columnName.replace(/\s+/g, ' ').trim();
+      
+      // Safety check: if after sanitization we have an empty string, 
+      // use the original column name to avoid creating invalid expressions
+      const finalColumnName = sanitizedColumnName || columnName;
+
+      // Escape any existing quotes in the column name
+      const escapedColumnName = finalColumnName.replace(/"/g, '\\"');
+      
+      return `col["${escapedColumnName}"]`;
+    } else if (style === 'letter') {
+      return `col[${getExcelColumnLetter(index + 1)}]`;
+    } else {
+      return `col[${index + 1}]`;
+    }
+  };
+
+  const copyToClipboard = (columnName: string, index: number, style: 'name' | 'letter' | 'number' = 'name') => {
+    const text = generateColumnReference(columnName, index, style);
+    if (!text) return;
+    
     navigator.clipboard.writeText(text).catch((err) => {
       console.error('Failed to copy text: ', err);
     });
@@ -105,12 +152,12 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
               </TabsContent>
 
               <TabsContent value="result" className="h-full m-0">
-                <div className="p-6">
+                <div className="p-4">
                   {testError ? (
                     <div className="text-red-500">{testError}</div>
                   ) : testResult !== null ? (
-                    <div className="font-mono bg-slate-50 p-4 rounded">
-                      <pre>
+                    <div>
+                      <pre className="bg-slate-100 p-2 rounded">
                         <code>
                           {testResult}
                         </code>
@@ -124,15 +171,28 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
                 </div>
               </TabsContent>
 
-              <TabsContent value="functions" className="h-full m-0">
+              <TabsContent value="functions" className="h-full m-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:none]">
                 <HelperFunctions />
               </TabsContent>
 
               <TabsContent value="Source columns" className="h-full m-0">
-                <ColumnSelector
-                  columns={sourceColumns}
-                  onColumnClick={copyToClipboard}
-                />
+                <div className="space-y-2">
+                  <div className="p-2 pl-4 bg-muted text-sm text-muted-foreground">
+                    Click a column to copy its reference. You can use column names (col["Name"]), letters (col[A]), or numbers (col[1]).
+                  </div>
+                  <ColumnSelector
+                    columns={sourceColumns}
+                    onColumnClick={(columnName, index) => {
+                      const nextStyle = referenceStyle === 'name' 
+                        ? 'letter' 
+                        : referenceStyle === 'letter' 
+                          ? 'number' 
+                          : 'name';
+                      setReferenceStyle(nextStyle);
+                      copyToClipboard(columnName, index, nextStyle);
+                    }}
+                  />
+                </div>
               </TabsContent>
             </div>
           </Tabs>
