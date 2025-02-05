@@ -42,6 +42,11 @@ const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCou
       fetchLastModified();
       const interval = setInterval(fetchLastModified, 5000);
       return () => clearInterval(interval);
+    } else {
+      // Handle production case
+      const date = new Date(Number(DEPLOYMENT_TIMESTAMP));
+      const { dateStr, timeStr } = formatRelativeDate(date);
+      setFormattedDate(`${dateStr} at ${timeStr}`);
     }
   }, [open]);
 
