@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './use-toast';
 import { MappingState } from '@/components/column-mapper/types';
+import { buildSettings } from '@/utils/settingsUtils';
 
-type SaveableState = Pick<MappingState, 'mapping' | 'columnTransforms' | 'sourceColumns' | 'connectionCounter' | 'sourceFilename'>;
+const STORAGE_KEY = 'configuration';
 
 export const useConfiguration = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const saveConfiguration = async (
-    state: SaveableState,
+    state: MappingState,
     isNewConfig: boolean = true
   ) => {
     // Return early if no mapping exists
@@ -25,17 +26,11 @@ export const useConfiguration = () => {
     setIsSaving(true);
 
     try {
+      const settings = buildSettings(state);
+
       const { data, error } = await supabase
         .from('shared_configurations')
-        .insert({
-          settings: {
-            mapping: state.mapping,
-            columnTransforms: state.columnTransforms,
-            sourceColumns: state.sourceColumns,
-            connectionCounter: state.connectionCounter,
-            sourceFilename: state.sourceFilename
-          },
-        })
+        .insert([{ settings }])
         .select()
         .single();
 
@@ -43,17 +38,20 @@ export const useConfiguration = () => {
         throw new Error(error.message);
       }
 
+      // Also save to local storage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ settings }));
+
       toast({
         title: "Success",
-        description: `Configuration ${isNewConfig ? 'saved' : 'updated'} successfully`,
+        description: "Configuration saved successfully",
       });
 
-      return data;
+      return data?.id;
     } catch (error) {
       console.error('Error saving configuration:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save configuration",
+        description: "Failed to save configuration",
         variant: "destructive",
       });
       return null;
@@ -62,5 +60,19 @@ export const useConfiguration = () => {
     }
   };
 
-  return { saveConfiguration, isSaving };
+  const loadConfiguration = async (id: number) => {
+    const { data: config, error } = await supabase
+      .from('shared_configurations')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (config) {
+      return config.settings;
+    }
+
+    return null;
+  };
+
+  return { saveConfiguration, loadConfiguration, isSaving };
 };

@@ -9,22 +9,9 @@ import '../vanilla/Button.css';
 import { FilterDialog, CompoundFilter, SingleCondition } from './FilterDialog';
 import { Badge } from '@/components/ui/badge';
 import { ExportButton } from '@/components/ui/export-button';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import classnames from 'classnames'; // Fix classnames import
 
 interface ConnectedColumnsProps {
   connectedColumns: [string, string, string][]; // [uniqueKey, sourceColumn, targetColumn]
@@ -35,6 +22,8 @@ interface ConnectedColumnsProps {
   columnTransforms?: Record<string, string>;
   sourceColumns: string[];
   sourceData?: any[];
+  activeFilter: CompoundFilter | null;
+  onFilterChange: (filter: CompoundFilter | null) => void;
 }
 
 interface SortableColumnItemProps {
@@ -113,14 +102,15 @@ const ConnectedColumns = ({
   onReorder,
   columnTransforms = {},
   sourceColumns = [],
-  sourceData = []
+  sourceData = [],
+  activeFilter,
+  onFilterChange
 }: ConnectedColumnsProps) => {
   const [searchParams] = useSearchParams();
   const filterParam = searchParams.get('ShowFilter');
   const showFilter = !filterParam || filterParam.toLowerCase() === 'yes';
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
   const [showFilterDialog, setShowFilterDialog] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<CompoundFilter | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -147,162 +137,51 @@ const ConnectedColumns = ({
     }
   };
 
-  const handleApplyFilter = (filter: CompoundFilter) => {
-    setActiveFilter(filter);
+  const handleApplyFilter = (filter: CompoundFilter | null) => {
+    if (onFilterChange) {
+      onFilterChange(filter);
+      setShowFilterDialog(false);
+    }
   };
 
   const handleExport = () => {
-    if (!onExport) return;
+    if (!onExport || !sourceData) return;
 
-    // If there's an active filter, apply it before exporting
-    if (activeFilter && sourceData) {
-      let filteredData;
+    let dataToExport = sourceData;
 
-      if (activeFilter.advancedMode && activeFilter.expression) {
-        try {
-          // Create a safe function from the expression
-          const filterFn = new Function('row', `
-            const getValue = (val) => {
-              if (val === null || val === undefined) return '';
-              if (val instanceof Date) return val;
-              if (typeof val === 'boolean') return val;
-              if (typeof val === 'number') return val;
-              // Try to parse date strings
-              if (typeof val === 'string') {
-                const date = new Date(val);
-                if (!isNaN(date.getTime())) return date;
-              }
-              return String(val);
-            };
-            return ${activeFilter.expression};
-          `);
-          filteredData = sourceData.filter(row => {
-            try {
-              return filterFn(row);
-            } catch (err) {
-              console.error('Error evaluating filter expression for row:', err);
-              return false;
-            }
-          });
-        } catch (err) {
-          console.error('Error creating filter function:', err);
-          return;
-        }
-      } else {
-        // Basic mode filtering
-        filteredData = sourceData.filter(row => {
-          // Skip rows that don't match our filter criteria
-          const shouldKeepRow = activeFilter.groups.every(group => {
-            const groupResult = group.type === 'AND'
-              ? group.conditions.every(condition => evaluateCondition(condition, row))
-              : group.conditions.some(condition => evaluateCondition(condition, row));
-            return groupResult;
-          });
-
-          console.log('Row decision:', {
-            row,
-            shouldKeep: shouldKeepRow
-          });
-
-          return shouldKeepRow;
+    if (activeFilter && activeFilter.groups && activeFilter.groups.length > 0) {
+      dataToExport = sourceData.filter(row => {
+        return activeFilter.groups.every(group => {
+          const conditions = group.conditions || [];
+          return group.type === 'AND'
+            ? conditions.every(condition => evaluateCondition(condition, row))
+            : conditions.some(condition => evaluateCondition(condition, row));
         });
-
-        function evaluateCondition(condition: SingleCondition, row: any) {
-          function getValue(val: any): any {
-            if (val === null || val === undefined) return '';
-            if (val instanceof Date) return val;
-            if (typeof val === 'boolean') return val;
-            if (typeof val === 'number') return val;
-            // Try to parse date strings
-            if (typeof val === 'string') {
-              const date = new Date(val);
-              if (!isNaN(date.getTime())) return date;
-            }
-            return String(val);
-          }
-
-          const value = getValue(row[condition.column]);
-          const typedFilterValue: any = (() => {
-            if (typeof value === 'number') return Number(condition.value);
-            if (value instanceof Date) return new Date(condition.value);
-            if (typeof value === 'boolean') return condition.value === 'true';
-            return condition.value;
-          })();
-
-          function compareValues(a: any, b: any): number {
-            if (a instanceof Date && b instanceof Date) {
-              return a.getTime() - b.getTime();
-            }
-            if (typeof a === 'number' && typeof b === 'number') {
-              return a - b;
-            }
-            return String(a).localeCompare(String(b));
-          }
-
-          switch (condition.operator) {
-            case 'equals':
-              if (value instanceof Date && typedFilterValue instanceof Date) {
-                return value.getTime() === typedFilterValue.getTime();
-              }
-              return value === typedFilterValue;
-            case 'contains':
-              return String(value).includes(String(typedFilterValue));
-            case 'startsWith':
-              return String(value).startsWith(String(typedFilterValue));
-            case 'endsWith':
-              return String(value).endsWith(String(typedFilterValue));
-            case 'greaterThan':
-              return compareValues(value, typedFilterValue) > 0;
-            case 'lessThan':
-              return compareValues(value, typedFilterValue) < 0;
-            case 'isEmpty':
-              if (value instanceof Date) return false;
-              if (typeof value === 'boolean') return false;
-              if (typeof value === 'number') return false;
-              return !value || String(value).trim() === '';
-            case 'isNotEmpty':
-              // Debug logging
-              console.log('isNotEmpty check for column:', condition.column, {
-                rawValue: row[condition.column],
-                valueAfterGetValue: value,
-                isDate: value instanceof Date,
-                isBoolean: typeof value === 'boolean',
-                isNumber: typeof value === 'number',
-                stringValue: String(value),
-                stringValueTrimmed: String(value).trim(),
-                wouldPass: (() => {
-                  if (value instanceof Date) return true;
-                  if (typeof value === 'boolean') return true;
-                  if (typeof value === 'number') return true;
-                  const str = String(value);
-                  return str !== '' && str.trim() !== '';
-                })()
-              });
-
-              // Special cases for non-string types
-              if (value instanceof Date) return true;
-              if (typeof value === 'boolean') return true;
-              if (typeof value === 'number') return true;
-              // For everything else, convert to string and check if it's non-empty after trimming
-              const stringValue = String(value);
-              return stringValue !== '' && stringValue.trim() !== '';
-            default:
-              return true;
-          }
-        }
-      }
-
-      console.log('Filtered data:', {
-        originalLength: sourceData.length,
-        filteredLength: filteredData.length,
-        filteredData
       });
+    }
 
-      // Pass filtered data to export
-      onExport(filteredData);
-    } else {
-      // No filter active, export all data
-      onExport();
+    onExport(dataToExport);
+  };
+
+  const evaluateCondition = (condition: SingleCondition, row: any) => {
+    const value = row[condition.column];
+    const compareValue = condition.value;
+
+    switch (condition.operator) {
+      case 'equals':
+        return String(value).toLowerCase() === String(compareValue).toLowerCase();
+      case 'not_equals':
+        return String(value).toLowerCase() !== String(compareValue).toLowerCase();
+      case 'contains':
+        return String(value).toLowerCase().includes(String(compareValue).toLowerCase());
+      case 'not_contains':
+        return !String(value).toLowerCase().includes(String(compareValue).toLowerCase());
+      case 'starts_with':
+        return String(value).toLowerCase().startsWith(String(compareValue).toLowerCase());
+      case 'ends_with':
+        return String(value).toLowerCase().endsWith(String(compareValue).toLowerCase());
+      default:
+        return false;
     }
   };
 
@@ -335,8 +214,10 @@ const ConnectedColumns = ({
             {showFilter && (
               <Button
                 onClick={() => setShowFilterDialog(true)}
-                variant="outline"
-                className={activeFilter ? "border-blue-500 text-blue-500" : ""}
+                variant={activeFilter ? "default" : "outline"}
+                className={classnames({
+                  'bg-blue-100 border-blue-500 text-blue-700 hover:bg-blue-200 hover:text-blue-800': activeFilter,
+                })}
               >
                 <Filter className="h-4 w-4 mr-2" />
                 {activeFilter ? "Filter Active" : "Filter"}
@@ -395,8 +276,9 @@ const ConnectedColumns = ({
         isOpen={showFilterDialog}
         onClose={() => setShowFilterDialog(false)}
         sourceColumns={sourceColumns}
-        onApplyFilter={handleApplyFilter}
         sourceData={sourceData}
+        onApplyFilter={handleApplyFilter}
+        initialFilter={activeFilter}
       />
     </VanillaCard>
   );

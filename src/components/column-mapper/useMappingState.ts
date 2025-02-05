@@ -1,33 +1,51 @@
 import { useState, useEffect, useRef } from 'react';
 import { MappingState } from './types';
+import { CompoundFilter } from './FilterDialog';
+import { Settings, buildSettings } from '@/utils/settingsUtils';
 
 const STORAGE_KEY = 'csv-transformer-state';
 
-type PersistedState = Pick<MappingState, 'mapping' | 'columnTransforms' | 'sourceColumns' | 'sourceData' | 'connectionCounter'>;
+type PersistedState = {
+  settings: Settings;
+};
 
 const getStoredState = (): PersistedState | null => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    console.error('Error loading stored state:', error);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+
+    const data = JSON.parse(raw);
+    // Handle legacy format and remove sourceData if present
+    if (data.settings?.sourceData) {
+      delete data.settings.sourceData;
+    }
+    return data.settings ? data : {
+      settings: buildSettings(data)
+    };
+  } catch {
     return null;
   }
+};
+
+const storeState = (state: MappingState) => {
+  const settings = buildSettings(state);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ settings }));
 };
 
 export const useMappingState = (onMappingChange: (mapping: Record<string, string>) => void) => {
   const [state, setState] = useState<MappingState>(() => {
     const storedState = getStoredState();
     return {
-      mapping: storedState?.mapping ?? {},
-      columnTransforms: storedState?.columnTransforms ?? {},
-      sourceSearch: '',
-      targetSearch: '',
+      mapping: storedState?.settings?.mapping ?? {},
+      columnTransforms: storedState?.settings?.columnTransforms ?? {},
+      sourceSearch: storedState?.settings?.sourceSearch ?? '',
+      targetSearch: storedState?.settings?.targetSearch ?? '',
+      activeFilter: storedState?.settings?.activeFilter ?? null,
       selectedSourceColumn: null,
       selectedTargetColumn: null,
-      connectionCounter: storedState?.connectionCounter ?? 0,
-      sourceColumns: storedState?.sourceColumns ?? [],
-      sourceData: storedState?.sourceData ?? [],
+      connectionCounter: storedState?.settings?.connectionCounter ?? 0,
+      sourceColumns: storedState?.settings?.sourceColumns ?? [],
+      sourceData: [],
       isLoading: false
     };
   });
@@ -57,21 +75,9 @@ export const useMappingState = (onMappingChange: (mapping: Record<string, string
   useEffect(() => {
     // Only persist if we have actual state to persist
     if (Object.keys(state.mapping).length > 0 || state.sourceColumns.length > 0) {
-      const persistedState: PersistedState = {
-        mapping: state.mapping,
-        columnTransforms: state.columnTransforms,
-        sourceColumns: state.sourceColumns,
-        sourceData: state.sourceData,
-        connectionCounter: state.connectionCounter
-      };
-
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(persistedState));
-      } catch (error) {
-        console.error('Error saving state to localStorage:', error);
-      }
+      storeState(state);
     }
-  }, [state.mapping, state.columnTransforms, state.sourceColumns, state.sourceData, state.connectionCounter]);
+  }, [state.mapping, state.columnTransforms, state.sourceColumns, state.connectionCounter, state.sourceSearch, state.targetSearch, state.activeFilter]);
 
   const updateState = (updates: Partial<MappingState>) => {
     setState(prevState => {

@@ -19,6 +19,7 @@ import InfoDialog from '@/components/column-mapper/InfoDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
 import PageHeader from './index/PageHeader';
 import { useMappingReducer } from '@/hooks/use-mapping-reducer';
+import ConnectedColumns from '@/components/column-mapper/ConnectedColumns';
 
 const Index = () => {
   const {
@@ -26,7 +27,9 @@ const Index = () => {
     loadConfiguration,
     setMapping,
     setSourceData,
-    resetState
+    resetState,
+    updateTransforms,
+    setFilter
   } = useMappingReducer();
 
   const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
@@ -140,6 +143,34 @@ const Index = () => {
     }
   }, [shouldResetMapper]);
 
+  const handleDisconnect = (uniqueKey: string) => {
+    const newMapping = { ...mappingState.mapping };
+    delete newMapping[uniqueKey];
+    setMapping(newMapping);
+  };
+
+  const handleExport = (filteredData?: any[]) => {
+    const dataToExport = filteredData || mappingState.sourceData;
+    if (dataToExport && dataToExport.length > 0) {
+      downloadCSV(dataToExport, 'exported-data.csv');
+    }
+  };
+
+  const handleUpdateTransform = (uniqueKey: string, code: string) => {
+    updateTransforms({
+      ...mappingState.columnTransforms,
+      [uniqueKey]: code
+    });
+  };
+
+  const handleReorder = (newOrder: [string, string, string][]) => {
+    const newMapping: Record<string, string> = {};
+    newOrder.forEach(([key, source, target]) => {
+      newMapping[key] = mappingState.mapping[key];
+    });
+    setMapping(newMapping);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <SavedConfigDialog
@@ -180,6 +211,18 @@ const Index = () => {
           onColumnSetChange={setActiveColumnSet}
           onSourceFileChange={setSourceFileInfo}
           shouldReset={shouldResetMapper}
+        />
+        <ConnectedColumns
+          connectedColumns={Object.entries(mappingState.mapping).map(([key, target]) => [key, key, target])}
+          onDisconnect={handleDisconnect}
+          onExport={handleExport}
+          onUpdateTransform={handleUpdateTransform}
+          onReorder={handleReorder}
+          columnTransforms={mappingState.columnTransforms}
+          sourceColumns={mappingState.sourceColumns}
+          sourceData={mappingState.sourceData}
+          activeFilter={mappingState.activeFilter}
+          onFilterChange={setFilter}
         />
       </div>
     </div>

@@ -9,6 +9,8 @@ export interface ColumnMapperProps {
   shouldReset?: boolean;
 }
 
+import { CompoundFilter } from './FilterDialog';
+
 export interface MappingState {
   sourceColumns: string[];
   sourceData: any[];
@@ -21,6 +23,7 @@ export interface MappingState {
   targetSearch: string;
   connectionCounter: number;
   isLoading?: boolean;
+  activeFilter: CompoundFilter | null;
 }
 
 export interface ConfigurationSettings {
@@ -31,4 +34,5 @@ export interface ConfigurationSettings {
   connectionCounter?: number;
   sourceFilename?: string;
   worksheetName?: string;
+  activeFilter?: CompoundFilter | null;
 }

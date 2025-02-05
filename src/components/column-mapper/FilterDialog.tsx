@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -23,8 +23,9 @@ interface FilterDialogProps {
   isOpen: boolean;
   onClose: () => void;
   sourceColumns: string[];
-  onApplyFilter: (filter: CompoundFilter) => void;
+  onApplyFilter: (filter: CompoundFilter | null) => void;
   sourceData?: any[];
+  initialFilter?: CompoundFilter | null;
 }
 
 export interface SingleCondition {
@@ -160,21 +161,32 @@ const ExamplesTab = () => {
   );
 };
 
-export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, sourceData = [] }: FilterDialogProps) => {
-  const [groups, setGroups] = useState<FilterGroup[]>([{
-    conditions: [{
-      column: sourceColumns[0] || '',
-      operator: 'equals',
-      value: ''
-    }],
-    type: 'AND'
-  }]);
-  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
-  const [expression, setExpression] = useState('');
+export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, sourceData = [], initialFilter }: FilterDialogProps) => {
+  const [groups, setGroups] = useState<FilterGroup[]>(() => 
+    initialFilter?.groups ?? [{
+      conditions: [{
+        column: sourceColumns[0] || '',
+        operator: 'equals',
+        value: ''
+      }],
+      type: 'AND'
+    }]
+  );
+  
+  const [isAdvancedMode, setIsAdvancedMode] = useState(initialFilter?.advancedMode ?? false);
+  const [expression, setExpression] = useState(initialFilter?.expression ?? '');
   const [activeTab, setActiveTab] = useState<'expression' | 'examples'>('expression');
   const [testResult, setTestResult] = useState<string | null>(null);
   const [testError, setTestError] = useState<string | null>(null);
   const [hasBeenTested, setHasBeenTested] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && initialFilter) {
+      setGroups(initialFilter.groups);
+      setIsAdvancedMode(initialFilter.advancedMode ?? false);
+      setExpression(initialFilter.expression ?? '');
+    }
+  }, [isOpen, initialFilter]);
 
   const handleAddCondition = (groupIndex: number) => {
     const newGroups = [...groups];
@@ -224,8 +236,9 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
     setTestError(null);
 
     if (isAdvancedMode) {
-      // Don't proceed if there's no expression in advanced mode
       if (!expression.trim()) {
+        onApplyFilter(null);
+        onClose();
         return;
       }
 
@@ -236,33 +249,29 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
         // Test with first row if available
         if (sourceData.length > 0) {
           try {
-            const result = filterFn(sourceData[0]);
-            if (typeof result !== 'boolean') {
-              setTestError("Expression must return a boolean value (true/false)");
-              setActiveTab('expression');
-              return;
-            }
+            filterFn(sourceData[0]);
           } catch (error) {
-            setTestError("Error evaluating expression with sample data: " + (error instanceof Error ? error.message : "Unknown error"));
-            setActiveTab('expression');
+            setTestError('Error: ' + (error as Error).message);
             return;
           }
         }
 
-        // If we get here, the expression is valid
         onApplyFilter({
-          groups,
+          groups: [],
           advancedMode: true,
           expression
         });
         onClose();
       } catch (error) {
-        setTestError("Invalid JavaScript expression: " + (error instanceof Error ? error.message : "Unknown error"));
-        setActiveTab('expression');
-        return;
+        setTestError('Error: ' + (error as Error).message);
       }
     } else {
-      // Basic mode
+      if (groups.length === 0) {
+        onApplyFilter(null);
+        onClose();
+        return;
+      }
+
       onApplyFilter({
         groups,
         advancedMode: false
@@ -319,10 +328,10 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
         setTestResult(`Test result with first row: ${resultWithData}`);
         setActiveTab('expression');
       } catch (error) {
-        setTestError("Error evaluating expression: " + (error instanceof Error ? error.message : "Unknown error"));
+        setTestError("Error evaluating expression: " + (error as Error).message);
       }
     } catch (error) {
-      setTestError("Invalid JavaScript expression: " + (error instanceof Error ? error.message : "Unknown error"));
+      setTestError("Invalid JavaScript expression: " + (error as Error).message);
     }
   };
 
