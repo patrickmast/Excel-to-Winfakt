@@ -4,6 +4,8 @@ import { toast } from './use-toast';
 import { MappingState } from '@/components/column-mapper/types';
 import { buildSettings } from '@/utils/settingsUtils';
 
+type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+
 const STORAGE_KEY = 'configuration';
 
 export const useConfiguration = () => {
@@ -12,7 +14,7 @@ export const useConfiguration = () => {
   const saveConfiguration = async (
     state: MappingState,
     isNewConfig: boolean = true
-  ) => {
+  ): Promise<string | number | null> => {
     // Return early if no mapping exists
     if (!state.mapping || Object.keys(state.mapping).length === 0) {
       toast({
@@ -30,7 +32,7 @@ export const useConfiguration = () => {
 
       const { data, error } = await supabase
         .from('shared_configurations')
-        .insert([{ settings }])
+        .insert({ settings: JSON.parse(JSON.stringify(settings)) })
         .select()
         .single();
 
@@ -64,7 +66,7 @@ export const useConfiguration = () => {
     const { data: config, error } = await supabase
       .from('shared_configurations')
       .select('*')
-      .eq('id', id)
+      .eq('id', String(id))
       .single();
 
     if (config) {

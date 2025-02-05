@@ -2,23 +2,18 @@ import React from 'react';
 import { Textarea } from "@/components/ui/textarea";
 
 interface ExpressionEditorProps {
-  value: string;
+  code: string;
   onChange: (value: string) => void;
-  result: string | null;
-  error: string | null;
 }
 
-const ExpressionEditor: React.FC<ExpressionEditorProps> = ({ value, onChange, result, error }) => {
-  const displayValue = (result || error) ? (error || result || '') : value;
-  
+const ExpressionEditor: React.FC<ExpressionEditorProps> = ({ code, onChange }) => {
   return (
     <div className="flex-1 p-4">
       <Textarea
-        value={displayValue}
+        value={code}
         onChange={(e) => onChange(e.target.value)}
-        className={`h-full font-mono resize-none ${error ? 'text-destructive' : ''} ${result ? 'text-success' : ''}`}
+        className="h-full font-mono resize-none"
         placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
-        readOnly={result !== null || error !== null}
       />
     </div>
   );

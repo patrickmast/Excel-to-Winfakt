@@ -11,19 +11,17 @@ import {
 } from "@/components/ui/tooltip";
 
 interface ColumnSelectorProps {
-  sourceColumns: string[];
-  sourceData: any[];
-  onColumnSelect: (columnName: string) => void;
+  columns: string[];
+  onColumnClick: (columnName: string) => void;
 }
 
 const ColumnSelector: React.FC<ColumnSelectorProps> = ({
-  sourceColumns,
-  sourceData,
-  onColumnSelect,
+  columns,
+  onColumnClick,
 }) => {
   const getFirstValue = (columnName: string) => {
-    if (sourceData && sourceData.length > 0) {
-      return String(sourceData[0][columnName] ?? '');
+    if (columns && columns.length > 0) {
+      return String(columns[0][columnName] ?? '');
     }
     return '';
   };
@@ -35,7 +33,7 @@ const ColumnSelector: React.FC<ColumnSelectorProps> = ({
           <div className="pt-1">
             <Table>
               <TableBody>
-                {sourceColumns.map((col) => (
+                {columns?.map((col) => (
                   <TableRow key={col}>
                     <TableCell className="py-1">
                       <TooltipProvider>
@@ -44,7 +42,7 @@ const ColumnSelector: React.FC<ColumnSelectorProps> = ({
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => onColumnSelect(col)}
+                              onClick={() => onColumnClick(col)}
                               className="h-6 w-6"
                             >
                               <Copy className="h-3 w-3" />

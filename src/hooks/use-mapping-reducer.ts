@@ -71,7 +71,7 @@ function mappingReducer(state: MappingState, action: MappingAction): MappingStat
         ...state,
         columnTransforms: action.payload
       };
-      
+
     case 'SET_FILTER':
       return {
         ...state,
@@ -94,8 +94,8 @@ export function useMappingReducer() {
     dispatch({ type: 'SET_MAPPING', payload: mapping });
   };
 
-  const setSourceData = (data: { columns: string[]; data: any[]; filename?: string; worksheetName?: string }) => {
-    dispatch({ type: 'SET_SOURCE_DATA', payload: data });
+  const setSourceData = (columns: string[], data: any[], fileInfo: { filename?: string; worksheetName?: string } = {}) => {
+    dispatch({ type: 'SET_SOURCE_DATA', payload: { columns, data, ...fileInfo } });
   };
 
   const resetState = () => {

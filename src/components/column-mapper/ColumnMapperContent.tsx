@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { VanillaCard, VanillaCardContent } from '../vanilla/react/VanillaCard';
 import '@/components/vanilla/Card.css';
 import ConnectedColumns from './ConnectedColumns';
@@ -8,6 +8,11 @@ import { MappingState } from './types';
 import VersionDisplay from '../VersionDisplay';
 import { VanillaMenu } from '../vanilla/react/VanillaMenu';
 import '@/components/vanilla/Menu.css';
+import { downloadCSV, addTimestampToFilename } from '@/utils/csvUtils';
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { AlertCircle } from 'lucide-react';
+import { Toaster } from '../../components/ui/toaster';
 
 interface ColumnMapperContentProps {
   state: MappingState;
@@ -15,8 +20,26 @@ interface ColumnMapperContentProps {
   targetColumns: string[];
   activeColumnSet: string;
   onColumnSetChange: (columnSet: string) => void;
-  onDataLoaded: (columns: string[], data: any[], sourceFilename: string, worksheetName?: string) => void;
+  onDataLoaded: (columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number) => void;
   onExport: () => void;
+}
+
+interface MappingState {
+  sourceData: any[];
+  sourceFilename: string;
+  exportFilename: string;
+  worksheetName?: string;
+  fileSize?: number;
+  columnTransforms: Record<string, string>;
+  mapping: Record<string, string>;
+  connectionCounter: number;
+  selectedSourceColumn: string | null;
+  selectedTargetColumn: string | null;
+  sourceColumns: string[];
+  sourceSearch: string;
+  targetSearch: string;
+  activeFilter: string;
+  isLoading: boolean;
 }
 
 const ColumnMapperContent = ({
@@ -28,8 +51,10 @@ const ColumnMapperContent = ({
   onDataLoaded,
   onExport
 }: ColumnMapperContentProps) => {
-  const handleDataLoaded = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string) => {
-    onDataLoaded(columns, data, sourceFilename, worksheetName);
+  const [showNoFileDialog, setShowNoFileDialog] = useState(false);
+
+  const handleDataLoaded = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number) => {
+    onDataLoaded(columns, data, sourceFilename, worksheetName, fileSize);
   }, [onDataLoaded]);
 
   const handleLoadingChange = useCallback((loading: boolean) => {
@@ -153,13 +178,31 @@ const ColumnMapperContent = ({
     }
   ];
 
+  const handleExport = () => {
+    if (!state.sourceFilename) {
+      setShowNoFileDialog(true);
+      return;
+    }
+    
+    // If no export filename is set, use the source filename
+    const exportFilename = state.exportFilename || state.sourceFilename;
+    
+    downloadCSV(
+      state.sourceData, 
+      exportFilename, 
+      state.sourceFilename, 
+      state.worksheetName, 
+      state.fileSize
+    );
+  };
+
   return (
     <div>
       <div className="mb-8">
         <ConnectedColumns
           connectedColumns={connectedColumns}
           onDisconnect={handleDisconnect}
-          onExport={onExport}
+          onExport={handleExport}
           onUpdateTransform={(uniqueKey, code) => {
             updateState({
               columnTransforms: {
@@ -172,6 +215,8 @@ const ColumnMapperContent = ({
           columnTransforms={state.columnTransforms}
           sourceColumns={state.sourceColumns}
           sourceData={state.sourceData}
+          activeFilter={state.activeFilter}
+          onFilterChange={(filter) => updateState({ activeFilter: filter })}
         />
       </div>
 
@@ -229,6 +274,31 @@ const ColumnMapperContent = ({
       <div className="text-xs text-gray-300 ml-[0.4rem] mt-[0.2rem]">
         <VersionDisplay />
       </div>
+      <Dialog open={showNoFileDialog} onOpenChange={setShowNoFileDialog}>
+        <DialogContent className="p-0 overflow-hidden border-0">
+          <div className="bg-slate-700 p-5 rounded-t-lg">
+            <DialogTitle className="text-white m-0">No source file selected</DialogTitle>
+          </div>
+          <div className="py-10 px-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-500" />
+              <DialogDescription className="text-slate-600 m-0">
+                Please select a source file before exporting to CSV.
+              </DialogDescription>
+            </div>
+          </div>
+          <DialogFooter className="p-5 bg-gray-50">
+            <Button 
+              className="bg-[#3b82f6] hover:bg-[#2563eb] text-white border-0 
+                        shadow-none rounded-md px-6"
+              onClick={() => setShowNoFileDialog(false)}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Toaster />
     </div>
   );
 };

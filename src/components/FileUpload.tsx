@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { VanillaMenu } from './vanilla/react/VanillaMenu';
 
 interface FileUploadProps {
-  onDataLoaded: (columns: string[], data: any[]) => void;
+  onDataLoaded: (columns: string[], data: any[], filename: string, currentMapping?: Record<string, string>, fileSize?: number) => void;
   currentMapping?: Record<string, string>;
   children?: React.ReactNode;
 }
@@ -21,7 +21,7 @@ const FileUpload = ({ onDataLoaded, currentMapping, children }: FileUploadProps)
       });
       return obj;
     });
-    onDataLoaded(headers, data);
+    onDataLoaded(headers, data, file.name, undefined, file.size); // Reverted to correct parameter order
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

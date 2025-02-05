@@ -26,7 +26,7 @@ const isXLSXLoaded = () => {
 interface HeaderProps {
   activeColumnSet: string;
   onColumnSetChange: (columnSet: string) => void;
-  onDataLoaded: (headers: string[], data: any[], sourceFilename: string, worksheetName: string) => void;
+  onDataLoaded: (headers: string[], data: any[], sourceFilename: string, worksheetName: string, fileSize?: number) => void;
   currentMapping?: Record<string, string>;
   isLoading: boolean;
   onLoadingChange: (loading: boolean) => void;
@@ -49,7 +49,7 @@ const Header = ({
   const [currentWorksheet, setCurrentWorksheet] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const processExcelWorksheet = (workbook: any, sheetName: string, fileName: string) => {
+  const processExcelWorksheet = (workbook: any, sheetName: string, fileName: string, fileSize: number) => {
     try {
       const worksheet = workbook.Sheets[sheetName];
       console.log('Processing worksheet:', sheetName);
@@ -66,7 +66,7 @@ const Header = ({
           });
           return obj;
         });
-        onDataLoaded(headers, jsonData, fileName, sheetName);
+        onDataLoaded(headers, jsonData, fileName, sheetName, fileSize);
       } else {
         toast({
           title: "Error",
@@ -89,20 +89,16 @@ const Header = ({
 
   const handleSheetSelect = (sheetName: string) => {
     if (currentWorkbook) {
-      processExcelWorksheet(currentWorkbook, sheetName, currentWorkbook.fileName);
+      processExcelWorksheet(currentWorkbook, sheetName, currentWorkbook.fileName, currentWorkbook.fileSize);
     }
   };
 
   const handleFileSelect = async (file: File) => {
-    console.log('handleFileSelect started');
-    console.log('File name:', file.name);
-    console.log('File type:', file.type);
-
     onLoadingChange(true);
 
     const lowerFileName = file.name.toLowerCase();
     if (lowerFileName.endsWith('.csv')) {
-      console.log('Processing as CSV file');
+      console.log('[DEBUG] Processing CSV file');
       Papa.parse(file, {
         header: false,
         skipEmptyLines: true,
@@ -117,7 +113,8 @@ const Header = ({
                 });
                 return obj;
               });
-              onDataLoaded(headers, data, file.name, undefined);
+              console.log('[DEBUG] Calling onDataLoaded for CSV with file size:', file.size);
+              onDataLoaded(headers, data, file.name, undefined, file.size);
             } else {
               toast({
                 title: "Error",
@@ -176,6 +173,7 @@ const Header = ({
 
             // Store the workbook and filename for later use
             workbook.fileName = file.name;
+            workbook.fileSize = file.size;
             setCurrentWorkbook(workbook);
 
             if (workbook.SheetNames.length > 1) {
@@ -191,7 +189,7 @@ const Header = ({
               console.log('Single sheet found, processing directly');
               const firstSheet = workbook.SheetNames[0];
               setCurrentWorksheet(firstSheet);
-              processExcelWorksheet(workbook, firstSheet, file.name);
+              processExcelWorksheet(workbook, firstSheet, file.name, file.size);
             }
           } catch (error) {
             console.error('Error parsing Excel:', error);
@@ -213,65 +211,113 @@ const Header = ({
         });
         onLoadingChange(false);
       }
-    } else if (lowerFileName.endsWith('.dbf') || lowerFileName.endsWith('.soc')) {
-      console.log('Processing as DBF/SOC file');
+    } else if (lowerFileName.endsWith('.dbf')) {
+      try {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const arrayBuffer = e.target?.result as ArrayBuffer;
+            if (!arrayBuffer) {
+              throw new Error('Failed to read file');
+            }
+
+            const records = await parseDBF(arrayBuffer);
+            if (records && records.length > 0) {
+              // Get headers from the first record's keys
+              const headers = Object.keys(records[0]);
+              onDataLoaded(headers, records, file.name, undefined, file.size);
+            } else {
+              toast({
+                title: "Error",
+                description: "The DBF file appears to be empty or invalid.",
+                variant: "destructive"
+              });
+            }
+          } catch (error) {
+            console.error('Error parsing DBF:', error);
+            toast({
+              title: "Error",
+              description: "Failed to parse DBF file. Please check the file format.",
+              variant: "destructive"
+            });
+          } finally {
+            onLoadingChange(false);
+          }
+        };
+
+        reader.onerror = () => {
+          console.error('Error reading file');
+          toast({
+            title: "Error",
+            description: "Failed to read DBF file.",
+            variant: "destructive"
+          });
+          onLoadingChange(false);
+        };
+
+        reader.readAsArrayBuffer(file);
+      } catch (error) {
+        console.error('Error handling DBF file:', error);
+        toast({
+          title: "Error",
+          description: "Failed to process DBF file.",
+          variant: "destructive"
+        });
+        onLoadingChange(false);
+      }
+    } else if (lowerFileName.endsWith('.soc')) {
+      console.log('Processing as SOC file');
       const reader = new FileReader();
       reader.onload = async (e) => {
         try {
-          const arrayBuffer = e.target?.result as ArrayBuffer;
-
-          // Check for associated SMT file
-          const baseName = file.name.slice(0, -4); // Remove .dbf or .soc extension
-          const fileInput = fileInputRef.current;
-          const smtFile = fileInput?.files && Array.from(fileInput.files).find(
-            f => f.name.toLowerCase() === `${baseName}.smt`
-          );
-
-          let memoData: ArrayBuffer | undefined;
-
-          // If SMT file exists, load it
-          if (smtFile) {
-            const smtReader = new FileReader();
-            memoData = await new Promise<ArrayBuffer>((resolve, reject) => {
-              smtReader.onload = (e) => {
-                const result = e.target?.result;
-                if (result instanceof ArrayBuffer) {
-                  resolve(result);
-                } else {
-                  reject(new Error('Failed to read SMT file'));
-                }
-              };
-              smtReader.onerror = reject;
-              smtReader.readAsArrayBuffer(smtFile);
-            });
+          const text = e.target?.result as string;
+          if (!text) {
+            throw new Error('Failed to read file');
           }
 
-          // Read the DBF file
-          const records = await parseDBF(arrayBuffer, memoData);
-
-          if (records && records.length > 0) {
-            // Get headers from the first record's keys
-            const headers = Object.keys(records[0]);
-            onDataLoaded(headers, records, file.name, undefined);
+          // Split the content into lines and parse as CSV
+          const lines = text.split('\n');
+          if (lines.length > 1) {
+            const headers = lines[0].split(',').map(header => header.trim());
+            const data = lines.slice(1).map(line => {
+              const values = line.split(',');
+              const obj: Record<string, string> = {};
+              headers.forEach((header, index) => {
+                obj[header] = values[index]?.trim() || '';
+              });
+              return obj;
+            });
+            onDataLoaded(headers, data, file.name, undefined, file.size);
           } else {
             toast({
               title: "Error",
-              description: "The DBF file appears to be empty or invalid.",
+              description: "The SOC file appears to be empty or invalid.",
               variant: "destructive"
             });
           }
         } catch (error) {
-          console.error('Error parsing DBF:', error);
+          console.error('Error parsing SOC:', error);
           toast({
             title: "Error",
-            description: "Failed to parse DBF file. Please check the file format.",
+            description: "Failed to parse SOC file. Please check the file format.",
             variant: "destructive"
           });
         } finally {
           onLoadingChange(false);
         }
       };
-      reader.readAsArrayBuffer(file);
+
+      reader.onerror = () => {
+        console.error('Error reading file');
+        toast({
+          title: "Error",
+          description: "Failed to read SOC file.",
+          variant: "destructive"
+        });
+        onLoadingChange(false);
+      };
+
+      reader.readAsText(file);
     } else {
       toast({
         title: "Error",

@@ -6,7 +6,7 @@ import { useConfiguration } from '@/hooks/use-configuration';
 import SavedConfigDialog from './column-mapper/SavedConfigDialog';
 import ColumnMapperContent from './column-mapper/ColumnMapperContent';
 import { downloadCSV } from '@/utils/csvUtils';
-import { MappingState } from './column-mapper/types';
+import { MappingState, ConfigurationSettings } from './column-mapper/types';
 
 const ColumnMapper = ({
   targetColumns,
@@ -42,7 +42,7 @@ const ColumnMapper = ({
     }
   }, [shouldReset, updateState]);
 
-  const handleFileData = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string) => {
+  const handleFileData = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number) => {
     // Update state first
     updateState({
       sourceColumns: columns,
@@ -50,18 +50,23 @@ const ColumnMapper = ({
       sourceFilename: sourceFilename,
       selectedSourceColumn: null,
       selectedTargetColumn: null,
-      sourceSearch: '',
-      targetSearch: ''
-    });
-
-    // Then notify parent components
-    onDataLoaded(data);
-    onSourceFileChange?.({
-      filename: sourceFilename,
-      rowCount: data.length,
+      connectionCounter: 0,
       worksheetName
     });
-  }, [onDataLoaded, onSourceFileChange, updateState]);
+
+    // Notify parent about source file change
+    if (onSourceFileChange) {
+      onSourceFileChange({
+        filename: sourceFilename,
+        rowCount: data.length,
+        worksheetName,
+        size: fileSize
+      });
+    }
+
+    // Notify parent about data load
+    onDataLoaded(data);
+  }, [updateState, onSourceFileChange, onDataLoaded]);
 
   const handleExport = useCallback((filteredData?: any[]) => {
     // Use filtered data if provided, otherwise use all source data
@@ -88,29 +93,33 @@ const ColumnMapper = ({
     });
 
     const outputFilename = state.sourceFilename ? state.sourceFilename.replace(/\.[^/.]+$/, '.CSV') : 'converted.CSV';
-    downloadCSV(transformedData, outputFilename);
+    downloadCSV(transformedData, outputFilename, state.sourceFilename || undefined, state.worksheetName);
     onExport(state.mapping);
     toast({
       title: "Export successful",
       description: `Your file has been converted and downloaded (${transformedData.length} rows)`,
     });
-  }, [state.sourceData, state.mapping, state.columnTransforms, state.sourceFilename, onExport]);
+  }, [state.sourceData, state.mapping, state.columnTransforms, state.sourceFilename, state.worksheetName, onExport]);
 
   const handleSaveConfiguration = useCallback(async () => {
-    const result = await saveConfiguration({
-      mapping: state.mapping,
-      columnTransforms: state.columnTransforms,
-      sourceColumns: state.sourceColumns,
-      connectionCounter: state.connectionCounter,
-      sourceFilename: state.sourceFilename
-    });
+    const configToSave: MappingState = {
+      ...state,
+      selectedSourceColumn: state.selectedSourceColumn || null,
+      selectedTargetColumn: state.selectedTargetColumn || null,
+      sourceSearch: state.sourceSearch || '',
+      targetSearch: state.targetSearch || '',
+      sourceData: state.sourceData || [],
+      isLoading: false
+    };
 
-    if (result) {
-      const configUrl = `${window.location.origin}/preview/${result.id}`;
+    const result = await saveConfiguration(configToSave);
+
+    if (result !== null) {
+      const configUrl = `${window.location.origin}/preview/${result}`;
       setSavedConfigUrl(configUrl);
       setShowSavedDialog(true);
     }
-  }, [state.mapping, state.columnTransforms, state.sourceColumns, state.connectionCounter, state.sourceFilename, saveConfiguration]);
+  }, [state, saveConfiguration]);
 
   return (
     <>

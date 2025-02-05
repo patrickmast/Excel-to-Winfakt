@@ -19,7 +19,6 @@ import InfoDialog from '@/components/column-mapper/InfoDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
 import PageHeader from './index/PageHeader';
 import { useMappingReducer } from '@/hooks/use-mapping-reducer';
-import ConnectedColumns from '@/components/column-mapper/ConnectedColumns';
 
 const Index = () => {
   const {
@@ -40,7 +39,7 @@ const Index = () => {
   const [savedConfigUrl, setSavedConfigUrl] = useState('');
   const [searchParams] = useSearchParams();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
-  const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number; worksheetName?: string } | null>(null);
+  const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number; worksheetName?: string; size?: number } | null>(null);
   const [shouldResetMapper, setShouldResetMapper] = useState(false);
 
   const handleLoadConfiguration = useCallback(async (id: string) => {
@@ -94,21 +93,30 @@ const Index = () => {
     setMapping(mapping);
   };
 
+  interface ConfigurationResult {
+    id: string;
+  }
+
   const handleSaveConfiguration = async (isNewConfig: boolean = true) => {
     // Save the entire mapping state
-    const result = await saveConfiguration({
+    const id = await saveConfiguration({
       mapping: mappingState.mapping,
       columnTransforms: mappingState.columnTransforms,
       sourceColumns: mappingState.sourceColumns,
       sourceData: mappingState.sourceData,
       connectionCounter: mappingState.connectionCounter,
-      sourceFilename: mappingState.sourceFilename
+      sourceFilename: mappingState.sourceFilename,
+      selectedSourceColumn: mappingState.selectedSourceColumn,
+      selectedTargetColumn: mappingState.selectedTargetColumn,
+      sourceSearch: mappingState.sourceSearch,
+      targetSearch: mappingState.targetSearch,
+      activeFilter: mappingState.activeFilter
     }, isNewConfig);
 
-    if (result) {
-      setCurrentConfigId(result.id);
+    if (id) {
+      setCurrentConfigId(String(id));
       if (isNewConfig) {
-        const configUrl = `${window.location.origin}?id=${result.id}`;
+        const configUrl = `${window.location.origin}?id=${id}`;
         setSavedConfigUrl(configUrl);
         setShowSavedDialog(true);
       } else {
@@ -151,8 +159,15 @@ const Index = () => {
 
   const handleExport = (filteredData?: any[]) => {
     const dataToExport = filteredData || mappingState.sourceData;
-    if (dataToExport && dataToExport.length > 0) {
-      downloadCSV(dataToExport, 'exported-data.csv');
+    if (dataToExport && dataToExport.length > 0 && mappingState.sourceFilename) {
+      const exportFilename = mappingState.sourceFilename;
+      downloadCSV(
+        dataToExport,
+        exportFilename,
+        exportFilename,
+        mappingState.worksheetName,
+        sourceFileInfo?.size
+      );
     }
   };
 
@@ -199,9 +214,7 @@ const Index = () => {
 
         <ColumnMapper
           onMappingChange={handleMappingChange}
-          onExport={() => {
-            handleMappingChange(mappingState.mapping);
-          }}
+          onExport={() => handleExport(mappingState.sourceData)}
           onDataLoaded={(data) => {
             const columns = data.length > 0 ? mappingState.sourceColumns : [];
             setSourceData(columns, data);
@@ -211,18 +224,6 @@ const Index = () => {
           onColumnSetChange={setActiveColumnSet}
           onSourceFileChange={setSourceFileInfo}
           shouldReset={shouldResetMapper}
-        />
-        <ConnectedColumns
-          connectedColumns={Object.entries(mappingState.mapping).map(([key, target]) => [key, key, target])}
-          onDisconnect={handleDisconnect}
-          onExport={handleExport}
-          onUpdateTransform={handleUpdateTransform}
-          onReorder={handleReorder}
-          columnTransforms={mappingState.columnTransforms}
-          sourceColumns={mappingState.sourceColumns}
-          sourceData={mappingState.sourceData}
-          activeFilter={mappingState.activeFilter}
-          onFilterChange={setFilter}
         />
       </div>
     </div>

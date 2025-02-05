@@ -5,7 +5,15 @@ export interface ColumnMapperProps {
   onDataLoaded: (data: any[]) => void;
   activeColumnSet: 'artikelen' | 'klanten';
   onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
-  onSourceFileChange?: (info: { filename: string; rowCount: number; worksheetName?: string }) => void;
+  onSourceFileChange?: (info: { 
+    filename: string; 
+    rowCount: number; 
+    worksheetName?: string;
+    size?: number;
+  }) => void;
+  filename: string;
+  rowCount: number;
+  worksheetName?: string;
   shouldReset?: boolean;
 }
 
