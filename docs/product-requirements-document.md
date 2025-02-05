@@ -37,6 +37,8 @@ Since **Winfakt Online** only accepts CSV files with a specific column structure
 
    - Visual interface for mapping source columns to Winfakt Online format
    - Smart column name matching suggestions
+   - Flexible column referencing (name, letter, or number based)
+   - Real-time data transformation preview
 3. **Data Validation & Transformation**
 
    - Real-time validation against Winfakt Online requirements
@@ -51,6 +53,8 @@ Since **Winfakt Online** only accepts CSV files with a specific column structure
 
    - Generate Winfakt-compatible CSV files
    - Detailed export summary with transformation statistics
+   - Automatic data transformation to match Winfakt column structure
+   - Export completion notifications and callbacks
 
 ## Technical Considerations
 
