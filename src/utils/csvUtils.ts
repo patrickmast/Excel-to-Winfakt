@@ -9,13 +9,24 @@ const addTimestampToFilename = (filename: string): string => {
 };
 
 export const downloadCSV = (data: any[], filename: string) => {
-  // Transform the data to handle quotes without wrapping
+  // Transform the data to handle quotes and numeric-like values correctly
   const escapedData = data.map(row => {
     const newRow: Record<string, any> = {};
     Object.entries(row).forEach(([key, value]) => {
       if (typeof value === 'string') {
-        // Replace quotes with escaped quotes, no wrapping
-        newRow[key] = value.replace(/"/g, '\\"');
+        // Trim any leading/trailing spaces while preserving internal spaces
+        const trimmedValue = value.trim();
+        
+        // Check if the value is numeric-like (contains only numbers and spaces)
+        const isNumericLike = /^[\d\s]+$/.test(trimmedValue);
+        
+        if (isNumericLike) {
+          // For numeric-like values, preserve spaces but don't add quotes
+          newRow[key] = trimmedValue;
+        } else {
+          // For other strings, escape quotes if present
+          newRow[key] = value.replace(/"/g, '\\"');
+        }
       } else {
         newRow[key] = value;
       }
@@ -25,9 +36,14 @@ export const downloadCSV = (data: any[], filename: string) => {
 
   const csv = Papa.unparse(escapedData, {
     delimiter: ';',
-    quotes: false,
+    quotes: false, // Don't automatically add quotes
     escapeFormulae: false,
-    transform: (value) => value === null || value === undefined ? '' : String(value)
+    transform: (value) => {
+      if (value === null || value === undefined) return '';
+      // Ensure we don't add quotes to numeric-like values
+      const strValue = String(value);
+      return strValue;
+    }
   });
 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
