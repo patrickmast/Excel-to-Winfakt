@@ -95,10 +95,6 @@ const ColumnMapper = ({
     const outputFilename = state.sourceFilename ? state.sourceFilename.replace(/\.[^/.]+$/, '.CSV') : 'converted.CSV';
     downloadCSV(transformedData, outputFilename, state.sourceFilename || undefined, state.worksheetName);
     onExport(state.mapping);
-    toast({
-      title: "Export successful",
-      description: `Your file has been converted and downloaded (${transformedData.length} rows)`,
-    });
   }, [state.sourceData, state.mapping, state.columnTransforms, state.sourceFilename, state.worksheetName, onExport]);
 
   const handleSaveConfiguration = useCallback(async () => {
