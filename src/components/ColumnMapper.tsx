@@ -5,7 +5,6 @@ import { useMappingState } from './column-mapper/useMappingState';
 import { useConfiguration } from '@/hooks/use-configuration';
 import SavedConfigDialog from './column-mapper/SavedConfigDialog';
 import ColumnMapperContent from './column-mapper/ColumnMapperContent';
-import { downloadCSV } from '@/utils/csvUtils';
 import { MappingState, ConfigurationSettings } from './column-mapper/types';
 
 const ColumnMapper = ({
@@ -16,7 +15,18 @@ const ColumnMapper = ({
   activeColumnSet,
   onColumnSetChange,
   onSourceFileChange,
-  shouldReset
+  shouldReset,
+  onTransformUpdate,
+  onFilterUpdate,
+  onLoadingChange,
+  currentMapping,
+  sourceData,
+  sourceColumns,
+  sourceFilename,
+  worksheetName,
+  columnTransforms,
+  isLoading,
+  activeFilter
 }: ColumnMapperProps) => {
   const [state, updateState] = useMappingState(onMappingChange);
   const { saveConfiguration, isSaving } = useConfiguration();
@@ -42,7 +52,7 @@ const ColumnMapper = ({
     }
   }, [shouldReset, updateState]);
 
-  const handleFileData = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number) => {
+  const handleFileData = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number, metadata?: any) => {
     // Update state first
     updateState({
       sourceColumns: columns,
@@ -51,7 +61,8 @@ const ColumnMapper = ({
       selectedSourceColumn: null,
       selectedTargetColumn: null,
       connectionCounter: 0,
-      worksheetName
+      worksheetName,
+      metadata
     });
 
     // Notify parent about source file change
@@ -65,11 +76,14 @@ const ColumnMapper = ({
     }
 
     // Notify parent about data load
-    onDataLoaded(data);
+    onDataLoaded(columns, data, sourceFilename, worksheetName, fileSize, metadata);
   }, [updateState, onSourceFileChange, onDataLoaded]);
 
   const handleExport = useCallback((filteredData?: any[]) => {
-    // Use filtered data if provided, otherwise use all source data
+    if (!state.sourceData || !state.sourceFilename) {
+      return;
+    }
+
     const dataToTransform = filteredData || state.sourceData;
 
     const transformedData = dataToTransform.map(row => {
@@ -92,10 +106,14 @@ const ColumnMapper = ({
       return newRow;
     });
 
-    const outputFilename = state.sourceFilename ? state.sourceFilename.replace(/\.[^/.]+$/, '.CSV') : 'converted.CSV';
-    downloadCSV(transformedData, outputFilename, state.sourceFilename || undefined, state.worksheetName);
-    onExport(state.mapping);
-  }, [state.sourceData, state.mapping, state.columnTransforms, state.sourceFilename, state.worksheetName, onExport]);
+    // Preserve metadata in the transformed data array
+    Object.assign(transformedData, {
+      metadata: state.metadata
+    });
+
+    // Pass along metadata if it exists
+    onExport(transformedData, state.metadata);
+  }, [state.sourceData, state.mapping, state.columnTransforms, state.metadata, onExport]);
 
   const handleSaveConfiguration = useCallback(async () => {
     const configToSave: MappingState = {

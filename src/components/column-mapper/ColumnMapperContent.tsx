@@ -20,8 +20,8 @@ interface ColumnMapperContentProps {
   targetColumns: string[];
   activeColumnSet: string;
   onColumnSetChange: (columnSet: string) => void;
-  onDataLoaded: (columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number) => void;
-  onExport: () => void;
+  onDataLoaded: (columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number, metadata?: any) => void;
+  onExport: (data: any[], metadata?: any) => void;
 }
 
 interface MappingState {
@@ -40,6 +40,7 @@ interface MappingState {
   targetSearch: string;
   activeFilter: string;
   isLoading: boolean;
+  metadata?: any;
 }
 
 const ColumnMapperContent = ({
@@ -53,14 +54,15 @@ const ColumnMapperContent = ({
 }: ColumnMapperContentProps) => {
   const [showNoFileDialog, setShowNoFileDialog] = useState(false);
 
-  const handleDataLoaded = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number) => {
-    onDataLoaded(columns, data, sourceFilename, worksheetName, fileSize);
+  const handleDataLoaded = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number, metadata?: any) => {
+    onDataLoaded(columns, data, sourceFilename, worksheetName, fileSize, metadata);
     updateState({
       sourceColumns: columns,
       sourceData: data,
       sourceFilename,
       worksheetName,
-      fileSize
+      fileSize,
+      metadata
     });
   }, [onDataLoaded, updateState]);
 
@@ -186,34 +188,30 @@ const ColumnMapperContent = ({
   ];
 
   const handleExport = () => {
-    if (!state.sourceFilename) {
+    if (!state.sourceData || !state.sourceFilename) {
       setShowNoFileDialog(true);
       return;
     }
-    
-    // If no export filename is set, use the source filename
-    const exportFilename = state.exportFilename || state.sourceFilename;
-    
-    // Transform the data to use WinFakt columns
+
     const transformedData = state.sourceData.map(row => {
       const newRow: Record<string, any> = {};
-      // For each mapping (source -> target), copy the data using target column as key
-      Object.entries(state.mapping).forEach(([sourceKey, targetColumn]) => {
-        const sourceColumn = sourceKey.split('_')[0]; // Remove the counter suffix
-        newRow[targetColumn] = row[sourceColumn];
+      state.sourceColumns.forEach(sourceColumn => {
+        const targetColumn = state.mapping[sourceColumn] || sourceColumn;
+        let value = row[sourceColumn];
+        if (state.columnTransforms[sourceColumn]) {
+          try {
+            const transform = new Function('value', 'row', `return ${state.columnTransforms[sourceColumn]}`);
+            value = transform(value, row);
+          } catch (error) {
+            console.error(`Error transforming column ${sourceColumn}:`, error);
+          }
+        }
+        newRow[targetColumn] = value;
       });
       return newRow;
     });
-    
-    downloadCSV(
-      transformedData, 
-      exportFilename, 
-      state.sourceFilename, 
-      state.worksheetName, 
-      state.fileSize
-    );
-    
-    onExport();
+
+    onExport(transformedData, state.metadata);
   };
 
   return (

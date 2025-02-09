@@ -342,11 +342,6 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
 
         // If there's no data or empty array, just show the result
         if (!sourceData || !Array.isArray(sourceData) || sourceData.length === 0) {
-          console.log('Source data status:', {
-            exists: !!sourceData,
-            isArray: Array.isArray(sourceData),
-            length: sourceData?.length
-          });
           setTestResult(`Test result: ${result}\n\nNote: No sample data available, tested with empty row object.`);
           setActiveTab('expression');
           return;

@@ -26,10 +26,16 @@ const isXLSXLoaded = () => {
 interface HeaderProps {
   activeColumnSet: string;
   onColumnSetChange: (columnSet: string) => void;
-  onDataLoaded: (headers: string[], data: any[], sourceFilename: string, worksheetName: string, fileSize?: number) => void;
+  onDataLoaded: (headers: string[], data: any[], sourceFilename: string, worksheetName: string, fileSize?: number, metadata?: any) => void;
   currentMapping?: Record<string, string>;
   isLoading: boolean;
   onLoadingChange: (loading: boolean) => void;
+}
+
+interface WorkbookState {
+  workbook: any;
+  fileName: string;
+  fileSize: number;
 }
 
 const Header = ({
@@ -45,35 +51,23 @@ const Header = ({
   const [showPreview, setShowPreview] = useState(false);
   const [showSheetSelector, setShowSheetSelector] = useState(false);
   const [availableSheets, setAvailableSheets] = useState<string[]>([]);
-  const [currentWorkbook, setCurrentWorkbook] = useState<any>(null);
+  const [currentWorkbook, setCurrentWorkbook] = useState<WorkbookState | null>(null);
   const [currentWorksheet, setCurrentWorksheet] = useState<string | null>(null);
   const { toast } = useToast();
 
   const processExcelWorksheet = (workbook: any, sheetName: string, fileName: string, fileSize: number) => {
     try {
       const worksheet = workbook.Sheets[sheetName];
-      console.log('Processing worksheet:', sheetName);
-      setCurrentWorksheet(sheetName);
       const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as unknown[][];
-      console.log('Raw data loaded:', rawData.length, 'rows');
-
-      if (rawData && rawData.length > 1) {
-        const headers = rawData[0].map(String);
-        const jsonData = rawData.slice(1).map(row => {
-          const obj: Record<string, string> = {};
-          headers.forEach((header: string, index: number) => {
-            obj[header] = String(row[index] ?? '');
-          });
-          return obj;
+      const headers = rawData[0].map(String);
+      const jsonData = rawData.slice(1).map(row => {
+        const obj: Record<string, string> = {};
+        headers.forEach((header: string, index: number) => {
+          obj[header] = String(row[index] ?? '');
         });
-        onDataLoaded(headers, jsonData, fileName, sheetName, fileSize);
-      } else {
-        toast({
-          title: "Error",
-          description: "The selected worksheet appears to be empty or missing headers.",
-          variant: "destructive"
-        });
-      }
+        return obj;
+      });
+      onDataLoaded(headers, jsonData, fileName, sheetName, fileSize);
     } catch (error) {
       console.error('Error processing worksheet:', error);
       toast({
@@ -84,37 +78,79 @@ const Header = ({
     } finally {
       onLoadingChange(false);
       setShowSheetSelector(false);
+      setCurrentWorkbook(null);
+      setCurrentWorksheet(null);
+      setAvailableSheets([]);
     }
   };
 
   const handleSheetSelect = (sheetName: string) => {
     if (currentWorkbook) {
-      processExcelWorksheet(currentWorkbook, sheetName, currentWorkbook.fileName, currentWorkbook.fileSize);
+      processExcelWorksheet(currentWorkbook.workbook, sheetName, currentWorkbook.fileName, currentWorkbook.fileSize);
     }
   };
 
   const handleFileSelect = async (file: File) => {
+    if (!file || file.size === 0) {
+      console.error('Invalid file: File is empty or does not exist');
+      toast({
+        title: "Invalid File",
+        description: "The selected file is empty. Please choose a valid file.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     onLoadingChange(true);
 
     const lowerFileName = file.name.toLowerCase();
     if (lowerFileName.endsWith('.csv')) {
-      console.log('[DEBUG] Processing CSV file');
+      let headers: string[] | undefined;
+      const allData: Record<string, string>[] = [];
+      let totalRows = 0;
+      let skippedRows = 0;
+
       Papa.parse(file, {
         header: false,
-        skipEmptyLines: true,
-        complete: (results) => {
+        skipEmptyLines: false,  
+        chunk: (results, parser) => {
           try {
-            if (results.data && results.data.length > 1) {
-              const headers = results.data[0] as string[];
-              const data = results.data.slice(1).map((row: unknown[]) => {
-                const obj: Record<string, string> = {};
-                headers.forEach((header: string, index: number) => {
-                  obj[header] = String(row[index] ?? '');
-                });
-                return obj;
+            results.data.forEach((row: any[], index: number) => {
+              totalRows++;
+              
+              const isEmptyRow = Array.isArray(row) && (
+                row.length === 0 || 
+                row.every(cell => cell === null || cell === undefined || String(cell).trim() === '')
+              );
+              
+              if (isEmptyRow) {
+                skippedRows++;
+                return;
+              }
+
+              if (!headers) {
+                headers = row.map(h => String(h || '').trim());
+                return;
+              }
+              
+              const obj: Record<string, string> = {};
+              headers.forEach((header: string, index: number) => {
+                obj[header] = String(row[index] ?? '').trim();
               });
-              console.log('[DEBUG] Calling onDataLoaded for CSV with file size:', file.size);
-              onDataLoaded(headers, data, file.name, undefined, file.size);
+              allData.push(obj);
+            });
+          } catch (error) {
+            throw error;
+          }
+        },
+        complete: () => {
+          try {
+            if (headers && allData.length > 0) {
+              const metadata = {
+                skippedRows,
+                totalRows: totalRows - 1  
+              };
+              onDataLoaded(headers, allData, file.name, undefined, file.size, metadata);
             } else {
               toast({
                 title: "Error",
@@ -122,24 +158,29 @@ const Header = ({
                 variant: "destructive"
               });
             }
+          } catch (error) {
+            console.error('Error processing CSV:', error);
+            toast({
+              title: "Error",
+              description: "Failed to parse CSV file. Please check the file format.",
+              variant: "destructive"
+            });
           } finally {
             onLoadingChange(false);
           }
         },
         error: (error) => {
-          console.error('Error parsing CSV:', error);
+          console.error('Papa Parse error:', error);
           toast({
             title: "Error",
-            description: "Failed to parse CSV file. Please check the file format.",
+            description: "Error processing CSV file: " + error.message,
             variant: "destructive"
           });
           onLoadingChange(false);
         }
       });
     } else if (lowerFileName.endsWith('.xlsx') || lowerFileName.endsWith('.xls')) {
-      console.log('Starting Excel file load process');
       if (!isXLSXLoaded()) {
-        console.log('XLSX not loaded, waiting...');
         toast({
           title: "Loading Excel Support",
           description: "Please wait while Excel support is being loaded...",
@@ -158,37 +199,25 @@ const Header = ({
           return;
         }
       }
-      console.log('XLSX loaded successfully');
 
       try {
         const reader = new FileReader();
         reader.onload = (e) => {
           try {
-            console.log('File read successfully, attempting to parse');
             const data = e.target?.result;
-            console.log('Data type:', typeof data);
             const workbook = XLSX.read(data, { type: 'array' });
-            console.log('Workbook loaded:', workbook.SheetNames);
-            console.log('Number of sheets:', workbook.SheetNames.length);
-
-            // Store the workbook and filename for later use
-            workbook.fileName = file.name;
-            workbook.fileSize = file.size;
-            setCurrentWorkbook(workbook);
 
             if (workbook.SheetNames.length > 1) {
-              // Multiple sheets found, show selector
-              console.log('Multiple sheets found:', workbook.SheetNames);
-              const sheets = [...workbook.SheetNames]; // Create a new array from SheetNames
-              console.log('Setting available sheets:', sheets);
+              const sheets = [...workbook.SheetNames]; 
               setAvailableSheets(sheets);
               setShowSheetSelector(true);
-              console.log('Dialog should be shown now, showSheetSelector:', true);
+              setCurrentWorkbook({
+                workbook,
+                fileName: file.name,
+                fileSize: file.size
+              });
             } else {
-              // Only one sheet, process it directly
-              console.log('Single sheet found, processing directly');
               const firstSheet = workbook.SheetNames[0];
-              setCurrentWorksheet(firstSheet);
               processExcelWorksheet(workbook, firstSheet, file.name, file.size);
             }
           } catch (error) {
@@ -199,6 +228,8 @@ const Header = ({
               variant: "destructive"
             });
             onLoadingChange(false);
+          } finally {
+            reader.onload = null;
           }
         };
         reader.readAsArrayBuffer(file);
@@ -223,7 +254,6 @@ const Header = ({
 
             const records = await parseDBF(arrayBuffer);
             if (records && records.length > 0) {
-              // Get headers from the first record's keys
               const headers = Object.keys(records[0]);
               onDataLoaded(headers, records, file.name, undefined, file.size);
             } else {
@@ -266,7 +296,6 @@ const Header = ({
         onLoadingChange(false);
       }
     } else if (lowerFileName.endsWith('.soc')) {
-      console.log('Processing as SOC file');
       const reader = new FileReader();
       reader.onload = async (e) => {
         try {
@@ -275,7 +304,6 @@ const Header = ({
             throw new Error('Failed to read file');
           }
 
-          // Split the content into lines and parse as CSV
           const lines = text.split('\n');
           if (lines.length > 1) {
             const headers = lines[0].split(',').map(header => header.trim());
@@ -329,21 +357,15 @@ const Header = ({
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('handleFileChange triggered');
     const file = e.target.files?.[0];
     if (file) {
-      console.log('File selected:', file.name, file.type);
       handleFileSelect(file);
     }
   };
 
   const handleSelectFile = () => {
-    console.log('handleSelectFile triggered');
     if (fileInputRef.current) {
-      console.log('File input found, clicking...');
       fileInputRef.current.click();
-    } else {
-      console.log('File input ref is null');
     }
   };
 
@@ -413,7 +435,7 @@ const Header = ({
           {
             label: 'Select worksheet',
             onClick: () => setShowSheetSelector(true),
-            disabled: !currentWorkbook || currentWorkbook.SheetNames.length <= 1,
+            disabled: !currentWorkbook || currentWorkbook.workbook.SheetNames.length <= 1,
             icon: (
               <svg
                 xmlns="http://www.w3.org/2000/svg"

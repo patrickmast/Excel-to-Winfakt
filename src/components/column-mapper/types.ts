@@ -1,8 +1,15 @@
 export interface ColumnMapperProps {
   targetColumns: string[];
   onMappingChange: (mapping: Record<string, string>) => void;
-  onExport: (mapping: Record<string, string>) => void;
-  onDataLoaded: (data: any[]) => void;
+  onExport: (data: any[], metadata?: any) => void;
+  onDataLoaded: (
+    columns: string[],
+    data: any[],
+    sourceFilename: string,
+    worksheetName?: string,
+    fileSize?: number,
+    metadata?: any
+  ) => void;
   activeColumnSet: 'artikelen' | 'klanten';
   onColumnSetChange: (value: 'artikelen' | 'klanten') => void;
   onSourceFileChange?: (info: { 
@@ -32,6 +39,8 @@ export interface MappingState {
   connectionCounter: number;
   isLoading?: boolean;
   activeFilter: CompoundFilter | null;
+  metadata?: any;
+  worksheetName?: string;
 }
 
 export interface ConfigurationSettings {

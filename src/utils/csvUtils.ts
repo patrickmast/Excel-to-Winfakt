@@ -6,15 +6,21 @@ export const addTimestampToFilename = (filename: string | undefined): string => 
   }
   // Remove extension first
   const baseName = filename.replace(/\.[^/.]+$/, '');
+  // Remove '_export' from the base name if present
+  const cleanBaseName = baseName.replace(/_export$/, '');
   const extension = '.CSV';
   const timestamp = Math.floor(Date.now() / 1000); // Unix timestamp in seconds
-  return `${baseName}-${timestamp}${extension}`;
+  return `${cleanBaseName}-${timestamp}${extension}`;
 };
 
 export const isRowEmpty = (row: Record<string, any>): boolean => {
-  return Object.values(row).every(value => 
-    value === null || value === undefined || String(value).trim() === ''
-  );
+  // Only check values that will be in the exported CSV (those that are not null/undefined)
+  const exportedValues = Object.entries(row)
+    .filter(([_, value]) => value !== null && value !== undefined)
+    .map(([_, value]) => value);
+  
+  const isEmpty = exportedValues.length === 0 || !exportedValues.some(value => String(value).trim() !== '');
+  return isEmpty;
 };
 
 export const formatFileSize = (bytes: number): string => {
@@ -29,149 +35,78 @@ export const formatFileSize = (bytes: number): string => {
     : `${value.toFixed(1)} ${sizes[i]}`;
 };
 
-export const generateExportReport = (
-  sourceFile: string,
-  totalRows: number,
-  exportedRows: number,
-  skippedRows: number[],
-  exportFile: string,
-  sourceFileSize: number,
-  exportFileSize: number,
-  worksheetName?: string
-): string => {
-  const report = [
-    'Export report',
-    '=============\n',
-    `Source file: ${sourceFile}`,
-    `Source file size: ${formatFileSize(sourceFileSize)}`,
-    worksheetName ? `Worksheet: ${worksheetName}` : null,
-    `Total rows processed: ${totalRows}`,
-    `Successfully exported rows: ${exportedRows}`,
-    `Skipped empty rows: ${skippedRows.length}`,
-    `CSV file: ${exportFile}`,
-    `CSV file size: ${formatFileSize(exportFileSize)}`,
-    ...(skippedRows.length > 0 ? [
-      '',
-      'Skipped rows:',
-      '-------------',
-      `Rows: ${skippedRows.join(', ')}`
-    ] : [])
-  ].filter(line => line !== null).join('\n');
+export const downloadCSV = (data: any[], filename: string) => {
+  // Configure Papa Parse for unparse
+  const config = {
+    quotes: true, // Force quotes around all fields
+    quoteChar: '"',
+    escapeChar: '"',
+    delimiter: ",",
+    header: true,
+    skipEmptyLines: true,
+    transformHeader: (header: string) => header.trim(),
+  };
 
-  return report;
+  try {
+    const csv = Papa.unparse(data, config);
+
+    // Create blob and download
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', addTimestampToFilename(filename));
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  } catch (error) {
+    throw error;
+  }
 };
 
-export const downloadCSV = (
-  data: any[],
-  filename: string,
-  sourceFilename?: string,
-  worksheetName?: string,
-  sourceFileSize?: number
-) => {
-  const skippedRows: number[] = [];
-  
-  // Find the last non-empty row index
-  let lastNonEmptyRowIndex = data.length - 1;
-  while (lastNonEmptyRowIndex >= 0 && isRowEmpty(data[lastNonEmptyRowIndex])) {
-    lastNonEmptyRowIndex--;
-  }
-
-  // Filter data and track skipped rows before the last non-empty row
-  const filteredData = data.filter((row, index) => {
-    if (isRowEmpty(row)) {
-      // Only track skipped rows that appear before the last non-empty row
-      if (index <= lastNonEmptyRowIndex) {
-        skippedRows.push(index + 2); // Add 2 to match Excel row numbers (header is row 1)
-      }
-      return false;
-    }
+export function isEmptyRow(row: any[]): boolean {
+  const hasValues = row.some(cell => {
+    if (cell === null || cell === undefined) return false;
+    if (typeof cell === 'string') return cell.trim().length > 0;
     return true;
   });
+  return !hasValues;
+}
 
-  // Transform the filtered data to handle quotes and numeric-like values correctly
-  const escapedData = filteredData.map(row => {
-    const newRow: Record<string, any> = {};
-    Object.entries(row).forEach(([key, value]) => {
-      if (typeof value === 'string') {
-        // Trim any leading/trailing spaces while preserving internal spaces
-        const trimmedValue = value.trim();
-        
-        // Check if the value is numeric-like (contains only numbers and spaces)
-        const isNumericLike = /^[\d\s]+$/.test(trimmedValue);
-        
-        if (isNumericLike) {
-          // For numeric-like values, preserve spaces but don't add quotes
-          newRow[key] = trimmedValue;
-        } else {
-          // For other strings, escape quotes if present
-          newRow[key] = value.replace(/"/g, '\\"');
-        }
-      } else {
-        newRow[key] = value;
-      }
+export async function downloadCSV(
+  data: any[],
+  filename: string,
+  headers: string[],
+  onError?: (error: Error) => void
+): Promise<void> {
+  try {
+    const csv = Papa.unparse({
+      fields: headers,
+      data: data
     });
-    return newRow;
-  });
 
-  // Generate the export filename with timestamp
-  const exportFilename = addTimestampToFilename(filename);
-  
-  // Create the CSV content first to get accurate file size
-  const csv = Papa.unparse(escapedData, {
-    delimiter: ';',
-    quotes: false, // Don't automatically add quotes
-    escapeFormulae: false,
-    transform: (value) => {
-      if (value === null || value === undefined) return '';
-      // Ensure we don't add quotes to numeric-like values
-      const strValue = String(value);
-      return strValue;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+
+    if (navigator.msSaveBlob) {
+      navigator.msSaveBlob(blob, filename);
+      return;
     }
-  });
 
-  // Calculate file sizes
-  const actualSourceFileSize = sourceFileSize || 0;
-  const exportFileSize = new Blob([csv]).size;
-  
-  // Generate the report
-  const report = [
-    'Export report',
-    '=============\n',
-    `Source file: ${sourceFilename || 'Unknown source file'}`,
-    `Source file size: ${formatFileSize(actualSourceFileSize)}`,
-    `Total rows processed: ${data.length}`,
-    `Successfully exported rows: ${filteredData.length}`,
-    `Skipped empty rows: ${skippedRows.length}`,
-    `CSV file: ${exportFilename}`,
-    `CSV file size: ${formatFileSize(exportFileSize)}`,
-    ...(worksheetName ? [
-      `Worksheet: ${worksheetName}`
-    ] : []),
-    ...(skippedRows.length > 0 ? [
-      `\nSkipped rows: ${skippedRows.join(', ')}`
-    ] : [])
-  ].filter(line => line !== null).join('\n');
-
-  // Create and download the report file
-  const reportBlob = new Blob([report], { type: 'text/plain' });
-  const reportUrl = window.URL.createObjectURL(reportBlob);
-  const reportLink = document.createElement('a');
-  reportLink.href = reportUrl;
-  reportLink.download = exportFilename.replace('.CSV', '-report.txt');
-  reportLink.click();
-  window.URL.revokeObjectURL(reportUrl);
-
-  // Create and download the CSV file
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-
-  if (navigator.hasOwnProperty('msSaveBlob')) {
-    (navigator as any).msSaveBlob(blob, exportFilename);
-  } else {
     link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', exportFilename);
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  } catch (error) {
+    if (onError) {
+      onError(error as Error);
+    } else {
+      throw error;
+    }
   }
-};
+}

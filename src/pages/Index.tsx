@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { useConfiguration } from '@/hooks/use-configuration';
 import SavedConfigDialog from '@/components/column-mapper/SavedConfigDialog';
 import InfoDialog from '@/components/column-mapper/InfoDialog';
+import LogDialog from '@/components/column-mapper/LogDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
 import PageHeader from './index/PageHeader';
 import { useMappingReducer } from '@/hooks/use-mapping-reducer';
@@ -39,6 +40,9 @@ const Index = () => {
   const [savedConfigUrl, setSavedConfigUrl] = useState('');
   const [searchParams] = useSearchParams();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
+  const [showLogDialog, setShowLogDialog] = useState(false);
+  const [latestReport, setLatestReport] = useState<string | null>(null);
+  const [exportData, setExportData] = useState<any[] | null>(null);
   const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number; worksheetName?: string; size?: number } | null>(null);
   const [shouldResetMapper, setShouldResetMapper] = useState(false);
 
@@ -157,19 +161,21 @@ const Index = () => {
     setMapping(newMapping);
   };
 
-  const handleExport = (filteredData?: any[]) => {
-    const dataToExport = filteredData || mappingState.sourceData;
-    if (dataToExport && dataToExport.length > 0 && mappingState.sourceFilename) {
-      const exportFilename = mappingState.sourceFilename;
-      downloadCSV(
-        dataToExport,
-        exportFilename,
-        exportFilename,
-        mappingState.worksheetName,
-        sourceFileInfo?.size
-      );
+  const handleExport = useCallback(async (data: any[], sourceFilename: string) => {
+    if (!sourceFilename) {
+      return;
     }
-  };
+    
+    // Show the log dialog immediately
+    setShowLogDialog(true);
+    
+    // Pass the data to LogDialog for processing
+    setExportData(data);
+  }, []);
+
+  const handleExportComplete = useCallback((report: string, exportedData: any[]) => {
+    setLatestReport(report);
+  }, []);
 
   const handleUpdateTransform = (uniqueKey: string, code: string) => {
     updateTransforms({
@@ -197,10 +203,17 @@ const Index = () => {
       <InfoDialog
         open={showInfoDialog}
         onOpenChange={setShowInfoDialog}
-        configId={currentConfigId}
-        sourceFileName={sourceFileInfo?.filename}
-        sourceRowCount={sourceFileInfo?.rowCount}
-        worksheetName={sourceFileInfo?.worksheetName}
+        sourceFileInfo={sourceFileInfo}
+      />
+
+      <LogDialog
+        open={showLogDialog}
+        onOpenChange={setShowLogDialog}
+        data={exportData}
+        sourceFilename={mappingState.sourceFilename}
+        sourceFileSize={mappingState.sourceFileSize}
+        worksheetName={mappingState.worksheetName}
+        onExportComplete={handleExportComplete}
       />
 
       <div className="container mx-auto px-4 py-8 flex-grow">
@@ -209,15 +222,25 @@ const Index = () => {
           onSave={() => handleSaveConfiguration(false)}
           onInfo={() => setShowInfoDialog(true)}
           onClearSettings={handleClearSettings}
+          onShowLog={() => {
+            if (latestReport) {
+              setShowLogDialog(true);
+            } else {
+              toast({
+                title: "No Export Report",
+                description: "Export a file first to generate a report.",
+                variant: "default"
+              });
+            }
+          }}
           isSaving={isSaving}
         />
 
         <ColumnMapper
           onMappingChange={handleMappingChange}
-          onExport={() => handleExport(mappingState.sourceData)}
-          onDataLoaded={(data) => {
-            const columns = data.length > 0 ? mappingState.sourceColumns : [];
-            setSourceData(columns, data);
+          onExport={(data) => handleExport(data, mappingState.sourceFilename || '')}
+          onDataLoaded={(columns, data, filename, worksheetName, fileSize) => {
+            setSourceData(columns, data, { filename, worksheetName });
           }}
           targetColumns={activeColumnSet === 'artikelen' ? ARTIKEL_COLUMNS : KLANTEN_COLUMNS}
           activeColumnSet={activeColumnSet}
