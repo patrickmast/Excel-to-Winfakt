@@ -9,7 +9,8 @@
     "build": "npm run generate-build-info && vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "npm install --no-save jsdom@22.1.0 && vitest",
+    "test:ci": "vitest"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -70,6 +71,9 @@
     "xlsx": "^0.18.5",
     "zod": "^3.23.8"
   },
+  "optionalDependencies": {
+    "jsdom": "^22.1.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@tailwindcss/typography": "^0.5.15",
@@ -82,7 +86,6 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
-    "jsdom": "^22.1.0",
     "lovable-tagger": "^1.0.19",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.11",
