@@ -43,8 +43,12 @@ const VersionDisplay = () => {
 
   const getDomainSuffix = () => {
     const hostname = window.location.hostname;
-    if (hostname.includes('netlify.app')) return ' (On Netlify.app)';
-    if (hostname.includes('replit.app')) return ' (On Replit.app)';
+    if (hostname === 'localhost' || hostname === '0.0.0.0') return '';
+    const parts = hostname.split('.');
+    if (parts.length >= 2) {
+      const domain = parts.slice(-2).join('.');
+      return ` (On ${domain})`;
+    }
     return '';
   };
 
