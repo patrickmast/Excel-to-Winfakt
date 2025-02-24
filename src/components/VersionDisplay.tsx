@@ -41,6 +41,13 @@ const VersionDisplay = () => {
     return versionNumber.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1.');
   };
 
+  const getDomainSuffix = () => {
+    const hostname = window.location.hostname;
+    if (hostname.includes('netlify.app')) return ' (On Netlify.app)';
+    if (hostname.includes('replit.app')) return ' (On Replit.app)';
+    return '';
+  };
+
   if (!import.meta.env.DEV) {
     return (
       <VanillaHoverCard>
@@ -51,7 +58,7 @@ const VersionDisplay = () => {
         </VanillaHoverCardTrigger>
         <VanillaHoverCardContent>
           <span className="whitespace-nowrap">
-            Deployed on {formatRelativeDate(new Date(Number(lastModified))).dateStr} at {formatRelativeDate(new Date(Number(lastModified))).timeStr}
+            Deployed on {formatRelativeDate(new Date(Number(lastModified))).dateStr} at {formatRelativeDate(new Date(Number(lastModified))).timeStr}{getDomainSuffix()}
           </span>
         </VanillaHoverCardContent>
       </VanillaHoverCard>
@@ -62,12 +69,12 @@ const VersionDisplay = () => {
     <VanillaHoverCard>
       <VanillaHoverCardTrigger>
         <span className="cursor-pointer" title={tooltipText}>
-          Last modified: {lastModified}
+          Last modified: {lastModified}{getDomainSuffix()}
         </span>
       </VanillaHoverCardTrigger>
       <VanillaHoverCardContent>
         <span className="whitespace-nowrap">
-          {tooltipText}
+          {tooltipText}{getDomainSuffix()}
         </span>
       </VanillaHoverCardContent>
     </VanillaHoverCard>
