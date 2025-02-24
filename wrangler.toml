@@ -8,3 +8,25 @@ bucket = "./dist"
 [build]
 command = "npm run build"
 pages_build_output_dir = "dist"
+
+# Configure proper MIME types
+[[headers]]
+for = "/assets/*.js"
+[headers.values]
+Content-Type = "text/javascript"
+
+[[headers]]
+for = "/*.js"
+[headers.values]
+Content-Type = "text/javascript"
+
+# Ensure module scripts are served correctly
+[[headers]]
+for = "/assets/*.mjs"
+[headers.values]
+Content-Type = "text/javascript"
+
+[[headers]]
+for = "/*.mjs"
+[headers.values]
+Content-Type = "text/javascript"
