@@ -14,21 +14,11 @@ bucket = "./dist"
 
 # Configure proper MIME types
 [[headers]]
-for = "/assets/*.js"
+for = "/assets/*"
 [headers.values]
 Content-Type = "text/javascript"
 
 [[headers]]
-for = "/*.js"
-[headers.values]
-Content-Type = "text/javascript"
-
-[[headers]]
-for = "/assets/*.mjs"
-[headers.values]
-Content-Type = "text/javascript"
-
-[[headers]]
-for = "/*.mjs"
+for = "/*"
 [headers.values]
 Content-Type = "text/javascript"
