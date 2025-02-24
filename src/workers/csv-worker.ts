@@ -90,7 +90,12 @@ self.onmessage = async (e) => {
         
         const csvData = Papa.unparse(processedChunks, {
           header: true,
-          skipEmptyLines: true
+          skipEmptyLines: true,
+          quotes: false,
+          quoteChar: '"',
+          escapeChar: '"',
+          delimiter: ',',
+          encoding: 'UTF-8'
         });
         
         // Send final report
