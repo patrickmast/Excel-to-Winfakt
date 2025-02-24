@@ -38,10 +38,9 @@ export const formatFileSize = (bytes: number): string => {
 export const downloadCSV = (data: any[], filename: string) => {
   // Configure Papa Parse for unparse
   const config = {
-    quotes: true, // Force quotes around all fields
-    quoteChar: '"',
-    escapeChar: '"',
-    delimiter: ",",
+    quotes: false, // Never use quotes around fields
+    delimiter: ";",
+    escapeChar: "\\",
     header: true,
     skipEmptyLines: true,
     transformHeader: (header: string) => header.trim(),

@@ -92,9 +92,8 @@ self.onmessage = async (e) => {
           header: true,
           skipEmptyLines: true,
           quotes: false,
-          quoteChar: '"',
-          escapeChar: '"',
-          delimiter: ',',
+          delimiter: ';',
+          escapeChar: '\\',
           encoding: 'UTF-8'
         });
         
