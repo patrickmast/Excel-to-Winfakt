@@ -26,12 +26,6 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     chunkSizeWarningLimit: 1000,
     target: 'esnext',
-    assetsDir: 'assets',
-    rollupOptions: {
-      output: {
-        manualChunks: undefined,
-      },
-    },
   },
   esbuild: {
     logOverride: { 'this-is-undefined-in-esm': 'silent' }
