@@ -25,21 +25,6 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
     "Ecoboni"
   ];
   
-  // Add special case for Stock fields
-  const stockFields = [
-    "Stock verwerken?",
-    "Minimum voorraad (ja/nee)",
-    "Minimum voorraad (aantal)",
-    "Minimum bestelhoeveelheid",
-    "Is beginstock"
-  ];
-  
-  // Add Voorraad locatie fields to stockFields
-  for (let i = 1; i <= 9; i++) {
-    stockFields.push(`Voorraad locatie ${i}`);
-    stockFields.push(`Voorraad locatie ${i} toevoegen`);
-  }
-  
   // Check if any Intrastat fields are present in the columns
   const presentIntrastatFields = intrastatFields.filter(field => columns.includes(field));
   
@@ -57,16 +42,6 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
     groups.push({
       name: "Taxen",
       columns: presentTaxenFields
-    });
-  }
-  
-  // Check if any Stock fields are present in the columns
-  const presentStockFields = stockFields.filter(field => columns.includes(field));
-  
-  if (presentStockFields.length > 0) {
-    groups.push({
-      name: "Stock",
-      columns: presentStockFields
     });
   }
 
@@ -104,8 +79,8 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
   const potentialGroups = new Map<string, string[]>();
 
   columns.forEach(col => {
-    // Skip columns that are already in the Intrastat, Taxen, or Stock groups
-    if (intrastatFields.includes(col) || taxenFields.includes(col) || stockFields.includes(col)) {
+    // Skip columns that are already in the Intrastat or Taxen groups
+    if (intrastatFields.includes(col) || taxenFields.includes(col)) {
       return;
     }
     
