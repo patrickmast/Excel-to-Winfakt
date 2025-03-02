@@ -11,6 +11,12 @@ export default defineConfig(({ mode }) => ({
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
+    allowedHosts: [
+      'localhost', 
+      '127.0.0.1',
+      '*.replit.dev',
+      '*.repl.co'
+    ],
   },
   plugins: [
     react(),
