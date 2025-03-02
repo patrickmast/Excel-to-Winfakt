@@ -15,7 +15,8 @@ export default defineConfig(({ mode }) => ({
       'localhost', 
       '127.0.0.1',
       '*.replit.dev',
-      '*.repl.co'
+      '*.repl.co',
+      'ed283830-3aad-4490-a326-01ef0401e16d-00-3ackej8lp5xd9.janeway.replit.dev'
     ],
   },
   plugins: [
