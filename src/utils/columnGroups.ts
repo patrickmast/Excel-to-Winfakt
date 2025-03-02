@@ -33,6 +33,17 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
     "Minimum bestelhoeveelheid"
   ];
   
+  // Add special case for Stock aantallen aanpassen fields
+  const stockAantallenFields = [
+    "Is beginstock"
+  ];
+  
+  // Add Voorraad locatie fields to stockAantallenFields
+  for (let i = 1; i <= 9; i++) {
+    stockAantallenFields.push(`Voorraad locatie ${i}`);
+    stockAantallenFields.push(`Voorraad locatie ${i} toevoegen`);
+  }
+  
   // Check if any Intrastat fields are present in the columns
   const presentIntrastatFields = intrastatFields.filter(field => columns.includes(field));
   
@@ -60,6 +71,16 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
     groups.push({
       name: "Stock",
       columns: presentStockFields
+    });
+  }
+  
+  // Check if any Stock aantallen aanpassen fields are present in the columns
+  const presentStockAantallenFields = stockAantallenFields.filter(field => columns.includes(field));
+  
+  if (presentStockAantallenFields.length > 0) {
+    groups.push({
+      name: "Stock aantallen aanpassen",
+      columns: presentStockAantallenFields
     });
   }
 
@@ -97,8 +118,9 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
   const potentialGroups = new Map<string, string[]>();
 
   columns.forEach(col => {
-    // Skip columns that are already in the Intrastat, Taxen, or Stock groups
-    if (intrastatFields.includes(col) || taxenFields.includes(col) || stockFields.includes(col)) {
+    // Skip columns that are already in the Intrastat, Taxen, Stock, or Stock aantallen aanpassen groups
+    if (intrastatFields.includes(col) || taxenFields.includes(col) || 
+        stockFields.includes(col) || stockAantallenFields.includes(col)) {
       return;
     }
     
