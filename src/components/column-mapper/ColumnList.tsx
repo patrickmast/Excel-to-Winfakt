@@ -57,6 +57,14 @@ const ColumnList = ({
     setExpandedGroups(newExpanded);
   };
 
+  // Get shortened display name for Intrastat fields
+  const getDisplayName = (column: string): string => {
+    if (column.startsWith("Intrastat, ")) {
+      return column.replace("Intrastat, ", "");
+    }
+    return column;
+  };
+
   // First filter by search, then handle mapped columns at the group level
   let filteredColumns = columns
     .filter(column => {
@@ -123,7 +131,8 @@ const ColumnList = ({
                         {unmappedGroupColumns.map(groupColumn => (
                           <ColumnPreview
                             key={groupColumn}
-                            columnName={groupColumn}
+                            columnName={group.name === "Intrastat" ? getDisplayName(groupColumn) : groupColumn}
+                            originalColumnName={groupColumn}
                             previewValue={getPreviewValue(groupColumn)}
                             isSelected={selectedColumn === groupColumn}
                             onClick={() => onColumnClick(groupColumn)}

@@ -4,6 +4,7 @@ import { Settings } from 'lucide-react';
 
 interface ColumnPreviewProps {
   columnName: string;
+  originalColumnName?: string;
   previewValue?: string | null;
   isSelected?: boolean;
   onClick?: () => void;
@@ -14,6 +15,7 @@ interface ColumnPreviewProps {
 
 const ColumnPreview: React.FC<ColumnPreviewProps> = ({
   columnName,
+  originalColumnName,
   previewValue,
   isSelected,
   onClick,
@@ -21,9 +23,15 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
   className,
   showPreview = true
 }) => {
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
     <div
-      onClick={onClick}
+      onClick={handleClick}
       className={cn(
         "p-3 rounded-md cursor-pointer transition-colors relative",
         isSelected || showSettings
@@ -35,7 +43,7 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
       <div className="flex justify-between items-center w-full">
         <div className="flex items-center justify-between flex-1 min-w-0">
           <span className="text-sm truncate">{columnName}</span>
-          {previewValue && (
+          {previewValue && showPreview && (
             <span className="text-xs text-gray-500 ml-2 truncate max-w-[50%]">
               {previewValue}
             </span>

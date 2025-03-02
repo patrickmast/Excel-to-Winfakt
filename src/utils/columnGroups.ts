@@ -6,6 +6,25 @@ interface ColumnGroup {
 export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
   const groups: ColumnGroup[] = [];
 
+  // Add special case for Intrastat fields
+  const intrastatFields = [
+    "Intrastat, lidstaat van herkomst",
+    "Intrastat, standaard gewest",
+    "Intrastat, goederencode",
+    "Intrastat, gewicht per eenheid",
+    "Intrastat, land van oorsprong"
+  ];
+  
+  // Check if any Intrastat fields are present in the columns
+  const presentIntrastatFields = intrastatFields.filter(field => columns.includes(field));
+  
+  if (presentIntrastatFields.length > 0) {
+    groups.push({
+      name: "Intrastat",
+      columns: presentIntrastatFields
+    });
+  }
+
   // Helper to check if a set of columns forms a numbered sequence
   const isNumberedSequence = (cols: string[]): boolean => {
     // Extract number and surrounding text pattern
@@ -40,6 +59,11 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
   const potentialGroups = new Map<string, string[]>();
 
   columns.forEach(col => {
+    // Skip columns that are already in the Intrastat group
+    if (intrastatFields.includes(col)) {
+      return;
+    }
+    
     const match = col.match(/^(.*?)(\d+)(.*?)$/);
     if (match) {
       const [_, prefix, num, suffix] = match;
