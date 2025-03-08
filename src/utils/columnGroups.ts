@@ -4,9 +4,11 @@ interface ColumnGroup {
 }
 
 export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
+  // This array will store the groups in the exact order they should appear in the UI
   const groups: ColumnGroup[] = [];
 
-  // Add special case for Intrastat fields
+  // Define all the special case fields
+  // Intrastat fields (should appear last)
   const intrastatFields = [
     "Intrastat, lidstaat van herkomst",
     "Intrastat, standaard gewest",
@@ -15,7 +17,7 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
     "Intrastat, land van oorsprong"
   ];
   
-  // Add special case for Taxen fields
+  // Taxen fields (should appear after BTW-percentage)
   const taxenFields = [
     "Recupel",
     "Auvibel",
@@ -25,7 +27,7 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
     "Ecoboni"
   ];
   
-  // Add special case for Stock fields
+  // Stock fields (should appear after Hoofdgroep and Subgroep)
   const stockFields = [
     "Stock verwerken?",
     "Minimum voorraad (ja/nee)",
@@ -33,9 +35,32 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
     "Minimum bestelhoeveelheid"
   ];
   
-  // Add special case for Stock aantallen aanpassen fields
+  // Stock aantallen aanpassen fields (should appear after Stock fields)
   const stockAantallenFields = [
     "Is beginstock"
+  ];
+  
+  // Add special case for language description fields
+  const languageDescriptionFields = [
+    "Omschrijving NL",
+    "Omschrijving GB",
+    "Omschrijving DE",
+    "Omschrijving FR",
+    "Omschrijving TR"
+  ];
+  
+  // Add special case for Netto verkoopprijs fields
+  // We want to exclude Netto verkoopprijs 1 from the group
+  const nettoVerkoopprijsFields = [
+    "Netto verkoopprijs 2",
+    "Netto verkoopprijs 3",
+    "Netto verkoopprijs 4",
+    "Netto verkoopprijs 5",
+    "Netto verkoopprijs 6",
+    "Netto verkoopprijs 7",
+    "Netto verkoopprijs 8",
+    "Netto verkoopprijs 9",
+    "Netto verkoopprijs 10"
   ];
   
   // Add Voorraad locatie fields to stockAantallenFields
@@ -44,44 +69,44 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
     stockAantallenFields.push(`Voorraad locatie ${i} toevoegen`);
   }
   
-  // Check if any Intrastat fields are present in the columns
+  // We'll create a mapping of group names to their columns
+  // This allows us to define the exact order in which groups should appear
+  
+  // First, prepare all the groups that might be present
+  const presentTaxenFields = taxenFields.filter(field => columns.includes(field));
+  const presentStockFields = stockFields.filter(field => columns.includes(field));
+  const presentStockAantallenFields = stockAantallenFields.filter(field => columns.includes(field));
+  const presentLanguageDescriptionFields = languageDescriptionFields.filter(field => columns.includes(field));
+  const presentNettoVerkoopprijsFields = nettoVerkoopprijsFields.filter(field => columns.includes(field));
   const presentIntrastatFields = intrastatFields.filter(field => columns.includes(field));
   
-  if (presentIntrastatFields.length > 0) {
-    groups.push({
-      name: "Intrastat",
-      columns: presentIntrastatFields
-    });
-  }
+  // Define the order of groups as specified by the user
+  const groupOrder = [
+    // These are individual columns, not groups
+    // "Artikelnummer", "Omschrijving", "Catalogusprijs", "Netto aankoopprijs", "Netto verkoopprijs 1", "BTW-percentage",
+    
+    // Groups in specified order
+    { name: "Taxen", columns: presentTaxenFields },
+    // "Leeggoed" is an individual column
+    // "Eenheid", "Barcode", "Leveranciersnummer", "Artikelnummer fabrikant", "Artikelnummer leverancier", "Hoofdgroep", "Subgroep" are individual columns
+    { name: "Stock", columns: presentStockFields },
+    { name: "Stock aantallen aanpassen", columns: presentStockAantallenFields },
+    // "Actief?", "Korting uitgeschakeld" are individual columns
+    { name: "Omschrijvingen in andere talen", columns: presentLanguageDescriptionFields },
+    { name: "Netto verkoopprijs 2 → 10", columns: presentNettoVerkoopprijsFields },
+    // The rest are automatically generated groups or individual columns
+    // "Intrastat" should be last
+    { name: "Intrastat", columns: presentIntrastatFields }
+  ];
   
-  // Check if any Taxen fields are present in the columns
-  const presentTaxenFields = taxenFields.filter(field => columns.includes(field));
-  
-  if (presentTaxenFields.length > 0) {
-    groups.push({
-      name: "Taxen",
-      columns: presentTaxenFields
-    });
-  }
-  
-  // Check if any Stock fields are present in the columns
-  const presentStockFields = stockFields.filter(field => columns.includes(field));
-  
-  if (presentStockFields.length > 0) {
-    groups.push({
-      name: "Stock",
-      columns: presentStockFields
-    });
-  }
-  
-  // Check if any Stock aantallen aanpassen fields are present in the columns
-  const presentStockAantallenFields = stockAantallenFields.filter(field => columns.includes(field));
-  
-  if (presentStockAantallenFields.length > 0) {
-    groups.push({
-      name: "Stock aantallen aanpassen",
-      columns: presentStockAantallenFields
-    });
+  // Add groups in the specified order, but only if they have columns
+  for (const group of groupOrder) {
+    if (group.columns.length > 0) {
+      groups.push({
+        name: group.name,
+        columns: group.columns
+      });
+    }
   }
 
   // Helper to check if a set of columns forms a numbered sequence
@@ -118,9 +143,11 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
   const potentialGroups = new Map<string, string[]>();
 
   columns.forEach(col => {
-    // Skip columns that are already in the Intrastat, Taxen, Stock, or Stock aantallen aanpassen groups
+    // Skip columns that are already in the special groups
     if (intrastatFields.includes(col) || taxenFields.includes(col) || 
-        stockFields.includes(col) || stockAantallenFields.includes(col)) {
+        stockFields.includes(col) || stockAantallenFields.includes(col) ||
+        languageDescriptionFields.includes(col) || nettoVerkoopprijsFields.includes(col) ||
+        col === "Netto verkoopprijs 1") {
       return;
     }
     

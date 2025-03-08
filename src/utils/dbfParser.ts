@@ -13,17 +13,40 @@ interface DBFField {
 }
 
 export async function parseDBF(buffer: ArrayBuffer, memoBuffer?: ArrayBuffer): Promise<Record<string, any>[]> {
-  const view = new DataView(buffer);
-  const header = readHeader(view);
-  const fields = readFields(view, header.headerLength);
-  const records = readRecords(view, header, fields);
-
-  // If we have a memo file, process memo fields
+  console.log('parseDBF called with buffer size:', buffer.byteLength, 'bytes');
   if (memoBuffer) {
-    processMemoFields(records, fields, memoBuffer);
+    console.log('Memo buffer provided, size:', memoBuffer.byteLength, 'bytes');
+  }
+  
+  if (!buffer || buffer.byteLength === 0) {
+    console.error('Invalid buffer: Buffer is empty or does not exist');
+    throw new Error('Invalid buffer: Buffer is empty or does not exist');
   }
 
-  return records;
+  try {
+    const view = new DataView(buffer);
+    console.log('Creating DataView successful');
+    
+    const header = readHeader(view);
+    console.log('Header read successfully:', header);
+    
+    const fields = readFields(view, header.headerLength);
+    console.log('Fields read successfully, count:', fields.length);
+    
+    const records = readRecords(view, header, fields);
+    console.log('Records read successfully, count:', records.length);
+
+    // If we have a memo file, process memo fields
+    if (memoBuffer) {
+      processMemoFields(records, fields, memoBuffer);
+      console.log('Memo fields processed');
+    }
+
+    return records;
+  } catch (error) {
+    console.error('Error in parseDBF:', error);
+    throw error;
+  }
 }
 
 function readHeader(view: DataView): DBFHeader {

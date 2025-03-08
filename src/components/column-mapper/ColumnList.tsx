@@ -57,12 +57,31 @@ const ColumnList = ({
     setExpandedGroups(newExpanded);
   };
 
-  // Get shortened display name for Intrastat fields
+  // Get display name for columns - this only affects the UI, not the exported CSV
   const getDisplayName = (column: string): string => {
-    if (column.startsWith("Intrastat, ")) {
-      return column.replace("Intrastat, ", "");
+    // Handle special cases for column display names
+    switch (column) {
+      case "Intrastat, lidstaat van herkomst":
+      case "Intrastat, standaard gewest":
+      case "Intrastat, goederencode":
+      case "Intrastat, gewicht per eenheid":
+      case "Intrastat, land van oorsprong":
+        return column.replace("Intrastat, ", "");
+      case "Netto verkoopprijs 1":
+        return "Netto verkoopprijs";
+      case "Actief?":
+        return "Artikel is actief";
+      case "Korting uitgeschakeld":
+        return "Korting uitschakelen";
+      case "merk":
+        return "Merk";
+      case "Rekeningnummer":
+        return "Grootboekrekening boekhouding";
+      case "Aantal 2":
+        return "Standaard waarde voor 2e aantal";
+      default:
+        return column;
     }
-    return column;
   };
 
   // First filter by search, then handle mapped columns at the group level
@@ -77,8 +96,22 @@ const ColumnList = ({
 
   // Only apply grouping to Winfakt columns
   const isWinfaktList = title !== "Source file columns";
-  const columnGroups = isWinfaktList ? identifyColumnGroups(filteredColumns) : [];
-  const groupedColumns = new Set(columnGroups.flatMap(g => g.columns));
+  
+  // Important: Use all columns for identifying groups, not just filtered ones
+  // This ensures groups maintain their original order even when some columns are mapped
+  const allColumnGroups = isWinfaktList ? identifyColumnGroups(columns) : [];
+  
+  // Then filter the groups to only include columns that pass our filters
+  const columnGroups = allColumnGroups.map(group => ({
+    ...group,
+    columns: group.columns.filter(col => filteredColumns.includes(col))
+  })).filter(group => group.columns.length > 0);
+  
+  // Create a set of all columns that belong to any group
+  const groupedColumns = new Set(allColumnGroups.flatMap(g => g.columns));
+
+  // Create a set to track which groups have already been rendered
+  const renderedGroups = new Set<string>();
 
   return (
     <VanillaCard>
@@ -94,26 +127,37 @@ const ColumnList = ({
       />
       <div className="space-y-2">
         {isWinfaktList ? (
-          filteredColumns.map(column => {
-            if (!column) return null; // Skip empty columns
-            // Find if this column belongs to a group
-            const group = columnGroups.find(g => g.columns.includes(column));
-
-            if (group) {
-              // If this is the first column in the group, render the group header
-              if (group.columns[0] === column) {
-                // Check if all columns in the group are mapped
-                const allGroupColumnsMapped = group.columns.every(col => isColumnMapped(col));
-
-                // Skip the entire group if all columns are mapped
-                if (allGroupColumnsMapped) {
+          <>
+            {/* Get the original column order from the parent component */}
+            {/* We need to process columns in their original order to maintain the specified sequence */}
+            {columns.filter(column => {
+              // Only include columns that pass our filters and aren't mapped yet
+              return filteredColumns.includes(column) && !isColumnMapped(column);
+            }).map(column => {
+              // Check if this column belongs to a group
+              const group = allColumnGroups.find(g => g.columns.includes(column));
+              
+              if (group) {
+                // If we've already rendered this group, skip it
+                if (renderedGroups.has(group.name)) {
                   return null;
                 }
-
+                
+                // Mark this group as rendered
+                renderedGroups.add(group.name);
+                
                 // Filter out mapped columns from the group
-                const unmappedGroupColumns = group.columns.filter(col => !isColumnMapped(col) && col);
-
-                return unmappedGroupColumns.length > 0 ? (
+                const unmappedGroupColumns = group.columns.filter(col => 
+                  filteredColumns.includes(col) && !isColumnMapped(col) && col
+                );
+                
+                // Skip the entire group if all columns are mapped or filtered out
+                if (unmappedGroupColumns.length === 0) {
+                  return null;
+                }
+                
+                // Render the group
+                return (
                   <div key={group.name}>
                     <div
                       onClick={() => toggleGroup(group.name)}
@@ -131,7 +175,7 @@ const ColumnList = ({
                         {unmappedGroupColumns.map(groupColumn => (
                           <ColumnPreview
                             key={groupColumn}
-                            columnName={group.name === "Intrastat" ? getDisplayName(groupColumn) : groupColumn}
+                            columnName={getDisplayName(groupColumn)}
                             originalColumnName={groupColumn}
                             previewValue={getPreviewValue(groupColumn)}
                             isSelected={selectedColumn === groupColumn}
@@ -142,24 +186,23 @@ const ColumnList = ({
                       </div>
                     )}
                   </div>
-                ) : null;
+                );
+              } else {
+                // This is an individual column, not part of any group
+                return (
+                  <ColumnPreview
+                    key={column}
+                    columnName={getDisplayName(column)}
+                    originalColumnName={column}
+                    previewValue={getPreviewValue(column)}
+                    isSelected={selectedColumn === column}
+                    onClick={() => onColumnClick(column)}
+                    showPreview={false}
+                  />
+                );
               }
-              // Always skip other columns in the group
-              return null;
-            }
-
-            // Render non-grouped columns normally (if not mapped)
-            return !isColumnMapped(column) ? (
-              <ColumnPreview
-                key={column}
-                columnName={column}
-                previewValue={getPreviewValue(column)}
-                isSelected={selectedColumn === column}
-                onClick={() => onColumnClick(column)}
-                showPreview={false}
-              />
-            ) : null;
-          }).filter(Boolean)
+            })}
+          </>
         ) : (
           filteredColumns.filter(column => column).map(column => (
             <ColumnPreview

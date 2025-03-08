@@ -296,56 +296,140 @@ const Header = ({
         onLoadingChange(false);
       }
     } else if (lowerFileName.endsWith('.soc')) {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const text = e.target?.result as string;
-          if (!text) {
-            throw new Error('Failed to read file');
-          }
-
-          const lines = text.split('\n');
-          if (lines.length > 1) {
-            const headers = lines[0].split(',').map(header => header.trim());
-            const data = lines.slice(1).map(line => {
-              const values = line.split(',');
-              const obj: Record<string, string> = {};
-              headers.forEach((header, index) => {
-                obj[header] = values[index]?.trim() || '';
-              });
-              return obj;
-            });
-            onDataLoaded(headers, data, file.name, undefined, file.size);
-          } else {
+      try {
+        // For .SOC files, we need to check if there's a corresponding .SMT memo file
+        const socFileName = file.name;
+        const smtFileName = socFileName.replace(/\.soc$/i, '.smt');
+        
+        // Log file details for debugging
+        console.log('Processing SOC file:', file.name, 'Size:', file.size, 'bytes');
+        
+        // First read the .SOC file as a DBF file
+        const socReader = new FileReader();
+        socReader.onload = async (socEvent) => {
+          try {
+            const socBuffer = socEvent.target?.result as ArrayBuffer;
+            if (!socBuffer) {
+              throw new Error('Failed to read SOC file');
+            }
+            
+            console.log('SOC buffer size:', socBuffer.byteLength, 'bytes');
+            
+            // Check if there's a corresponding SMT file in the same directory
+            const fileList = fileInputRef.current?.files;
+            let smtFile: File | undefined;
+            
+            if (fileList) {
+              for (let i = 0; i < fileList.length; i++) {
+                if (fileList[i].name.toLowerCase() === smtFileName.toLowerCase()) {
+                  smtFile = fileList[i];
+                  console.log('Found matching SMT file:', smtFile.name, 'Size:', smtFile.size, 'bytes');
+                  break;
+                }
+              }
+            }
+            
+            if (smtFile) {
+              // If we found an SMT file, read it and then parse both files
+              const smtReader = new FileReader();
+              smtReader.onload = async (smtEvent) => {
+                try {
+                  const smtBuffer = smtEvent.target?.result as ArrayBuffer;
+                  if (!smtBuffer) {
+                    throw new Error('Failed to read SMT file');
+                  }
+                  
+                  console.log('SMT buffer size:', smtBuffer.byteLength, 'bytes');
+                  
+                  // Parse the SOC file with the SMT memo file
+                  console.log('Parsing SOC with SMT memo file...');
+                  const records = await parseDBF(socBuffer, smtBuffer);
+                  console.log('Parsed records:', records ? records.length : 0);
+                  
+                  if (records && records.length > 0) {
+                    const headers = Object.keys(records[0]);
+                    console.log('Headers found:', headers);
+                    onDataLoaded(headers, records, file.name, undefined, file.size);
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: "The SOC file appears to be empty or invalid.",
+                      variant: "destructive"
+                    });
+                  }
+                } catch (error) {
+                  console.error('Error parsing SOC with SMT:', error);
+                  toast({
+                    title: "Error",
+                    description: "Failed to parse SOC file with SMT memo file. Please check the file format.",
+                    variant: "destructive"
+                  });
+                } finally {
+                  onLoadingChange(false);
+                }
+              };
+              
+              smtReader.onerror = () => {
+                console.error('Error reading SMT file');
+                toast({
+                  title: "Error",
+                  description: "Failed to read SMT memo file.",
+                  variant: "destructive"
+                });
+                onLoadingChange(false);
+              };
+              
+              smtReader.readAsArrayBuffer(smtFile);
+            } else {
+              // If no SMT file, just parse the SOC file as a regular DBF
+              console.log('No SMT file found, parsing SOC as regular DBF');
+              const records = await parseDBF(socBuffer);
+              console.log('Parsed records:', records ? records.length : 0);
+              
+              if (records && records.length > 0) {
+                const headers = Object.keys(records[0]);
+                console.log('Headers found:', headers);
+                onDataLoaded(headers, records, file.name, undefined, file.size);
+              } else {
+                toast({
+                  title: "Error",
+                  description: "The SOC file appears to be empty or invalid.",
+                  variant: "destructive"
+                });
+              }
+              onLoadingChange(false);
+            }
+          } catch (error) {
+            console.error('Error parsing SOC:', error);
             toast({
               title: "Error",
-              description: "The SOC file appears to be empty or invalid.",
+              description: "Failed to parse SOC file. Please check the file format.",
               variant: "destructive"
             });
+            onLoadingChange(false);
           }
-        } catch (error) {
-          console.error('Error parsing SOC:', error);
+        };
+        
+        socReader.onerror = () => {
+          console.error('Error reading SOC file');
           toast({
             title: "Error",
-            description: "Failed to parse SOC file. Please check the file format.",
+            description: "Failed to read SOC file.",
             variant: "destructive"
           });
-        } finally {
           onLoadingChange(false);
-        }
-      };
-
-      reader.onerror = () => {
-        console.error('Error reading file');
+        };
+        
+        socReader.readAsArrayBuffer(file);
+      } catch (error) {
+        console.error('Error handling SOC file:', error);
         toast({
           title: "Error",
-          description: "Failed to read SOC file.",
+          description: "Failed to process SOC file.",
           variant: "destructive"
         });
         onLoadingChange(false);
-      };
-
-      reader.readAsText(file);
+      }
     } else {
       toast({
         title: "Error",
@@ -357,10 +441,49 @@ const Header = ({
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFileSelect(file);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    // Find the main file (.SOC, .DBF, .CSV, .XLSX, .XLS)
+    let mainFile: File | null = null;
+    let supportFiles: File[] = [];
+    
+    // First pass: categorize files
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const lowerFileName = file.name.toLowerCase();
+      
+      if (lowerFileName.endsWith('.soc') || 
+          lowerFileName.endsWith('.dbf') || 
+          lowerFileName.endsWith('.csv') || 
+          lowerFileName.endsWith('.xlsx') || 
+          lowerFileName.endsWith('.xls')) {
+        // If we already found a main file, we can only process one at a time
+        if (mainFile) {
+          toast({
+            title: "Multiple Main Files",
+            description: "Please select only one main data file at a time.",
+            variant: "destructive"
+          });
+          return;
+        }
+        mainFile = file;
+      } else if (lowerFileName.endsWith('.smt')) {
+        supportFiles.push(file);
+      }
     }
+    
+    if (!mainFile) {
+      toast({
+        title: "No Valid File",
+        description: "Please select a valid data file (CSV, Excel, DBF, or SOC).",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Now process the main file
+    handleFileSelect(mainFile);
   };
 
   const handleSelectFile = () => {
@@ -389,10 +512,11 @@ const Header = ({
       <input
         ref={fileInputRef}
         type="file"
-        accept=".csv,.xlsx,.xls,.dbf,.soc"
+        accept=".csv,.xlsx,.xls,.dbf,.soc,.smt"
         onChange={handleFileChange}
         style={{ display: 'none' }}
         data-testid="file-input"
+        multiple
       />
       <VanillaMenu
         items={[

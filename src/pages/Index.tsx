@@ -254,51 +254,53 @@ const Index = () => {
 };
 
 const ARTIKEL_COLUMNS = [
-  // Basic fields
-  "Actief?", "Stock verwerken?", "Artikelnummer", "Omschrijving", "Omschrijving NL",
-  "Omschrijving GB", "Omschrijving DE", "Omschrijving FR", "Omschrijving TR",
-  "BTW-percentage",
-
-  // Price fields
-  "Netto verkoopprijs 1", "Netto verkoopprijs 2", "Netto verkoopprijs 3",
-  "Netto verkoopprijs 4", "Netto verkoopprijs 5", "Netto verkoopprijs 6", "Netto verkoopprijs 7",
-  "Netto verkoopprijs 8", "Netto verkoopprijs 9", "Netto verkoopprijs 10", "Netto aankoopprijs",
-  "Catalogusprijs",
-
-  // Product identification fields
-  "Artikelnummer fabrikant", "Artikelnummer leverancier", "Leveranciersnummer",
-  "merk", "Recupel", "Auvibel", "Bebat", "Reprobel", "Leeggoed", "Accijnzen", "Ecoboni",
-  "Barcode", "Rekeningnummer",
-
-  // Extra numeric fields
-  ...Array.from({length: 20}, (_, i) => `Numeriek extra veld ${i + 1}`),
-
-  // Extra alphanumeric fields
-  ...Array.from({length: 20}, (_, i) => `Alfanumeriek extra veld ${i + 1}`),
-
-  // Extra logical fields
-  ...Array.from({length: 20}, (_, i) => `Logisch extra veld ${i + 1}`),
-
+  // Priority fields in specified order
+  "Artikelnummer", "Omschrijving", "Catalogusprijs", "Netto aankoopprijs",
+  "Netto verkoopprijs 1", "BTW-percentage",
+  
+  // Tax fields
+  "Recupel", "Auvibel", "Bebat", "Reprobel", "Accijnzen", "Ecoboni",
+  "Leeggoed",
+  
+  // Product details
+  "Eenheid", "Barcode", "Leveranciersnummer", "Artikelnummer fabrikant", "Artikelnummer leverancier",
+  "Hoofdgroep", "Subgroep",
+  
+  // Stock fields
+  "Stock verwerken?", "Minimum voorraad (ja/nee)", "Minimum voorraad (aantal)", "Minimum bestelhoeveelheid",
+  
   // Stock location fields
   ...Array.from({length: 9}, (_, i) => `Voorraad locatie ${i + 1}`),
   ...Array.from({length: 9}, (_, i) => `Voorraad locatie ${i + 1} toevoegen`),
+  "Is beginstock",
+  
+  // Status fields
+  "Actief?", "Korting uitgeschakeld",
+  
+  // Language descriptions
+  "Omschrijving NL", "Omschrijving GB", "Omschrijving DE", "Omschrijving FR", "Omschrijving TR",
+  
+  // Additional price fields
+  "Netto verkoopprijs 2", "Netto verkoopprijs 3", "Netto verkoopprijs 4", "Netto verkoopprijs 5",
+  "Netto verkoopprijs 6", "Netto verkoopprijs 7", "Netto verkoopprijs 8", "Netto verkoopprijs 9", "Netto verkoopprijs 10",
 
-  // Additional fields
-  "Is beginstock", "Hoofdgroep", "Subgroep", "Eenheid", "Korting uitgeschakeld",
-  "Gemarkeerd voor label printer", "Aantal 2",
-
-  // Intrastat fields
-  "Intrastat, lidstaat van herkomst", "Intrastat, standaard gewest",
-  "Intrastat, goederencode", "Intrastat, gewicht per eenheid", "Intrastat, land van oorsprong",
-
-  // Minimum stock fields
-  "Minimum voorraad (ja/nee)", "Minimum voorraad (aantal)", "Minimum bestelhoeveelheid",
+  // Extra fields in specified order
+  ...Array.from({length: 20}, (_, i) => `Alfanumeriek extra veld ${i + 1}`),
+  ...Array.from({length: 20}, (_, i) => `Numeriek extra veld ${i + 1}`),
+  ...Array.from({length: 20}, (_, i) => `Logisch extra veld ${i + 1}`),
 
   // Price date ranges
   ...Array.from({length: 10}, (_, i) => [
     `Prijs ${i + 1}, datum van`,
     `Prijs ${i + 1}, datum tot`
   ]).flat(),
+
+  // Remaining fields in specified order
+  "merk", "Rekeningnummer", "Gemarkeerd voor label printer", "Aantal 2",
+
+  // Intrastat fields
+  "Intrastat, lidstaat van herkomst", "Intrastat, standaard gewest",
+  "Intrastat, goederencode", "Intrastat, gewicht per eenheid", "Intrastat, land van oorsprong",
 ];
 
 const KLANTEN_COLUMNS = [
