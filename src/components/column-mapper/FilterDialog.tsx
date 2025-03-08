@@ -167,14 +167,14 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
     operator: 'equals',
     value: ''
   };
-  const defaultGroup = {
-    conditions: [defaultCondition],
+  const defaultGroup: FilterGroup = {
+    conditions: [],
     type: 'AND'
   };
 
-  const [groups, setGroups] = useState<FilterGroup[]>(() =>
-    initialFilter?.groups ?? [defaultGroup]
-  );
+  const [groups, setGroups] = useState<FilterGroup[]>(() => {
+    return initialFilter?.groups ?? [defaultGroup as FilterGroup];
+  });
 
   const [isAdvancedMode, setIsAdvancedMode] = useState(initialFilter?.advancedMode ?? false);
   const [expression, setExpression] = useState(initialFilter?.expression ?? '');
@@ -199,16 +199,12 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
     // Check if we have the default state
     if (groups.length !== 1) return false;
     const group = groups[0];
-    if (group.conditions.length !== 1) return false;
-    const condition = group.conditions[0];
     
     return (
       group.type === 'AND' &&
-      (!condition.column || condition.column === sourceColumns[0]) &&
-      condition.operator === 'equals' &&
-      !condition.value.trim()
+      group.conditions.length === 0
     );
-  }, [isAdvancedMode, expression, groups, sourceColumns]);
+  }, [isAdvancedMode, expression, groups]);
 
   useEffect(() => {
     if (isOpen && initialFilter) {
@@ -239,12 +235,8 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
 
   const handleAddGroup = () => {
     setGroups([...groups, {
-      conditions: [{
-        column: sourceColumns[0] || '',
-        operator: 'equals',
-        value: ''
-      }],
-      type: 'AND'
+      conditions: [],
+      type: 'AND' as 'AND' | 'OR'
     }]);
   };
 
