@@ -5,6 +5,7 @@ import ConnectedColumns from './ConnectedColumns';
 import ColumnList from './ColumnList';
 import Header from './Header';
 import { MappingState } from './types';
+import { CompoundFilter } from './FilterDialog';
 import VersionDisplay from '../VersionDisplay';
 import { VanillaMenu } from '../vanilla/react/VanillaMenu';
 import '@/components/vanilla/Menu.css';
@@ -13,6 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogFooter } f
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 import { Toaster } from '../../components/ui/toaster';
+import { useTranslation } from 'react-i18next';
 
 interface ColumnMapperContentProps {
   state: MappingState;
@@ -24,24 +26,7 @@ interface ColumnMapperContentProps {
   onExport: (data: any[], metadata?: any) => void;
 }
 
-interface MappingState {
-  sourceData: any[];
-  sourceFilename: string;
-  exportFilename: string;
-  worksheetName?: string;
-  fileSize?: number;
-  columnTransforms: Record<string, string>;
-  mapping: Record<string, string>;
-  connectionCounter: number;
-  selectedSourceColumn: string | null;
-  selectedTargetColumn: string | null;
-  sourceColumns: string[];
-  sourceSearch: string;
-  targetSearch: string;
-  activeFilter: string;
-  isLoading: boolean;
-  metadata?: any;
-}
+// Using MappingState from types.ts instead of local declaration
 
 const ColumnMapperContent = ({
   state,
@@ -53,6 +38,7 @@ const ColumnMapperContent = ({
   onExport
 }: ColumnMapperContentProps) => {
   const [showNoFileDialog, setShowNoFileDialog] = useState(false);
+  const { t } = useTranslation();
 
   const handleDataLoaded = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number, metadata?: any) => {
     onDataLoaded(columns, data, sourceFilename, worksheetName, fileSize, metadata);
@@ -61,7 +47,7 @@ const ColumnMapperContent = ({
       sourceData: data,
       sourceFilename,
       worksheetName,
-      fileSize,
+      sourceFileSize: fileSize, // Changed to sourceFileSize to match MappingState interface
       metadata
     });
   }, [onDataLoaded, updateState]);
@@ -143,7 +129,7 @@ const ColumnMapperContent = ({
   const columnSetItems = [
     {
       value: 'artikelen',
-      label: 'Artikelen',
+      label: t('columnMapper.artikelen'),
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -165,7 +151,7 @@ const ColumnMapperContent = ({
     },
     {
       value: 'klanten',
-      label: 'Klanten',
+      label: t('columnMapper.klanten'),
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -233,8 +219,8 @@ const ColumnMapperContent = ({
           columnTransforms={state.columnTransforms}
           sourceColumns={state.sourceColumns}
           sourceData={state.sourceData}
-          activeFilter={state.activeFilter}
-          onFilterChange={(filter) => updateState({ activeFilter: filter })}
+          activeFilter={state.activeFilter as CompoundFilter | null}
+          onFilterChange={(filter: CompoundFilter | null) => updateState({ activeFilter: filter })}
         />
       </div>
 
@@ -258,14 +244,14 @@ const ColumnMapperContent = ({
               selectedColumn={state.selectedSourceColumn}
               onColumnClick={handleSourceColumnClick}
               isColumnMapped={(column) => false}
-              searchPlaceholder="Search source columns..."
+              searchPlaceholder={t('columnMapper.search')}
               columnTransforms={state.columnTransforms}
               sourceData={state.sourceData}
             />
             <ColumnList
               title={
                 <div className="flex items-center justify-between">
-                  <span>Winfakt columns</span>
+                  <span>{t('columnMapper.targetColumns')}</span>
                   <VanillaMenu
                     items={columnSetItems.map(item => ({
                       label: item.label,
@@ -273,7 +259,7 @@ const ColumnMapperContent = ({
                       onClick: () => onColumnSetChange(item.value as 'artikelen' | 'klanten')
                     }))}
                   >
-                    {activeColumnSet === 'artikelen' ? 'Artikelen' : 'Klanten'}
+                    {activeColumnSet === 'artikelen' ? t('columnMapper.artikelen') : t('columnMapper.klanten')}
                   </VanillaMenu>
                 </div>
               }
@@ -283,7 +269,7 @@ const ColumnMapperContent = ({
               selectedColumn={state.selectedTargetColumn}
               onColumnClick={handleTargetColumnClick}
               isColumnMapped={(column) => mappedTargetColumns.has(column)}
-              searchPlaceholder="Search Winfakt columns..."
+              searchPlaceholder={t('columnMapper.search')}
             />
           </div>
         </VanillaCardContent>
@@ -295,13 +281,13 @@ const ColumnMapperContent = ({
       <Dialog open={showNoFileDialog} onOpenChange={setShowNoFileDialog}>
         <DialogContent className="p-0 overflow-hidden border-0">
           <div className="bg-slate-700 p-5 rounded-t-lg">
-            <DialogTitle className="text-white m-0">No source file selected</DialogTitle>
+            <DialogTitle className="text-white m-0">{t('fileUpload.noFileSelected')}</DialogTitle>
           </div>
           <div className="py-10 px-6">
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-amber-500" />
               <DialogDescription className="text-slate-600 m-0">
-                Please select a source file before exporting to CSV.
+                {t('fileUpload.selectFileBeforeExport')}
               </DialogDescription>
             </div>
           </div>
@@ -311,7 +297,7 @@ const ColumnMapperContent = ({
                         shadow-none rounded-md px-6"
               onClick={() => setShowNoFileDialog(false)}
             >
-              Close
+              {t('common.close')}
             </Button>
           </DialogFooter>
         </DialogContent>

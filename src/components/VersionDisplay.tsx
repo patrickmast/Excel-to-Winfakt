@@ -1,6 +1,8 @@
+// Updated to add i18n translations
 import { useEffect, useState } from 'react';
 import { VanillaHoverCard, VanillaHoverCardTrigger, VanillaHoverCardContent } from './vanilla/react/VanillaHoverCard';
 import { formatRelativeDate } from '@/utils/dateFormat';
+import { useTranslation } from 'react-i18next';
 
 const DEPLOYMENT_TIMESTAMP = import.meta.env.VITE_DEPLOYMENT_TIMESTAMP || '1704063600000';
 
@@ -19,7 +21,9 @@ const VersionDisplay = () => {
           setLastModified(timeStr);
           setTooltipText(`${dateStr} at ${timeStr}`);
         } catch (error) {
-          console.error('Failed to fetch last modified time:', error);
+          // Improved error handling with more specific message
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          console.error('Failed to fetch last modified time:', { error: errorMessage });
         }
       };
 
@@ -49,17 +53,20 @@ const VersionDisplay = () => {
     return getDomainSuffixUtil();
   };
 
+  const { t } = useTranslation();
+
   if (!import.meta.env.DEV) {
+    const { dateStr, timeStr } = formatRelativeDate(new Date(Number(lastModified)));
     return (
       <VanillaHoverCard>
         <VanillaHoverCardTrigger>
           <span className="cursor-pointer">
-            Version {getVersionNumber()}
+            {t('common.version')} {getVersionNumber()}
           </span>
         </VanillaHoverCardTrigger>
         <VanillaHoverCardContent>
           <span className="whitespace-nowrap">
-            Deployed on {formatRelativeDate(new Date(Number(lastModified))).dateStr} at {formatRelativeDate(new Date(Number(lastModified))).timeStr}{getDomainSuffix()}
+            {t('common.deployedOn')} {t(`common.${dateStr.toLowerCase()}`)} {t('common.at')} {timeStr}{getDomainSuffix()}
           </span>
         </VanillaHoverCardContent>
       </VanillaHoverCard>
@@ -70,7 +77,7 @@ const VersionDisplay = () => {
     <VanillaHoverCard>
       <VanillaHoverCardTrigger>
         <span className="cursor-pointer">
-          Last modified: {lastModified}{getDomainSuffix()}
+          {t('common.lastModified')}: {lastModified}{getDomainSuffix()}
         </span>
       </VanillaHoverCardTrigger>
       <VanillaHoverCardContent>

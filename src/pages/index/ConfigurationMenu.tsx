@@ -1,5 +1,6 @@
 import { VanillaMenu } from '@/components/vanilla/react/VanillaMenu';
 import '@/components/vanilla/Menu.css';
+import { useTranslation } from 'react-i18next';
 
 interface ConfigurationMenuProps {
   onSaveNew: () => void;
@@ -11,11 +12,12 @@ interface ConfigurationMenuProps {
 }
 
 const ConfigurationMenu = ({ onSaveNew, onSave, onInfo, onClearSettings, onShowLog, isSaving }: ConfigurationMenuProps) => {
+  const { t } = useTranslation();
   return (
     <VanillaMenu
       items={[
         {
-          label: 'Save as New',
+          label: t('menu.saveAsNew'),
           onClick: onSaveNew,
           disabled: isSaving,
           icon: (
@@ -36,7 +38,7 @@ const ConfigurationMenu = ({ onSaveNew, onSave, onInfo, onClearSettings, onShowL
           )
         },
         {
-          label: 'Save',
+          label: t('menu.save'),
           onClick: onSave,
           disabled: isSaving,
           icon: (
@@ -59,7 +61,7 @@ const ConfigurationMenu = ({ onSaveNew, onSave, onInfo, onClearSettings, onShowL
         },
         'separator',
         {
-          label: 'Clear Settings',
+          label: t('menu.clearSettings'),
           onClick: onClearSettings,
           icon: (
             <svg
@@ -83,7 +85,7 @@ const ConfigurationMenu = ({ onSaveNew, onSave, onInfo, onClearSettings, onShowL
         },
         'separator',
         {
-          label: 'Info',
+          label: t('menu.info'),
           onClick: onInfo,
           icon: (
             <svg
@@ -105,7 +107,7 @@ const ConfigurationMenu = ({ onSaveNew, onSave, onInfo, onClearSettings, onShowL
         },
         'separator',
         {
-          label: 'Show Log',
+          label: t('menu.exportLog'),
           onClick: onShowLog,
           icon: (
             <svg

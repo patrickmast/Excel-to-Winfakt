@@ -2,6 +2,7 @@ import { ArrowRight, X, Download, Filter, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ColumnSettingsDialog from './ColumnSettingsDialog';
 import { VanillaCard, VanillaCardContent, VanillaCardHeader, VanillaCardTitle } from '../vanilla/react/VanillaCard';
 import ColumnPreview from './ColumnPreview';
@@ -111,6 +112,7 @@ const ConnectedColumns = ({
   const showFilter = !filterParam || filterParam.toLowerCase() === 'yes';
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
   const [showFilterDialog, setShowFilterDialog] = useState(false);
+  const { t } = useTranslation();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -209,7 +211,7 @@ const ConnectedColumns = ({
     <VanillaCard className="w-full bg-white rounded-lg border border-gray-200 py-4">
       <VanillaCardHeader className="px-6 py-0">
         <div className="flex items-center justify-between w-full">
-          <VanillaCardTitle className="text-xl font-semibold">Connected columns</VanillaCardTitle>
+          <VanillaCardTitle className="text-xl font-semibold">{t('columnMapper.connectedColumns')}</VanillaCardTitle>
           <div className="flex gap-2">
             {showFilter && (
               <Button
@@ -220,7 +222,7 @@ const ConnectedColumns = ({
                 })}
               >
                 <Filter className="h-4 w-4 mr-2" />
-                {activeFilter ? "Filter Active" : "Filter"}
+                {activeFilter ? t('columnMapper.filterActive') : t('columnMapper.filterButton')}
               </Button>
             )}
             {onExport && (

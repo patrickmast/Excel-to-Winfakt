@@ -1,4 +1,6 @@
+// Updated to add i18n translations
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -45,15 +47,15 @@ export interface CompoundFilter {
   expression?: string;
 }
 
-const operators = [
-  { value: 'equals', label: 'Equals' },
-  { value: 'contains', label: 'Contains' },
-  { value: 'startsWith', label: 'Starts with' },
-  { value: 'endsWith', label: 'Ends with' },
-  { value: 'greaterThan', label: 'Greater than' },
-  { value: 'lessThan', label: 'Less than' },
-  { value: 'isEmpty', label: 'Is empty' },
-  { value: 'isNotEmpty', label: 'Is not empty' },
+const getOperators = (t: (key: string) => string) => [
+  { value: 'equals', label: t('columnMapper.filter.operators.equals') },
+  { value: 'contains', label: t('columnMapper.filter.operators.contains') },
+  { value: 'startsWith', label: t('columnMapper.filter.operators.startsWith') },
+  { value: 'endsWith', label: t('columnMapper.filter.operators.endsWith') },
+  { value: 'greaterThan', label: t('columnMapper.filter.operators.greaterThan') },
+  { value: 'lessThan', label: t('columnMapper.filter.operators.lessThan') },
+  { value: 'isEmpty', label: t('columnMapper.filter.operators.isEmpty') },
+  { value: 'isNotEmpty', label: t('columnMapper.filter.operators.isNotEmpty') },
 ];
 
 interface FilterConditionProps {
@@ -65,6 +67,8 @@ interface FilterConditionProps {
 }
 
 const FilterCondition = ({ condition, onChange, onRemove, sourceColumns, showRemove }: FilterConditionProps) => {
+  const { t } = useTranslation();
+  const operators = getOperators(t);
   const showValueInput = !['isEmpty', 'isNotEmpty'].includes(condition.operator);
 
   return (
@@ -162,6 +166,7 @@ const ExamplesTab = () => {
 };
 
 export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, sourceData = [], initialFilter }: FilterDialogProps) => {
+  const { t } = useTranslation();
   const defaultCondition = {
     column: sourceColumns[0] || '',
     operator: 'equals',
@@ -328,7 +333,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
       try {
         const result = filterFn({});
         if (typeof result !== 'boolean') {
-          setTestError("Expression must return a boolean value (true/false)");
+          setTestError(t('columnMapper.filter.invalidJavaScript') + ": Expression must return a boolean value (true/false)");
           return;
         }
 
@@ -342,13 +347,13 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
         // If we have data, test with the first row
         const row = sourceData[0];
         const resultWithData = filterFn(row);
-        setTestResult(`Test result with first row: ${resultWithData}`);
+        setTestResult(`${t('columnMapper.filter.testResultWithFirstRow')}: ${resultWithData}`);
         setActiveTab('expression');
       } catch (error) {
-        setTestError("Error evaluating expression: " + (error as Error).message);
+        setTestError(`${t('columnMapper.filter.errorEvaluating')}: ${(error as Error).message}`);
       }
     } catch (error) {
-      setTestError("Invalid JavaScript expression: " + (error as Error).message);
+      setTestError(`${t('columnMapper.filter.invalidJavaScript')}: ${(error as Error).message}`);
     }
   };
 
@@ -383,7 +388,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
       <DialogContent className="sm:max-w-[600px] border-none">
         <DialogHeader className="bg-[#1e2838] -mx-6 -mt-6 px-6 py-4 rounded-t-lg">
           <DialogTitle className="flex items-center justify-between text-white text-lg font-semibold">
-            <span>Filter Rows</span>
+            <span>{t('columnMapper.filter.title')}</span>
             <Button
               variant="outline"
               size="sm"
@@ -391,13 +396,13 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
               className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white hover:text-white border-0 transition-colors"
             >
               <Code className="h-4 w-4" />
-              {isAdvancedMode ? 'Switch to Basic' : 'Switch to Advanced'}
+              {isAdvancedMode ? t('columnMapper.filter.switchToBasic') : t('columnMapper.filter.switchToAdvanced')}
             </Button>
           </DialogTitle>
           <DialogDescription className="text-gray-300 mt-1">
             {isAdvancedMode
-              ? "Create a custom JavaScript filter expression to filter rows based on their values. Write a JavaScript expression that returns true for rows that should be included. Use row[\"Column Name\"] to access column values."
-              : "Create filter conditions to filter rows based on their values."}
+              ? t('columnMapper.filter.advancedDescription')
+              : t('columnMapper.filter.basicDescription')}
           </DialogDescription>
         </DialogHeader>
         {isAdvancedMode ? (
@@ -408,8 +413,8 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
               className="flex-1 flex flex-col min-h-0"
             >
               <TabsList className="h-10 px-6 justify-start space-x-8 bg-transparent flex-shrink-0">
-                <TabsTrigger value="expression">Filter expression</TabsTrigger>
-                <TabsTrigger value="examples">Examples</TabsTrigger>
+                <TabsTrigger value="expression">{t('columnMapper.filter.filterExpression')}</TabsTrigger>
+                <TabsTrigger value="examples">{t('columnMapper.filter.examples')}</TabsTrigger>
               </TabsList>
 
               <div className="flex-1 overflow-hidden">
@@ -439,7 +444,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                       <div className="space-y-3">
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
-                            Numbers:
+                            {t('columnMapper.filter.numbers')}:
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -457,7 +462,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                         </div>
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
-                            Dates:
+                            {t('columnMapper.filter.dates')}:
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -475,7 +480,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                         </div>
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
-                            Booleans:
+                            {t('columnMapper.filter.booleans')}:
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -493,7 +498,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                         </div>
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
-                            Strings:
+                            {t('columnMapper.filter.strings')}:
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -511,7 +516,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                         </div>
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
-                            Empty/Null Checks:
+                            {t('columnMapper.filter.emptyChecks')}:
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -547,7 +552,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                         </div>
                         <div>
                           <div className="font-medium text-muted-foreground mb-1 flex items-center justify-between">
-                            Multiple Column Comparisons:
+                            {t('columnMapper.filter.columnComparisons')}:
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -580,7 +585,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                     size="sm"
                     onClick={() => handleToggleGroupType(groupIndex)}
                   >
-                    {group.type} Group
+                    {group.type === 'AND' ? t('columnMapper.filter.andGroup') : t('columnMapper.filter.orGroup')}
                   </Button>
                   {groupIndex > 0 && (
                     <Button
@@ -611,7 +616,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                   className="w-full"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Condition
+                  {t('columnMapper.filter.addCondition')}
                 </Button>
               </div>
             ))}
@@ -621,7 +626,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
               className="w-full"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add OR Group
+              {t('columnMapper.filter.addOrGroup')}
             </Button>
           </div>
         )}
@@ -639,7 +644,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
             className="border-slate-200 mr-auto hover:text-red-600 relative disabled:opacity-50"
           >
             <div className="flex items-center gap-2">
-              <span>Clear Filter</span>
+              <span>{t('columnMapper.filter.clearFilter')}</span>
               {showClearConfirm && (
                 <div className="flex gap-1 border-l pl-2 ml-2">
                   <Button
@@ -653,7 +658,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                       onClose();
                     }}
                   >
-                    Yes
+                    {t('columnMapper.filter.yes')}
                   </Button>
                   <Button
                     size="sm"
@@ -664,7 +669,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                       setShowClearConfirm(false);
                     }}
                   >
-                    No
+                    {t('columnMapper.filter.no')}
                   </Button>
                 </div>
               )}
@@ -676,7 +681,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
             onClick={onClose}
             className="border-slate-200"
           >
-            Cancel
+            {t('dialogs.cancel')}
           </Button>
           <Button
             type="submit"
@@ -684,7 +689,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
             disabled={!isValid}
             className="bg-blue-500 hover:bg-blue-600 text-white"
           >
-            Apply Filter
+            {t('columnMapper.filter.applyFilter')}
           </Button>
           {isAdvancedMode && (
             <Button
@@ -694,7 +699,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
               className="absolute left-6"
             >
               <Play className="h-4 w-4 mr-2" />
-              Test Expression
+              {t('columnMapper.filter.testExpression')}
             </Button>
           )}
         </DialogFooter>

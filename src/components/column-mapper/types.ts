@@ -41,6 +41,7 @@ export interface MappingState {
   activeFilter: CompoundFilter | null;
   metadata?: any;
   worksheetName?: string;
+  sourceFileSize?: number; // Added to store the file size
 }
 
 export interface ConfigurationSettings {

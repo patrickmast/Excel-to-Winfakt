@@ -3,6 +3,7 @@ import { VanillaMenu } from '../vanilla/react/VanillaMenu';
 import '@/components/vanilla/Menu.css';
 import { VanillaCard } from '../vanilla/react/VanillaCard';
 import { VanillaDialog } from '../vanilla/react/VanillaDialog';
+import { useTranslation } from 'react-i18next';
 import Papa from 'papaparse';
 import { toast } from '@/components/ui/use-toast';
 import { useToast } from '@/components/ui/use-toast';
@@ -505,10 +506,11 @@ const Header = ({
   };
 
   const hasFileSelected = fileInputRef.current?.files?.length > 0;
+  const { t } = useTranslation();
 
   return (
     <div className="flex items-center justify-between">
-      <span>Source file columns</span>
+      <span>{t('columnMapper.sourceColumns')}</span>
       <input
         ref={fileInputRef}
         type="file"
@@ -521,7 +523,7 @@ const Header = ({
       <VanillaMenu
         items={[
           {
-            label: isLoading ? 'Loading...' : 'Select file',
+            label: isLoading ? t('common.loading') : t('header.selectFile'),
             onClick: isLoading ? undefined : handleSelectFile,
             disabled: isLoading,
             icon: isLoading ? (
@@ -557,7 +559,7 @@ const Header = ({
             )
           },
           {
-            label: 'Select worksheet',
+            label: t('header.selectWorksheet'),
             onClick: () => setShowSheetSelector(true),
             disabled: !currentWorkbook || currentWorkbook.workbook.SheetNames.length <= 1,
             icon: (
@@ -579,7 +581,7 @@ const Header = ({
             )
           },
           {
-            label: 'Preview file',
+            label: t('header.previewFile'),
             onClick: handlePreviewFile,
             disabled: !hasFileSelected || isLoading,
             icon: (
@@ -601,13 +603,13 @@ const Header = ({
           }
         ]}
       >
-        {isLoading ? 'Loading...' : 'Source file'}
+        {isLoading ? t('common.loading') : t('header.sourceFile')}
       </VanillaMenu>
 
       <VanillaDialog
         open={showPreview}
         onOpenChange={setShowPreview}
-        title="File Preview"
+        title={t('header.filePreview')}
       >
         <pre style={{
           whiteSpace: 'pre-wrap',

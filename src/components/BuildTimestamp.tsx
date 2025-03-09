@@ -1,10 +1,13 @@
-// Updated to add domain suffix to timestamp
+// Updated to add domain suffix to timestamp and i18n translations
 import { useEffect, useState } from 'react';
 import { formatRelativeDate } from '@/utils/dateFormat';
 import { getDomainSuffixUtil } from './VersionDisplay';
+import { useTranslation } from 'react-i18next';
 
 const BuildTimestamp = () => {
   const [lastModified, setLastModified] = useState<string>('');
+  // Move useTranslation hook to component level
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (import.meta.env.DEV) {
@@ -18,10 +21,12 @@ const BuildTimestamp = () => {
           const domainSuffix = getDomainSuffixUtil();
           
           // If the date is today, only show the time (without 'Today at')
-          const formattedDate = dateStr === 'Today' ? timeStr : `${dateStr} at ${timeStr}`;
-          setLastModified(`Last modified: ${formattedDate}${domainSuffix}`);
+          const formattedDate = dateStr === 'Today' ? timeStr : `${t(`common.${dateStr.toLowerCase()}`)} ${t('common.at')} ${timeStr}`;
+          setLastModified(`${t('common.lastModified')}: ${formattedDate}${domainSuffix}`);
         } catch (error) {
-          console.error('Failed to fetch last modified time:', error);
+          // Improved error handling with more specific message
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          console.error('Failed to fetch last modified time:', { error: errorMessage });
         }
       };
 

@@ -13,6 +13,7 @@ import { ReactNode, useState } from 'react';
 import ColumnPreview from './ColumnPreview';
 import { identifyColumnGroups } from '@/utils/columnGroups';
 import { ChevronRight, ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ColumnListProps {
   title: ReactNode;
@@ -40,6 +41,7 @@ const ColumnList = ({
   sourceData = []
 }: ColumnListProps) => {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const { t } = useTranslation();
 
   const getPreviewValue = (column: string): string | null => {
     if (!sourceData.length) return null;
@@ -95,7 +97,7 @@ const ColumnList = ({
     });
 
   // Only apply grouping to Winfakt columns
-  const isWinfaktList = title !== "Source file columns";
+  const isWinfaktList = title !== t('columnMapper.sourceColumns');
   
   // Important: Use all columns for identifying groups, not just filtered ones
   // This ensures groups maintain their original order even when some columns are mapped
@@ -126,7 +128,12 @@ const ColumnList = ({
         className="mb-4 w-full"
       />
       <div className="space-y-2">
-        {isWinfaktList ? (
+        {filteredColumns.length === 0 && (
+          <div className="text-sm text-gray-500 py-2">
+            {isWinfaktList ? t('columnMapper.noTargetColumns') : t('columnMapper.noSourceColumns')}
+          </div>
+        )}
+        {filteredColumns.length > 0 && isWinfaktList ? (
           <>
             {/* Get the original column order from the parent component */}
             {/* We need to process columns in their original order to maintain the specified sequence */}
@@ -204,7 +211,7 @@ const ColumnList = ({
             })}
           </>
         ) : (
-          filteredColumns.filter(column => column).map(column => (
+          filteredColumns.length > 0 && filteredColumns.filter(column => column).map(column => (
             <ColumnPreview
               key={column}
               columnName={column}

@@ -1,6 +1,7 @@
 import ConfigurationMenu from './ConfigurationMenu';
 import BuildTimestamp from '@/components/BuildTimestamp';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface PageHeaderProps {
   onSaveNew: () => void;
@@ -17,6 +18,7 @@ const PageHeader = ({ onSaveNew, onSave, onInfo, onClearSettings, onShowLog, isS
   const showH1 = !h1Param || h1Param.toLowerCase() === 'yes';
   const menuParam = searchParams.get('ShowMenu');
   const showMenu = !menuParam || menuParam.toLowerCase() === 'yes';
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col">
@@ -25,11 +27,11 @@ const PageHeader = ({ onSaveNew, onSave, onInfo, onClearSettings, onShowLog, isS
         {showH1 && (
           <h1 className="flex-1 text-3xl font-extrabold text-center sm:text-2xl md:text-3xl lg:text-4xl relative">
             <span className="absolute inset-0 bg-[linear-gradient(to_right,#7e22ce,#ec4899,#f472b6,#fbbf24,#ef4444,#7e22ce,#ec4899,#f472b6)] animate-gradient-cycle bg-[length:200%_100%] bg-clip-text text-transparent">
-              CSV for Winfakt imports
+              {t('header.title')}
             </span>
             {/* This span is for maintaining layout since the animated span is absolute positioned */}
             <span className="invisible">
-              CSV for Winfakt imports
+              {t('header.title')}
             </span>
           </h1>
         )}

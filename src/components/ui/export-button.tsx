@@ -1,5 +1,6 @@
 import { Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface ExportButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
@@ -21,6 +22,7 @@ const Star = ({ index }: { index: number }) => (
 );
 
 const ExportButton = ({ className, children, disabled, ...props }: ExportButtonProps) => {
+  const { t } = useTranslation();
   return (
     <button
       className={cn(
@@ -33,7 +35,7 @@ const ExportButton = ({ className, children, disabled, ...props }: ExportButtonP
     >
       <span className="flex items-center gap-2">
         <Download className="h-4 w-4" />
-        Export CSV
+        {t('columnMapper.exportCSV')}
       </span>
       {!disabled && [...Array(6)].map((_, i) => (
         <div

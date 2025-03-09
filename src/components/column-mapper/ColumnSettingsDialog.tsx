@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
   sourceColumns = [],
   sourceData = [],
 }) => {
+  const { t } = useTranslation();
   const [expressionCode, setExpressionCode] = useState(initialCode);
   const [activeTab, setActiveTab] = useState<'expression' | 'result' | 'functions' | 'Source columns'>('expression');
   const [testResult, setTestResult] = useState<string | null>(null);
@@ -117,10 +119,9 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
       <DialogContent className="p-0 overflow-hidden border-0 max-w-[625px] h-[90vh] max-h-[700px] flex flex-col">
         <div className="bg-slate-700 p-5 rounded-t-lg flex-shrink-0">
-          <DialogTitle className="text-white m-0 text-base">Settings for {columnName}</DialogTitle>
+          <DialogTitle className="text-white m-0 text-base">{t('columnMapper.settingsFor')} {columnName}</DialogTitle>
           <DialogDescription className="text-slate-300 mt-1">
-            Enter JavaScript code to transform the value. Use 'value' for the current column's value,
-            and select a column from the menu to insert it in your code.
+            {t('columnMapper.settingsDescription')}
           </DialogDescription>
         </div>
 
@@ -132,15 +133,15 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
             onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions' | 'Source columns')}
           >
             <TabsList className="h-10 px-6 justify-start space-x-8 bg-transparent flex-shrink-0 border-b">
-              <TabsTrigger value="expression">Expression</TabsTrigger>
+              <TabsTrigger value="expression">{t('columnMapper.expression')}</TabsTrigger>
               <TabsTrigger value="result" className="flex items-center gap-2">
-                Result <PlayIcon
+                {t('columnMapper.result')} <PlayIcon
                   className={`h-4 w-4 cursor-pointer hover:text-primary ${activeTab === 'result' ? 'text-[#048F01]' : ''}`}
                   onClick={testExpression}
                 />
               </TabsTrigger>
-              <TabsTrigger value="functions">Functions</TabsTrigger>
-              <TabsTrigger value="Source columns">Source columns</TabsTrigger>
+              <TabsTrigger value="functions">{t('columnMapper.functions')}</TabsTrigger>
+              <TabsTrigger value="Source columns">{t('columnMapper.sourceColumnsTab')}</TabsTrigger>
             </TabsList>
 
             <div className="flex-1 overflow-hidden">
@@ -165,7 +166,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
                     </div>
                   ) : (
                     <div className="text-slate-500">
-                      Click the play button to test your expression
+                      {t('columnMapper.clickToTest')}
                     </div>
                   )}
                 </div>
@@ -178,11 +179,12 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
               <TabsContent value="Source columns" className="h-full m-0">
                 <div className="space-y-2">
                   <div className="p-2 pl-4 bg-muted text-sm text-muted-foreground">
-                    Click a column to copy its reference. You can use column names (col["Name"]), letters (col[A]), or numbers (col[1]).
+                    {t('columnMapper.columnReferenceHelp')}
                   </div>
                   <ColumnSelector
                     columns={sourceColumns}
-                    onColumnClick={(columnName, index) => {
+                    onColumnClick={(columnName) => {
+                      const index = sourceColumns.indexOf(columnName);
                       const nextStyle = referenceStyle === 'name' 
                         ? 'letter' 
                         : referenceStyle === 'letter' 
@@ -204,14 +206,14 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
             onClick={onClose}
             className="border-slate-200"
           >
-            Cancel
+            {t('columnMapper.cancel')}
           </Button>
           <Button 
             className="bg-[#3b82f6] hover:bg-[#2563eb] text-white border-0 
                       shadow-none rounded-md px-6"
             onClick={handleSave}
           >
-            Save
+            {t('columnMapper.save')}
           </Button>
         </div>
       </DialogContent>

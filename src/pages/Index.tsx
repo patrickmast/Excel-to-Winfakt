@@ -1,4 +1,6 @@
+// Updated to add i18n translations
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import ColumnMapper from '../components/ColumnMapper';
 import { useToast } from '../components/ui/use-toast';
 import { downloadCSV } from '../utils/csvUtils';
@@ -20,6 +22,7 @@ import LogDialog from '@/components/column-mapper/LogDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
 import PageHeader from './index/PageHeader';
 import { useMappingReducer } from '@/hooks/use-mapping-reducer';
+import ClearSettingsConfirmDialog from '@/components/dialogs/ClearSettingsConfirmDialog';
 
 const Index = () => {
   const {
@@ -45,6 +48,7 @@ const Index = () => {
   const [exportData, setExportData] = useState<any[] | null>(null);
   const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number; worksheetName?: string; size?: number } | null>(null);
   const [shouldResetMapper, setShouldResetMapper] = useState(false);
+  const [showClearSettingsDialog, setShowClearSettingsDialog] = useState(false);
 
   const handleLoadConfiguration = useCallback(async (id: string) => {
     try {
@@ -73,14 +77,14 @@ const Index = () => {
       }
 
       toast({
-        title: "Configuration loaded",
-        description: "The saved configuration has been loaded successfully.",
+        title: t('dialogs.configurationLoaded'),
+        description: t('toast.configLoaded'),
       });
     } catch (error) {
       console.error('Error loading configuration:', error);
       toast({
-        title: "Error",
-        description: "Failed to load the saved configuration",
+        title: t('toast.error'),
+        description: t('toast.configLoadError'),
         variant: "destructive",
       });
     }
@@ -125,14 +129,20 @@ const Index = () => {
         setShowSavedDialog(true);
       } else {
         toast({
-          title: "Success",
-          description: "Configuration updated successfully",
+          title: t('toast.success'),
+          description: t('toast.configUpdated'),
         });
       }
     }
   };
 
+  const { t } = useTranslation();
+
   const handleClearSettings = useCallback(() => {
+    setShowClearSettingsDialog(true);
+  }, []);
+
+  const handleConfirmClearSettings = useCallback(() => {
     // Reset all state
     resetState();
     setSourceFileInfo(null);
@@ -140,12 +150,12 @@ const Index = () => {
     setShouldResetMapper(true);
 
     toast({
-      title: "Settings Cleared",
-      description: "All settings have been reset to default",
+      title: t('toast.success'),
+      description: t('toast.settingsCleared'),
       duration: 3000,
       variant: "default"
     });
-  }, [resetState, toast]);
+  }, [resetState, toast, t]);
 
   // Reset the flag after a short delay to allow the reset to complete
   useEffect(() => {
@@ -216,6 +226,12 @@ const Index = () => {
         onExportComplete={handleExportComplete}
       />
 
+      <ClearSettingsConfirmDialog
+        open={showClearSettingsDialog}
+        onOpenChange={setShowClearSettingsDialog}
+        onConfirm={handleConfirmClearSettings}
+      />
+
       <div className="container mx-auto px-4 py-8 flex-grow">
         <PageHeader
           onSaveNew={() => handleSaveConfiguration(true)}
@@ -241,10 +257,16 @@ const Index = () => {
           onExport={(data) => handleExport(data, mappingState.sourceFilename || '')}
           onDataLoaded={(columns, data, filename, worksheetName, fileSize) => {
             setSourceData(columns, data, { filename, worksheetName });
+            // Update source file info with file size
+            if (fileSize) {
+              setSourceFileInfo(prev => prev ? { ...prev, size: fileSize } : null);
+            }
           }}
           targetColumns={activeColumnSet === 'artikelen' ? ARTIKEL_COLUMNS : KLANTEN_COLUMNS}
           activeColumnSet={activeColumnSet}
           onColumnSetChange={setActiveColumnSet}
+          filename={sourceFileInfo?.filename || ''}
+          rowCount={sourceFileInfo?.rowCount || 0}
           onSourceFileChange={setSourceFileInfo}
           shouldReset={shouldResetMapper}
         />
