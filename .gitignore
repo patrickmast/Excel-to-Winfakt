@@ -28,4 +28,4 @@ dist-ssr
 .env.production
 
 # Windsurf IDE files
-.windsurfrules
+# .windsurfrules - now tracked in repository
