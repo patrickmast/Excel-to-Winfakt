@@ -69,7 +69,7 @@ const VersionDisplay = () => {
   return (
     <VanillaHoverCard>
       <VanillaHoverCardTrigger>
-        <span className="cursor-pointer" title={tooltipText}>
+        <span className="cursor-pointer">
           Last modified: {lastModified}{getDomainSuffix()}
         </span>
       </VanillaHoverCardTrigger>
