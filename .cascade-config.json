@@ -19,7 +19,7 @@
       "By default, only propose changes using propose_code",
       "Let the USER review and implement the changes",
       "Let the USER make their own commits with their preferred commit messages and timing",
-      "EXCEPTION: If the USER explicitly asks to commit with phrases like 'Commit now', then DO perform the commit"
+      "EXCEPTION: If the USER explicitly asks to commit with phrases like 'Commit now' or 'Commit', then DO perform the commit"
     ]
   }
 }
