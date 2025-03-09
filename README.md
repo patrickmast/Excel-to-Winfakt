@@ -59,6 +59,14 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Using with Cascade
+
+This project includes a `.cascade-config.json` file that provides configuration for the Cascade AI assistant. When working with Cascade:
+
+- Simply type "Run" to start the development server and open a preview
+- The configuration ensures consistent behavior across different computers
+- Important validations (like file size checks in the FileUpload component) are documented
+
 
 ## Deploy to Cloudflare
 

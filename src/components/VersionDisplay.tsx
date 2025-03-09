@@ -41,9 +41,18 @@ const VersionDisplay = () => {
     return versionNumber.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1.');
   };
 
+  /**
+   * Returns a domain suffix for display purposes
+   * Updated to handle 127.0.0.1 addresses as 'localhost'
+   */
   const getDomainSuffix = () => {
     const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '0.0.0.0') return '';
+    const protocol = window.location.protocol;
+    const fullUrl = `${protocol}//${hostname}`;
+
+    // Handle localhost and IP variations
+    if (hostname === 'localhost' || hostname === '0.0.0.0' || fullUrl.startsWith('http://127')) return ' (localhost)';
+
     const parts = hostname.split('.');
     if (parts.length >= 2) {
       const domain = parts.slice(-2).join('.');
