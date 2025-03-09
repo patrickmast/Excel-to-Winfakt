@@ -1,5 +1,7 @@
+// Updated to add domain suffix to timestamp
 import { useEffect, useState } from 'react';
 import { formatRelativeDate } from '@/utils/dateFormat';
+import { getDomainSuffixUtil } from './VersionDisplay';
 
 const BuildTimestamp = () => {
   const [lastModified, setLastModified] = useState<string>('');
@@ -12,7 +14,12 @@ const BuildTimestamp = () => {
           const data = await response.json();
           const date = new Date(Number(data.timestamp));
           const { dateStr, timeStr } = formatRelativeDate(date);
-          setLastModified(`Last modified: ${dateStr} at ${timeStr}`);
+          // Add domain suffix to the timestamp
+          const domainSuffix = getDomainSuffixUtil();
+          
+          // If the date is today, only show the time (without 'Today at')
+          const formattedDate = dateStr === 'Today' ? timeStr : `${dateStr} at ${timeStr}`;
+          setLastModified(`Last modified: ${formattedDate}${domainSuffix}`);
         } catch (error) {
           console.error('Failed to fetch last modified time:', error);
         }

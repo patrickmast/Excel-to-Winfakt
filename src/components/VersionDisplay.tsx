@@ -46,19 +46,7 @@ const VersionDisplay = () => {
    * Updated to handle 127.0.0.1 addresses as 'localhost'
    */
   const getDomainSuffix = () => {
-    const hostname = window.location.hostname;
-    const protocol = window.location.protocol;
-    const fullUrl = `${protocol}//${hostname}`;
-
-    // Handle localhost and IP variations
-    if (hostname === 'localhost' || hostname === '0.0.0.0' || fullUrl.startsWith('http://127')) return ' (localhost)';
-
-    const parts = hostname.split('.');
-    if (parts.length >= 2) {
-      const domain = parts.slice(-2).join('.');
-      return ` (On ${domain})`;
-    }
-    return '';
+    return getDomainSuffixUtil();
   };
 
   if (!import.meta.env.DEV) {
@@ -92,6 +80,26 @@ const VersionDisplay = () => {
       </VanillaHoverCardContent>
     </VanillaHoverCard>
   );
+};
+
+/**
+ * Returns a domain suffix for display purposes
+ * Updated to handle 127.0.0.1 addresses as 'localhost'
+ */
+export const getDomainSuffixUtil = (): string => {
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
+  const fullUrl = `${protocol}//${hostname}`;
+
+  // Handle localhost and IP variations
+  if (hostname === 'localhost' || hostname === '0.0.0.0' || fullUrl.startsWith('http://127')) return ' (localhost)';
+
+  const parts = hostname.split('.');
+  if (parts.length >= 2) {
+    const domain = parts.slice(-2).join('.');
+    return ` (On ${domain})`;
+  }
+  return '';
 };
 
 export default VersionDisplay;
