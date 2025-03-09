@@ -1,4 +1,6 @@
-# General Code Style & Formatting
+# CSV Transformer Hero - Project Rules
+
+## General Code Style & Formatting
 - Use English for all code and documentation.
 - Always declare the type of each variable and function (parameters and return value).
 - Avoid using any.
@@ -7,26 +9,82 @@
 - Don't leave blank lines within a function.
 - One export per file.
 
-# Naming Conventions
+## Naming Conventions
 - Use PascalCase for classes.
 - Use camelCase for variables, functions, and methods.
 - Use kebab-case for file and directory names.
 - Use UPPERCASE for environment variables.
 - Avoid magic numbers and define constants.
 
-# Functions & Logic
+## Functions & Logic
 - Keep functions short and single-purpose (<20 lines).
 - Avoid deeply nested blocks by:
-- Using early returns.
-- Extracting logic into utility functions.
+  - Using early returns.
+  - Extracting logic into utility functions.
 - Use higher-order functions (map, filter, reduce) to simplify logic.
 - Use arrow functions for simple cases (<3 instructions), named functions otherwise.
 - Use default parameter values instead of null/undefined checks.
 - Use RO-RO (Receive Object, Return Object) for passing and returning multiple parameters.
 
-# Data Handling
+## Data Handling
 - Avoid excessive use of primitive types; encapsulate data in composite types.
-- Avoid placing validation inside functions—use classes with internal validation instead.
+- Avoid placing validation inside functionsu2014use classes with internal validation instead.
 - Prefer immutability for data:
-- Use readonly for immutable properties.
-- Use as const for literals that never change.
+  - Use readonly for immutable properties.
+  - Use as const for literals that never change.
+
+## UI Components
+
+### Dialog Box Standards
+All dialog boxes should follow these styling guidelines:
+
+1. **Overlay**
+   - Use `bg-black/30` (30% opacity black) for all dialog overlays
+   - This applies to both regular dialogs and alert dialogs
+
+2. **Header**
+   - Background: `bg-slate-700`
+   - Padding: `p-5`
+   - Rounded corners: `rounded-t-lg` (top corners only)
+   - Title text: White (`text-white`), no margin (`m-0`), base size (`text-base`)
+
+3. **Content Area**
+   - Padding: `py-8 px-6` (8px top/bottom, 6px left/right)
+   - No border on the dialog: `border-0`
+   - Prevent content overflow: `overflow-hidden`
+   - Minimum width: `min-w-[500px]` (adjust as needed for specific dialogs)
+
+4. **Footer**
+   - Top margin: `mt-6`
+   - Gap between buttons: `gap-2`
+   - Button styling:
+     - Cancel button: `bg-slate-100 hover:bg-slate-200 text-slate-700`
+     - Primary action button: Use appropriate color based on action type
+       - Destructive actions: `bg-red-600 hover:bg-red-700`
+       - Standard actions: `bg-blue-600 hover:bg-blue-700`
+
+5. **Text Colors**
+   - Headers/Labels: `text-slate-600`
+   - Content text: `text-slate-700`
+   - Secondary text: `text-slate-500`
+
+## Translation Rules
+
+### Critical Rules
+
+**IMPORTANT:** The column names in the exported CSV files must NEVER be translated. These column names are FIXED and cannot be changed, regardless of the UI language setting.
+
+- u2705 **DO:** Translate UI elements like buttons, labels, menu items, and messages
+- u274C **DO NOT:** Translate any column names or data structure in the exported CSV files
+
+### When Adding New Translations
+
+1. Add the translation key to all language files (`en.json`, `nl.json`, `fr.json`, `tr.json`)
+2. Use the translation function (`t()`) in the component
+3. Test the UI in all supported languages to ensure proper display
+4. Ensure menu items don't wrap to multiple lines
+
+## Critical Component Rules
+
+### FileUpload Component
+The FileUpload component has a critical validation point for file size that must be maintained across all refactors. Empty files (0 bytes) must be caught and handled before processing. This validation has been lost multiple times during refactors, causing recurring bugs. Always ensure file size validation remains in place when modifying file upload logic.

@@ -32,19 +32,23 @@ const ClearSettingsConfirmDialog: React.FC<ClearSettingsConfirmDialogProps> = ({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t('clearSettings.confirmTitle')}</AlertDialogTitle>
-          <AlertDialogDescription>
+      <AlertDialogContent className="p-0 overflow-hidden border-0">
+        <div className="bg-slate-700 p-5 rounded-t-lg">
+          <AlertDialogTitle className="text-white m-0 text-base">{t('clearSettings.confirmTitle')}</AlertDialogTitle>
+        </div>
+        
+        <div className="py-8 px-6">
+          <AlertDialogDescription className="text-slate-700 mb-6">
             {t('clearSettings.confirmDescription')}
           </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>{t('clearSettings.cancelButton')}</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm}>
-            {t('clearSettings.confirmButton')}
-          </AlertDialogAction>
-        </AlertDialogFooter>
+          
+          <AlertDialogFooter className="mt-6 gap-2">
+            <AlertDialogCancel className="bg-slate-100 hover:bg-slate-200 text-slate-700">{t('clearSettings.cancelButton')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirm} className="bg-red-600 hover:bg-red-700">
+              {t('clearSettings.confirmButton')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </div>
       </AlertDialogContent>
     </AlertDialog>
   );
