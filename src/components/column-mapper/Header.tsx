@@ -60,11 +60,19 @@ const Header = ({
     try {
       const worksheet = workbook.Sheets[sheetName];
       const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as unknown[][];
-      const headers = rawData[0].map(String);
+      // Filter out empty or undefined headers to prevent empty cards
+      const headers = rawData[0]
+        .map(String)
+        .filter(header => header && header.trim() !== '');
+      
       const jsonData = rawData.slice(1).map(row => {
         const obj: Record<string, string> = {};
         headers.forEach((header: string, index: number) => {
-          obj[header] = String(row[index] ?? '');
+          // Get the original index from the raw data
+          const originalIndex = rawData[0].findIndex((h, i) => 
+            String(h) === header && i >= index
+          );
+          obj[header] = String(row[originalIndex] ?? '');
         });
         return obj;
       });
