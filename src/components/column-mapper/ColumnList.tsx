@@ -9,11 +9,12 @@ import {
 } from '@/components/vanilla/react/VanillaCard';
 import '@/components/vanilla/Card.css';
 import '@/components/vanilla/Input.css';
-import { ReactNode, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import ColumnPreview from './ColumnPreview';
 import { identifyColumnGroups } from '@/utils/columnGroups';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import Header from './Header';
 
 interface ColumnListProps {
   title: ReactNode;
@@ -97,7 +98,12 @@ const ColumnList = ({
     });
 
   // Only apply grouping to Winfakt columns
-  const isWinfaktList = title !== t('columnMapper.sourceColumns');
+  // Determine if this is a source column list or Winfakt list
+  // We need to check if the title is a React component (Header) or a string
+  // For source columns, we use the Header component which contains sourceColumns text
+  // For target columns, we use a div with targetColumns text
+  const isSourceColumnList = typeof title !== 'string' && React.isValidElement(title) && title.type === Header;
+  const isWinfaktList = !isSourceColumnList;
   
   // Important: Use all columns for identifying groups, not just filtered ones
   // This ensures groups maintain their original order even when some columns are mapped
@@ -168,7 +174,7 @@ const ColumnList = ({
                   <div key={group.name}>
                     <div
                       onClick={() => toggleGroup(group.name)}
-                      className="p-3 rounded-md cursor-pointer transition-colors bg-[#F9FAFB] hover:bg-[#F0FFF6] hover:border-[#BBF7D0] border border-[#E5E7EB] flex items-center justify-between"
+                      className="p-3 rounded-md cursor-pointer transition-colors bg-[#F9FAFB] hover:bg-[#F0FFF6] hover:border-[#BBF7D0] border border-[#E5E7EB] flex items-center justify-between h-[48px]"
                     >
                       <span className="text-sm">{group.name}</span>
                       {expandedGroups.has(group.name) ? (
@@ -188,6 +194,8 @@ const ColumnList = ({
                             isSelected={selectedColumn === groupColumn}
                             onClick={() => onColumnClick(groupColumn)}
                             showPreview={false}
+                            showInfo={isSourceColumnList}
+                            sourceData={sourceData}
                           />
                         ))}
                       </div>
@@ -205,6 +213,8 @@ const ColumnList = ({
                     isSelected={selectedColumn === column}
                     onClick={() => onColumnClick(column)}
                     showPreview={false}
+                    showInfo={isSourceColumnList}
+                    sourceData={sourceData}
                   />
                 );
               }
@@ -215,10 +225,13 @@ const ColumnList = ({
             <ColumnPreview
               key={column}
               columnName={column}
+              originalColumnName={column}
               previewValue={getPreviewValue(column)}
               isSelected={selectedColumn === column}
               onClick={() => onColumnClick(column)}
               showPreview={true}
+              showInfo={isSourceColumnList}
+              sourceData={sourceData}
             />
           ))
         )}
