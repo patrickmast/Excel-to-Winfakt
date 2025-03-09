@@ -32,6 +32,7 @@
   "columnMapper": {
     "sourceColumns": "Colonnes source",
     "targetColumns": "Colonnes cibles",
+    "availableRows": "Lignes disponibles",
     "search": "Rechercher",
     "filterButton": "Filtrer",
     "filterActive": "Filtre actif",

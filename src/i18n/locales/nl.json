@@ -32,6 +32,7 @@
   "columnMapper": {
     "sourceColumns": "Bronkolommen",
     "targetColumns": "Doelkolommen",
+    "availableRows": "Beschikbare rijen",
     "search": "Zoeken",
     "filterButton": "Filter",
     "filterActive": "Filter Actief",

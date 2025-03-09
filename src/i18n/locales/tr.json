@@ -32,6 +32,7 @@
   "columnMapper": {
     "sourceColumns": "Kaynak sütunlar",
     "targetColumns": "Hedef sütunlar",
+    "availableRows": "Mevcut satırlar",
     "search": "Ara",
     "filterButton": "Filtre",
     "filterActive": "Filtre Aktif",
