@@ -25,7 +25,6 @@
     "title": "CSV for Winfakt imports",
     "sourceFile": "Source file",
     "selectFile": "Select file",
-    "previewFile": "Preview file",
     "filePreview": "File Preview",
     "selectWorksheet": "Select worksheet"
   },

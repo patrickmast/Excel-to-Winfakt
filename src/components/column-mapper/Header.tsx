@@ -48,7 +48,7 @@ const Header = ({
   onLoadingChange
 }: HeaderProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const previewContentRef = useRef<string>('');
+  // Preview file state has been removed
   const [showPreview, setShowPreview] = useState(false);
   const [showSheetSelector, setShowSheetSelector] = useState(false);
   const [availableSheets, setAvailableSheets] = useState<string[]>([]);
@@ -501,17 +501,7 @@ const Header = ({
     }
   };
 
-  const handlePreviewFile = () => {
-    const file = fileInputRef.current?.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        previewContentRef.current = e.target?.result as string;
-        setShowPreview(true);
-      };
-      reader.readAsText(file);
-    }
-  };
+  // Preview file functionality has been removed
 
   const hasFileSelected = fileInputRef.current?.files?.length > 0;
   const { t } = useTranslation();
@@ -587,52 +577,13 @@ const Header = ({
                 <path d="M3 18h18" />
               </svg>
             )
-          },
-          {
-            label: t('header.previewFile'),
-            onClick: handlePreviewFile,
-            disabled: !hasFileSelected || isLoading,
-            icon: (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            )
           }
         ]}
       >
         {isLoading ? t('common.loading') : t('header.sourceFile')}
       </VanillaMenu>
 
-      <VanillaDialog
-        open={showPreview}
-        onOpenChange={setShowPreview}
-        title={t('header.filePreview')}
-      >
-        <pre style={{
-          whiteSpace: 'pre-wrap',
-          wordWrap: 'break-word',
-          maxHeight: '60vh',
-          overflow: 'auto',
-          padding: '1rem',
-          backgroundColor: '#f9fafb',
-          borderRadius: '0.375rem',
-          fontSize: '0.875rem',
-          lineHeight: '1.5'
-        }}>
-          {previewContentRef.current}
-        </pre>
-      </VanillaDialog>
+      {/* File preview dialog has been removed */}
 
       {showSheetSelector && (
         <div className="fixed inset-0 z-50 overflow-y-auto">

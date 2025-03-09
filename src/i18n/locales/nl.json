@@ -25,7 +25,6 @@
     "title": "CSV voor Winfakt imports",
     "sourceFile": "Bronbestand",
     "selectFile": "Bestand selecteren",
-    "previewFile": "Bestand bekijken",
     "filePreview": "Bestandsvoorbeeld",
     "selectWorksheet": "Werkblad selecteren"
   },

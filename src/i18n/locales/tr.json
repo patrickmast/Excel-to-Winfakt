@@ -25,7 +25,6 @@
     "title": "Winfakt içe aktarmaları için CSV",
     "sourceFile": "Kaynak dosya",
     "selectFile": "Dosya seç",
-    "previewFile": "Dosya önizleme",
     "filePreview": "Dosya Önizleme",
     "selectWorksheet": "Çalışma sayfası seç"
   },
