@@ -20,8 +20,16 @@ const BuildTimestamp = () => {
           // Add domain suffix to the timestamp
           const domainSuffix = getDomainSuffixUtil();
           
-          // If the date is today, only show the time (without 'Today at')
-          const formattedDate = dateStr === 'Today' ? timeStr : `${t(`common.${dateStr.toLowerCase()}`)} ${t('common.at')} ${timeStr}`;
+          // Format the date and time
+          let formattedDate;
+          if (dateStr === 'Today') {
+            formattedDate = `${t('common.today')} ${t('common.at')} ${timeStr}`;
+          } else if (dateStr === 'Yesterday') {
+            formattedDate = `${t('common.yesterday')} ${t('common.at')} ${timeStr}`;
+          } else {
+            // For other dates, use the full date string as-is (already localized)
+            formattedDate = `${dateStr} ${t('common.at')} ${timeStr}`;
+          }
           setLastModified(`${t('common.lastModified')}: ${formattedDate}${domainSuffix}`);
         } catch (error) {
           // Improved error handling with more specific message

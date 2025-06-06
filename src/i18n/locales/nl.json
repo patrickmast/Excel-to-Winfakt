@@ -11,6 +11,8 @@
   "menu": {
     "saveAsNew": "Opslaan als nieuw",
     "save": "Opslaan",
+    "exportSettings": "Instellingen exporteren",
+    "loadSettings": "Instellingen laden",
     "clearSettings": "Instellingen wissen",
     "info": "Info",
     "exportLog": "Export log"

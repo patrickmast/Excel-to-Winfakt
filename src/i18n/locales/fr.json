@@ -11,6 +11,8 @@
   "menu": {
     "saveAsNew": "Enregistrer comme nouveau",
     "save": "Enregistrer",
+    "exportSettings": "Exporter les paramètres",
+    "loadSettings": "Charger les paramètres",
     "clearSettings": "Effacer les paramètres",
     "info": "Info",
     "exportLog": "Journal d'exportation"

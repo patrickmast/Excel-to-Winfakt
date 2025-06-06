@@ -3,18 +3,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import ColumnMapper from '../components/ColumnMapper';
 import { useToast } from '../components/ui/use-toast';
-import { downloadCSV } from '../utils/csvUtils';
-import { Menu, Save, Plus, Info } from 'lucide-react';
+import { downloadSettingsAsJSON, loadSettingsFromJSON } from '../utils/settingsUtils';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { Button } from '@/components/ui/button';
 import { useConfiguration } from '@/hooks/use-configuration';
 import SavedConfigDialog from '@/components/column-mapper/SavedConfigDialog';
 import InfoDialog from '@/components/column-mapper/InfoDialog';
@@ -49,6 +40,8 @@ const Index = () => {
   const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number; worksheetName?: string; size?: number } | null>(null);
   const [shouldResetMapper, setShouldResetMapper] = useState(false);
   const [showClearSettingsDialog, setShowClearSettingsDialog] = useState(false);
+  
+  const { t } = useTranslation();
 
   const handleLoadConfiguration = useCallback(async (id: string) => {
     try {
@@ -76,6 +69,9 @@ const Index = () => {
         });
       }
 
+      // Trigger UI refresh to update Connected columns and other components
+      setShouldResetMapper(true);
+
       toast({
         title: t('dialogs.configurationLoaded'),
         description: t('toast.configLoaded'),
@@ -88,7 +84,7 @@ const Index = () => {
         variant: "destructive",
       });
     }
-  }, [loadConfiguration, toast]);
+  }, [loadConfiguration, setShouldResetMapper, toast, t]);
 
   useEffect(() => {
     const id = searchParams.get('id');
@@ -136,8 +132,6 @@ const Index = () => {
     }
   };
 
-  const { t } = useTranslation();
-
   const handleClearSettings = useCallback(() => {
     setShowClearSettingsDialog(true);
   }, []);
@@ -156,6 +150,79 @@ const Index = () => {
       variant: "default"
     });
   }, [resetState, toast, t]);
+
+  const handleExportSettings = useCallback(() => {
+    try {
+      downloadSettingsAsJSON(mappingState);
+      toast({
+        title: t('toast.success'),
+        description: 'Settings exported successfully',
+      });
+    } catch (error) {
+      console.error('Error exporting settings:', error);
+      toast({
+        title: t('toast.error'),
+        description: 'Failed to export settings',
+        variant: "destructive",
+      });
+    }
+  }, [mappingState, toast, t]);
+
+  const handleLoadSettings = useCallback(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.style.display = 'none';
+    
+    input.onchange = async (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      
+      try {
+        const settings = await loadSettingsFromJSON(file);
+        
+        // Load the settings using the existing loadConfiguration action
+        loadConfiguration({
+          mapping: settings.mapping,
+          columnTransforms: settings.columnTransforms,
+          sourceColumns: settings.sourceColumns,
+          connectionCounter: settings.connectionCounter || 0,
+          sourceSearch: settings.sourceSearch || '',
+          targetSearch: settings.targetSearch || '',
+          sourceFilename: settings.sourceFilename,
+          activeFilter: settings.activeFilter
+        });
+        
+        // Update source file info if available
+        if (settings.sourceColumns) {
+          setSourceFileInfo({
+            filename: settings.sourceFilename || 'Loaded from settings',
+            rowCount: 0, // We don't have actual data, just column mappings
+            worksheetName: undefined
+          });
+        }
+        
+        // Trigger UI refresh to update Connected columns and other components
+        setShouldResetMapper(true);
+        
+        toast({
+          title: t('toast.success'),
+          description: 'Settings loaded successfully',
+        });
+      } catch (error) {
+        console.error('Error loading settings:', error);
+        toast({
+          title: t('toast.error'),
+          description: (error as Error).message,
+          variant: "destructive",
+        });
+      }
+    };
+    
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+  }, [loadConfiguration, setSourceFileInfo, setShouldResetMapper, toast, t]);
 
   // Reset the flag after a short delay to allow the reset to complete
   useEffect(() => {
@@ -236,6 +303,8 @@ const Index = () => {
         <PageHeader
           onSaveNew={() => handleSaveConfiguration(true)}
           onSave={() => handleSaveConfiguration(false)}
+          onExportSettings={handleExportSettings}
+          onLoadSettings={handleLoadSettings}
           onInfo={() => setShowInfoDialog(true)}
           onClearSettings={handleClearSettings}
           onShowLog={() => {
@@ -269,6 +338,16 @@ const Index = () => {
           rowCount={sourceFileInfo?.rowCount || 0}
           onSourceFileChange={setSourceFileInfo}
           shouldReset={shouldResetMapper}
+          currentMapping={mappingState.mapping}
+          sourceData={mappingState.sourceData}
+          sourceColumns={mappingState.sourceColumns}
+          sourceFilename={mappingState.sourceFilename}
+          worksheetName={mappingState.worksheetName}
+          columnTransforms={mappingState.columnTransforms}
+          isLoading={mappingState.isLoading}
+          activeFilter={mappingState.activeFilter}
+          onTransformUpdate={handleUpdateTransform}
+          onFilterUpdate={setFilter}
         />
       </div>
     </div>

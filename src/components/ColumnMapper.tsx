@@ -52,6 +52,27 @@ const ColumnMapper = ({
     }
   }, [shouldReset, updateState]);
 
+  // Sync internal state with props when they change (for loading settings)
+  useEffect(() => {
+    if (currentMapping || sourceColumns || sourceData || sourceFilename || columnTransforms || activeFilter) {
+      const newState: Partial<MappingState> = {};
+      
+      if (currentMapping) newState.mapping = currentMapping;
+      if (sourceColumns) newState.sourceColumns = sourceColumns;
+      if (sourceData) newState.sourceData = sourceData;
+      if (sourceFilename) newState.sourceFilename = sourceFilename;
+      if (columnTransforms) newState.columnTransforms = columnTransforms;
+      if (activeFilter !== undefined) newState.activeFilter = activeFilter;
+      if (worksheetName) newState.worksheetName = worksheetName;
+      if (isLoading !== undefined) newState.isLoading = isLoading;
+      
+      // Only update if we have meaningful props to sync
+      if (Object.keys(newState).length > 0) {
+        updateState(newState);
+      }
+    }
+  }, [currentMapping, sourceColumns, sourceData, sourceFilename, columnTransforms, activeFilter, worksheetName, isLoading, updateState]);
+
   const handleFileData = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number, metadata?: any) => {
     // Update state first
     updateState({

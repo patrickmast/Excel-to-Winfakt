@@ -11,6 +11,8 @@
   "menu": {
     "saveAsNew": "Save as New",
     "save": "Save",
+    "exportSettings": "Export Settings",
+    "loadSettings": "Load Settings",
     "clearSettings": "Clear Settings",
     "info": "Info",
     "exportLog": "Export Log"

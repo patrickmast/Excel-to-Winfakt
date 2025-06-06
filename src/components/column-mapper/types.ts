@@ -22,6 +22,16 @@ export interface ColumnMapperProps {
   rowCount: number;
   worksheetName?: string;
   shouldReset?: boolean;
+  onTransformUpdate?: (uniqueKey: string, code: string) => void;
+  onFilterUpdate?: (filter: CompoundFilter | null) => void;
+  onLoadingChange?: (loading: boolean) => void;
+  currentMapping?: Record<string, string>;
+  sourceData?: any[];
+  sourceColumns?: string[];
+  sourceFilename?: string;
+  columnTransforms?: Record<string, string>;
+  isLoading?: boolean;
+  activeFilter?: CompoundFilter | null;
 }
 
 import { CompoundFilter } from './FilterDialog';
@@ -52,5 +62,7 @@ export interface ConfigurationSettings {
   connectionCounter?: number;
   sourceFilename?: string;
   worksheetName?: string;
+  sourceSearch?: string;
+  targetSearch?: string;
   activeFilter?: CompoundFilter | null;
 }

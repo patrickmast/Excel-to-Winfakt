@@ -6,13 +6,15 @@ import { useTranslation } from 'react-i18next';
 interface PageHeaderProps {
   onSaveNew: () => void;
   onSave: () => void;
+  onExportSettings: () => void;
+  onLoadSettings: () => void;
   onInfo: () => void;
   onClearSettings: () => void;
   onShowLog: () => void;
   isSaving: boolean;
 }
 
-const PageHeader = ({ onSaveNew, onSave, onInfo, onClearSettings, onShowLog, isSaving }: PageHeaderProps) => {
+const PageHeader = ({ onSaveNew, onSave, onExportSettings, onLoadSettings, onInfo, onClearSettings, onShowLog, isSaving }: PageHeaderProps) => {
   const [searchParams] = useSearchParams();
   const h1Param = searchParams.get('ShowH1');
   const showH1 = !h1Param || h1Param.toLowerCase() === 'yes';
@@ -41,6 +43,8 @@ const PageHeader = ({ onSaveNew, onSave, onInfo, onClearSettings, onShowLog, isS
             <ConfigurationMenu
               onSaveNew={onSaveNew}
               onSave={onSave}
+              onExportSettings={onExportSettings}
+              onLoadSettings={onLoadSettings}
               onInfo={onInfo}
               onClearSettings={onClearSettings}
               onShowLog={onShowLog}
