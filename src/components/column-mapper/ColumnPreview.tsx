@@ -88,7 +88,7 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
         <div className="flex items-center justify-between flex-1 min-w-0">
           <span className="text-sm truncate">{columnName}</span>
           {previewValue && showPreview && (
-            <span className="text-xs text-gray-500 ml-2 truncate max-w-[50%]">
+            <span className={cn("text-xs text-gray-500 truncate max-w-[50%]", showSettings ? "ml-2 mr-1" : "ml-2")}>
               {previewValue}
             </span>
           )}
