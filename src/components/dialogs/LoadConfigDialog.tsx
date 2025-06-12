@@ -94,8 +94,8 @@ const LoadConfigDialog = ({
               </div>
             </div>
           ) : (
-            <ScrollArea className="h-64">
-              <div className="space-y-2">
+            <ScrollArea className="h-64 pr-2">
+              <div className="space-y-2 pr-1">
                 {configurations.map((config) => (
                   <div
                     key={config.id}
@@ -106,24 +106,17 @@ const LoadConfigDialog = ({
                     }`}
                     onClick={() => setSelectedConfig(config)}
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium truncate">
-                          {config.configuration_name}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Aangemaakt: {formatDate(config.created_at)}
-                        </div>
-                        {config.updated_at !== config.created_at && (
-                          <div className="text-xs text-muted-foreground">
-                            Gewijzigd: {formatDate(config.updated_at)}
-                          </div>
-                        )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">
+                        {config.configuration_name}
                       </div>
-                      {selectedConfig?.id === config.id && (
-                        <Badge variant="default" className="ml-2">
-                          Geselecteerd
-                        </Badge>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Aangemaakt: {formatDate(config.created_at)}
+                      </div>
+                      {config.updated_at !== config.created_at && (
+                        <div className="text-xs text-muted-foreground">
+                          Gewijzigd: {formatDate(config.updated_at)}
+                        </div>
                       )}
                     </div>
                   </div>
