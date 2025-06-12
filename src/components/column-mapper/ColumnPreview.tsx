@@ -30,22 +30,7 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
   showPreview = true,
   sourceData = []
 }) => {
-  // Force showInfo to true if we have sourceData and originalColumnName
-  // Add more debug information to understand why the icon isn't showing
-  console.log('ColumnPreview props:', { showInfo, sourceDataLength: sourceData?.length, hasOriginalName: !!originalColumnName });
-  
-  // Simplify the condition - just check if showInfo is true
   const shouldShowInfo = showInfo;
-  
-  // Debug: Log the source data when component mounts
-  useEffect(() => {
-    if (showInfo && originalColumnName) {
-      console.log('ColumnPreview for:', originalColumnName);
-      console.log('showInfo:', showInfo);
-      console.log('sourceData length:', sourceData?.length || 0);
-      console.log('First row of sourceData:', sourceData?.[0]);
-    }
-  }, [showInfo, originalColumnName, sourceData]);
   const [showDataPreview, setShowDataPreview] = useState(false);
   const { t } = useTranslation();
 
@@ -58,7 +43,6 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
   const handleInfoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowDataPreview(true);
-    console.log('Info icon clicked for column:', columnName);
   };
 
   // Get the first 5 rows of data for this column

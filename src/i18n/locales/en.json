@@ -9,10 +9,10 @@
     "loading": "Loading..."
   },
   "menu": {
-    "saveAsNew": "Save as New",
+    "new": "New",
     "save": "Save",
-    "exportSettings": "Export Settings",
-    "loadSettings": "Load Settings",
+    "load": "Load",
+    "delete": "Delete",
     "clearSettings": "Clear Settings",
     "info": "Info",
     "exportLog": "Export Log"

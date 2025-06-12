@@ -5,6 +5,7 @@ import Preview from './pages/Preview';
 import { useTranslation } from 'react-i18next';
 import i18n, { changeLanguage } from './i18n';
 import { useEffect } from 'react';
+import { parseUrlParams } from './utils/urlParams';
 
 // Language switcher has been moved to the Info dialog
 
@@ -24,6 +25,17 @@ const App = () => {
     
     // Force initial render with correct language
     document.documentElement.lang = i18n.language;
+  }, []);
+
+  // Parse URL parameters on app start
+  useEffect(() => {
+    const urlParams = parseUrlParams();
+    console.log('App started with URL parameters:', urlParams);
+    
+    // TODO: Load configuration if config parameter is present
+    if (urlParams.config) {
+      console.log(`Will load configuration "${urlParams.config}" for dossier ${urlParams.dossier}`);
+    }
   }, []);
   
   return (

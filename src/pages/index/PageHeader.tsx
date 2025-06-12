@@ -1,20 +1,21 @@
 import ConfigurationMenu from './ConfigurationMenu';
 import BuildTimestamp from '@/components/BuildTimestamp';
+import ConfigurationIndicator from '@/components/ConfigurationIndicator';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 interface PageHeaderProps {
-  onSaveNew: () => void;
+  onNew: () => void;
   onSave: () => void;
-  onExportSettings: () => void;
-  onLoadSettings: () => void;
+  onLoad: () => void;
+  onDelete: () => void;
   onInfo: () => void;
   onClearSettings: () => void;
   onShowLog: () => void;
   isSaving: boolean;
 }
 
-const PageHeader = ({ onSaveNew, onSave, onExportSettings, onLoadSettings, onInfo, onClearSettings, onShowLog, isSaving }: PageHeaderProps) => {
+const PageHeader = ({ onNew, onSave, onLoad, onDelete, onInfo, onClearSettings, onShowLog, isSaving }: PageHeaderProps) => {
   const [searchParams] = useSearchParams();
   const h1Param = searchParams.get('ShowH1');
   const showH1 = !h1Param || h1Param.toLowerCase() === 'yes';
@@ -24,10 +25,10 @@ const PageHeader = ({ onSaveNew, onSave, onExportSettings, onLoadSettings, onInf
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center mb-8">
-        <div className="w-32"> {/* Spacer to balance the menu width */}</div>
+      <div className="flex items-center mb-0 justify-center">
+        <div className="absolute left-0 w-32"> {/* Spacer to balance the menu width */}</div>
         {showH1 && (
-          <h1 className="flex-1 text-3xl font-extrabold text-center sm:text-2xl md:text-3xl lg:text-4xl relative">
+          <h1 className="w-4/5 text-2xl font-extrabold text-center md:text-3xl lg:text-4xl relative">
             <span className="absolute inset-0 bg-[linear-gradient(to_right,#7e22ce,#ec4899,#f472b6,#fbbf24,#ef4444,#7e22ce,#ec4899,#f472b6)] animate-gradient-cycle bg-[length:200%_100%] bg-clip-text text-transparent">
               {t('header.title')}
             </span>
@@ -37,14 +38,13 @@ const PageHeader = ({ onSaveNew, onSave, onExportSettings, onLoadSettings, onInf
             </span>
           </h1>
         )}
-        {!showH1 && <div className="flex-1" />}
-        <div className="w-32 flex justify-end"> {/* Added flex justify-end */}
+        <div className="absolute right-0 w-32 flex justify-end"> {/* Added flex justify-end */}
           {showMenu && (
             <ConfigurationMenu
-              onSaveNew={onSaveNew}
+              onNew={onNew}
               onSave={onSave}
-              onExportSettings={onExportSettings}
-              onLoadSettings={onLoadSettings}
+              onLoad={onLoad}
+              onDelete={onDelete}
               onInfo={onInfo}
               onClearSettings={onClearSettings}
               onShowLog={onShowLog}
@@ -53,7 +53,7 @@ const PageHeader = ({ onSaveNew, onSave, onExportSettings, onLoadSettings, onInf
           )}
         </div>
       </div>
-      <BuildTimestamp />
+      <ConfigurationIndicator className="mt-0 md:mt-1 lg:mt-2 mb-6" />
     </div>
   );
 };

@@ -1,19 +1,19 @@
 // Updated to add i18n translations
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import ColumnMapper from '../components/ColumnMapper';
 import { useToast } from '../components/ui/use-toast';
-import { downloadSettingsAsJSON, loadSettingsFromJSON } from '../utils/settingsUtils';
-import { useSearchParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useConfiguration } from '@/hooks/use-configuration';
-import SavedConfigDialog from '@/components/column-mapper/SavedConfigDialog';
+import { useUrlParams } from '@/hooks/use-url-params';
+import { useConfigurationApi } from '@/hooks/use-configuration-api';
 import InfoDialog from '@/components/column-mapper/InfoDialog';
 import LogDialog from '@/components/column-mapper/LogDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
 import PageHeader from './index/PageHeader';
 import { useMappingReducer } from '@/hooks/use-mapping-reducer';
 import ClearSettingsConfirmDialog from '@/components/dialogs/ClearSettingsConfirmDialog';
+import SaveConfigDialog from '@/components/dialogs/SaveConfigDialog';
+import LoadConfigDialog from '@/components/dialogs/LoadConfigDialog';
+import DeleteConfigDialog from '@/components/dialogs/DeleteConfigDialog';
 
 const Index = () => {
   const {
@@ -28,108 +28,124 @@ const Index = () => {
 
   const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
   const { toast } = useToast();
-  const { saveConfiguration, isSaving } = useConfiguration();
-  const [currentConfigId, setCurrentConfigId] = useState<string | null>(null);
-  const [showSavedDialog, setShowSavedDialog] = useState(false);
-  const [savedConfigUrl, setSavedConfigUrl] = useState('');
-  const [searchParams] = useSearchParams();
+  const { dossier, config, updateConfig, clearConfig } = useUrlParams();
+  const { isLoading: isConfigLoading, loadConfig } = useConfigurationApi();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [showLogDialog, setShowLogDialog] = useState(false);
+  const [showSaveConfigDialog, setShowSaveConfigDialog] = useState(false);
+  const [showLoadConfigDialog, setShowLoadConfigDialog] = useState(false);
+  const [showDeleteConfigDialog, setShowDeleteConfigDialog] = useState(false);
   const [latestReport, setLatestReport] = useState<string | null>(null);
   const [exportData, setExportData] = useState<any[] | null>(null);
   const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number; worksheetName?: string; size?: number } | null>(null);
   const [shouldResetMapper, setShouldResetMapper] = useState(false);
   const [showClearSettingsDialog, setShowClearSettingsDialog] = useState(false);
+  const lastLoadedConfig = useRef<string | null>(null);
+  const errorToastShown = useRef<string | null>(null);
   
   const { t } = useTranslation();
 
-  const handleLoadConfiguration = useCallback(async (id: string) => {
+  const handleLoadConfigurationFromUrl = useCallback(async (configName: string) => {
+    // Prevent loading the same config multiple times
+    if (lastLoadedConfig.current === configName) {
+      return;
+    }
+
     try {
-      const { data: config, error } = await supabase
-        .from('shared_configurations')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const loadedConfig = await loadConfig(configName);
+      
+      if (loadedConfig) {
+        lastLoadedConfig.current = configName;
+        const settings = loadedConfig.configuration_data as unknown as ConfigurationSettings;
 
-      if (error) throw error;
-      if (!config) return;
+        // Load all state properties in a single atomic update
+        loadConfiguration(settings);
 
-      setCurrentConfigId(config.id);
-      const settings = config.settings as unknown as ConfigurationSettings;
+        // Update source file info if available
+        if (settings.sourceColumns) {
+          setSourceFileInfo({
+            filename: settings.sourceFilename || '',
+            rowCount: settings.sourceData?.length || 0,
+            worksheetName: settings.worksheetName
+          });
+        }
 
-      // Load all state properties in a single atomic update
-      loadConfiguration(settings);
-
-      // Update source file info if available
-      if (settings.sourceColumns) {
-        setSourceFileInfo({
-          filename: settings.sourceFilename || '',
-          rowCount: settings.sourceData?.length || 0,
-          worksheetName: settings.worksheetName
-        });
+        // Trigger UI refresh to update Connected columns and other components
+        setShouldResetMapper(true);
+      } else {
+        // Configuration not found - show error toast once and clear from URL
+        if (errorToastShown.current !== configName) {
+          toast({
+            title: "Configuratie niet gevonden",
+            description: `Configuratie "${configName}" bestaat niet voor dossier ${dossier}.`,
+            variant: "destructive",
+          });
+          errorToastShown.current = configName;
+        }
+        lastLoadedConfig.current = null;
+        clearConfig();
       }
-
-      // Trigger UI refresh to update Connected columns and other components
-      setShouldResetMapper(true);
-
-      toast({
-        title: t('dialogs.configurationLoaded'),
-        description: t('toast.configLoaded'),
-      });
     } catch (error) {
       console.error('Error loading configuration:', error);
-      toast({
-        title: t('toast.error'),
-        description: t('toast.configLoadError'),
-        variant: "destructive",
-      });
+      // Error toast is already handled in the loadConfig hook for network/API errors
+      lastLoadedConfig.current = null;
+      clearConfig();
     }
-  }, [loadConfiguration, setShouldResetMapper, toast, t]);
+  }, [loadConfig, loadConfiguration, setShouldResetMapper]);
 
   useEffect(() => {
-    const id = searchParams.get('id');
-    if (id) {
-      handleLoadConfiguration(id);
+    if (config) {
+      handleLoadConfigurationFromUrl(config);
     }
-  }, [searchParams, handleLoadConfiguration]);
+  }, [config, handleLoadConfigurationFromUrl]);
 
   const handleMappingChange = (mapping: Record<string, string>) => {
     setMapping(mapping);
   };
 
-  interface ConfigurationResult {
-    id: string;
-  }
+  // New handlers for the new configuration system
+  const handleNew = () => {
+    resetState();
+    setSourceFileInfo(null);
+    setShouldResetMapper(true);
+  };
 
-  const handleSaveConfiguration = async (isNewConfig: boolean = true) => {
-    // Save the entire mapping state
-    const id = await saveConfiguration({
-      mapping: mappingState.mapping,
-      columnTransforms: mappingState.columnTransforms,
-      sourceColumns: mappingState.sourceColumns,
-      sourceData: mappingState.sourceData,
-      connectionCounter: mappingState.connectionCounter,
-      sourceFilename: mappingState.sourceFilename,
-      selectedSourceColumn: mappingState.selectedSourceColumn,
-      selectedTargetColumn: mappingState.selectedTargetColumn,
-      sourceSearch: mappingState.sourceSearch,
-      targetSearch: mappingState.targetSearch,
-      activeFilter: mappingState.activeFilter
-    }, isNewConfig);
+  const handleSave = () => {
+    setShowSaveConfigDialog(true);
+  };
 
-    if (id) {
-      setCurrentConfigId(String(id));
-      if (isNewConfig) {
-        const configUrl = `${window.location.origin}?id=${id}`;
-        setSavedConfigUrl(configUrl);
-        setShowSavedDialog(true);
-      } else {
-        toast({
-          title: t('toast.success'),
-          description: t('toast.configUpdated'),
-        });
-      }
+  const handleLoad = () => {
+    setShowLoadConfigDialog(true);
+  };
+
+  const handleDelete = () => {
+    setShowDeleteConfigDialog(true);
+  };
+
+  const handleConfigurationSaved = (configName: string) => {
+    // Update URL to reflect the saved configuration
+    updateConfig(configName);
+    // Update the ref to prevent reload loop
+    lastLoadedConfig.current = configName;
+  };
+
+  const handleConfigurationLoaded = (configName: string, configData: any) => {
+    const settings = configData as ConfigurationSettings;
+    
+    // Load all state properties in a single atomic update
+    loadConfiguration(settings);
+
+    // Update source file info if available
+    if (settings.sourceColumns) {
+      setSourceFileInfo({
+        filename: settings.sourceFilename || '',
+        rowCount: settings.sourceData?.length || 0,
+        worksheetName: settings.worksheetName
+      });
     }
+
+    // Trigger UI refresh to update Connected columns and other components
+    setShouldResetMapper(true);
   };
 
   const handleClearSettings = useCallback(() => {
@@ -140,7 +156,6 @@ const Index = () => {
     // Reset all state
     resetState();
     setSourceFileInfo(null);
-    setCurrentConfigId(null);
     setShouldResetMapper(true);
 
     toast({
@@ -151,84 +166,10 @@ const Index = () => {
     });
   }, [resetState, toast, t]);
 
-  const handleExportSettings = useCallback(() => {
-    try {
-      downloadSettingsAsJSON(mappingState);
-      toast({
-        title: t('toast.success'),
-        description: 'Settings exported successfully',
-      });
-    } catch (error) {
-      console.error('Error exporting settings:', error);
-      toast({
-        title: t('toast.error'),
-        description: 'Failed to export settings',
-        variant: "destructive",
-      });
-    }
-  }, [mappingState, toast, t]);
-
-  const handleLoadSettings = useCallback(() => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json,application/json';
-    input.style.display = 'none';
-    
-    input.onchange = async (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      
-      try {
-        const settings = await loadSettingsFromJSON(file);
-        
-        // Load the settings using the existing loadConfiguration action
-        loadConfiguration({
-          mapping: settings.mapping,
-          columnTransforms: settings.columnTransforms,
-          sourceColumns: settings.sourceColumns,
-          connectionCounter: settings.connectionCounter || 0,
-          sourceSearch: settings.sourceSearch || '',
-          targetSearch: settings.targetSearch || '',
-          sourceFilename: settings.sourceFilename,
-          activeFilter: settings.activeFilter
-        });
-        
-        // Update source file info if available
-        if (settings.sourceColumns) {
-          setSourceFileInfo({
-            filename: settings.sourceFilename || 'Loaded from settings',
-            rowCount: 0, // We don't have actual data, just column mappings
-            worksheetName: undefined
-          });
-        }
-        
-        // Trigger UI refresh to update Connected columns and other components
-        setShouldResetMapper(true);
-        
-        toast({
-          title: t('toast.success'),
-          description: 'Settings loaded successfully',
-        });
-      } catch (error) {
-        console.error('Error loading settings:', error);
-        toast({
-          title: t('toast.error'),
-          description: (error as Error).message,
-          variant: "destructive",
-        });
-      }
-    };
-    
-    document.body.appendChild(input);
-    input.click();
-    document.body.removeChild(input);
-  }, [loadConfiguration, setSourceFileInfo, setShouldResetMapper, toast, t]);
-
-  // Reset the flag after a short delay to allow the reset to complete
+  // Reset the flag immediately after render to prevent flickering
   useEffect(() => {
     if (shouldResetMapper) {
-      const timer = setTimeout(() => setShouldResetMapper(false), 100);
-      return () => clearTimeout(timer);
+      setShouldResetMapper(false);
     }
   }, [shouldResetMapper]);
 
@@ -271,10 +212,36 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <SavedConfigDialog
-        open={showSavedDialog}
-        onOpenChange={setShowSavedDialog}
-        configUrl={savedConfigUrl}
+      {/* New configuration dialogs */}
+      <SaveConfigDialog
+        open={showSaveConfigDialog}
+        onOpenChange={setShowSaveConfigDialog}
+        configurationData={{
+          mapping: mappingState.mapping,
+          columnTransforms: mappingState.columnTransforms,
+          sourceColumns: mappingState.sourceColumns,
+          sourceData: mappingState.sourceData,
+          connectionCounter: mappingState.connectionCounter,
+          sourceFilename: mappingState.sourceFilename,
+          selectedSourceColumn: mappingState.selectedSourceColumn,
+          selectedTargetColumn: mappingState.selectedTargetColumn,
+          sourceSearch: mappingState.sourceSearch,
+          targetSearch: mappingState.targetSearch,
+          activeFilter: mappingState.activeFilter
+        }}
+        onConfigurationSaved={handleConfigurationSaved}
+        currentConfigName={config}
+      />
+
+      <LoadConfigDialog
+        open={showLoadConfigDialog}
+        onOpenChange={setShowLoadConfigDialog}
+        onConfigurationLoaded={handleConfigurationLoaded}
+      />
+
+      <DeleteConfigDialog
+        open={showDeleteConfigDialog}
+        onOpenChange={setShowDeleteConfigDialog}
       />
 
       <InfoDialog
@@ -301,10 +268,10 @@ const Index = () => {
 
       <div className="container mx-auto px-4 py-8 flex-grow">
         <PageHeader
-          onSaveNew={() => handleSaveConfiguration(true)}
-          onSave={() => handleSaveConfiguration(false)}
-          onExportSettings={handleExportSettings}
-          onLoadSettings={handleLoadSettings}
+          onNew={handleNew}
+          onSave={handleSave}
+          onLoad={handleLoad}
+          onDelete={handleDelete}
           onInfo={() => setShowInfoDialog(true)}
           onClearSettings={handleClearSettings}
           onShowLog={() => {
@@ -318,7 +285,7 @@ const Index = () => {
               });
             }
           }}
-          isSaving={isSaving}
+          isSaving={isConfigLoading}
         />
 
         <ColumnMapper

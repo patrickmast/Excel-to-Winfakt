@@ -47,7 +47,7 @@ const BuildTimestamp = () => {
   if (!import.meta.env.DEV || !lastModified) return null;
 
   return (
-    <div className="text-xs text-gray-400 text-center -mt-9 mb-8 font-light">
+    <div className="text-xs text-gray-400 text-center mt-1 mb-8 font-light">
       {lastModified}
     </div>
   );

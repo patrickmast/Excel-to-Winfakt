@@ -9,10 +9,10 @@
     "loading": "Yükleniyor..."
   },
   "menu": {
-    "saveAsNew": "Yeni Olarak Kaydet",
+    "new": "Yeni",
     "save": "Kaydet",
-    "exportSettings": "Ayarları Dışa Aktar",
-    "loadSettings": "Ayarları Yükle",
+    "load": "Yükle",
+    "delete": "Sil",
     "clearSettings": "Ayarları Temizle",
     "info": "Bilgi",
     "exportLog": "Dışa Aktarma Günlüğü"

@@ -87,24 +87,27 @@ const ColumnList = ({
     }
   };
 
-  // First filter by search, then handle mapped columns at the group level
-  let filteredColumns = columns
-    .filter(column => {
-      // For source columns, show all. For Winfakt columns, only show unmapped ones
-      const passesMapping = title === "Source file columns" || !isColumnMapped(column);
-      // Apply search filter - make sure to handle case where searchValue is undefined
-      const passesSearch = !searchValue || column.toLowerCase().includes(searchValue.toLowerCase());
-      return passesMapping && passesSearch;
-    });
-
-  // Only apply grouping to Winfakt columns
   // Determine if this is a source column list or Winfakt list
   // We need to check if the title is a React component (Header) or a string
   // For source columns, we use the Header component which contains sourceColumns text
   // For target columns, we use a div with targetColumns text
   const isSourceColumnList = typeof title !== 'string' && React.isValidElement(title) && title.type === Header;
   const isWinfaktList = !isSourceColumnList;
-  
+
+  // First filter by search, and for target columns also filter out mapped ones
+  let filteredColumns = columns
+    .filter(column => {
+      // Apply search filter - make sure to handle case where searchValue is undefined
+      const passesSearch = !searchValue || column.toLowerCase().includes(searchValue.toLowerCase());
+      
+      // For target columns (Winfakt columns), hide mapped columns completely
+      // For source columns, show all columns regardless of mapping status
+      const shouldShow = isSourceColumnList || !isColumnMapped(column);
+      
+      return passesSearch && shouldShow;
+    });
+
+  // Only apply grouping to Winfakt columns
   // Important: Use all columns for identifying groups, not just filtered ones
   // This ensures groups maintain their original order even when some columns are mapped
   const allColumnGroups = isWinfaktList ? identifyColumnGroups(columns) : [];
@@ -144,8 +147,8 @@ const ColumnList = ({
             {/* Get the original column order from the parent component */}
             {/* We need to process columns in their original order to maintain the specified sequence */}
             {columns.filter(column => {
-              // Only include columns that pass our filters and aren't mapped yet
-              return filteredColumns.includes(column) && !isColumnMapped(column);
+              // Include all columns that pass search filter (mapped and unmapped)
+              return filteredColumns.includes(column);
             }).map(column => {
               // Check if this column belongs to a group
               const group = allColumnGroups.find(g => g.columns.includes(column));
@@ -159,13 +162,21 @@ const ColumnList = ({
                 // Mark this group as rendered
                 renderedGroups.add(group.name);
                 
-                // Filter out mapped columns from the group
-                const unmappedGroupColumns = group.columns.filter(col => 
-                  filteredColumns.includes(col) && !isColumnMapped(col) && col
+                // Include all group columns that pass search filter (mapped and unmapped)
+                const groupColumns = group.columns.filter(col => 
+                  filteredColumns.includes(col) && col
                 );
                 
-                // Skip the entire group if all columns are mapped or filtered out
-                if (unmappedGroupColumns.length === 0) {
+                // Skip the group if no columns pass search filter
+                if (groupColumns.length === 0) {
+                  return null;
+                }
+                
+                // Check if all columns in this group are mapped
+                const allGroupColumnsMapped = groupColumns.every(col => isColumnMapped(col));
+                
+                // Skip the group if all columns are mapped and this is a target column list
+                if (allGroupColumnsMapped && !isSourceColumnList) {
                   return null;
                 }
                 
@@ -174,7 +185,7 @@ const ColumnList = ({
                   <div key={group.name}>
                     <div
                       onClick={() => toggleGroup(group.name)}
-                      className="p-3 rounded-md cursor-pointer transition-colors bg-[#F9FAFB] hover:bg-[#F0FFF6] hover:border-[#BBF7D0] border border-[#E5E7EB] flex items-center justify-between h-[48px]"
+                      className="p-3 rounded-md transition-colors border border-[#E5E7EB] flex items-center justify-between h-[48px] cursor-pointer bg-[#F9FAFB] hover:bg-[#F0FFF6] hover:border-[#BBF7D0]"
                     >
                       <span className="text-sm">{group.name}</span>
                       {expandedGroups.has(group.name) ? (
@@ -185,18 +196,19 @@ const ColumnList = ({
                     </div>
                     {expandedGroups.has(group.name) && (
                       <div className="ml-4 mt-2 space-y-2">
-                        {unmappedGroupColumns.map(groupColumn => (
-                          <ColumnPreview
-                            key={groupColumn}
-                            columnName={getDisplayName(groupColumn)}
-                            originalColumnName={groupColumn}
-                            previewValue={getPreviewValue(groupColumn)}
-                            isSelected={selectedColumn === groupColumn}
-                            onClick={() => onColumnClick(groupColumn)}
-                            showPreview={false}
-                            showInfo={isSourceColumnList}
-                            sourceData={sourceData}
-                          />
+                        {groupColumns.map(groupColumn => (
+                          <div key={groupColumn}>
+                            <ColumnPreview
+                              columnName={getDisplayName(groupColumn)}
+                              originalColumnName={groupColumn}
+                              previewValue={getPreviewValue(groupColumn)}
+                              isSelected={selectedColumn === groupColumn}
+                              onClick={() => onColumnClick(groupColumn)}
+                              showPreview={false}
+                              showInfo={isSourceColumnList}
+                              sourceData={sourceData}
+                            />
+                          </div>
                         ))}
                       </div>
                     )}
@@ -205,17 +217,18 @@ const ColumnList = ({
               } else {
                 // This is an individual column, not part of any group
                 return (
-                  <ColumnPreview
-                    key={column}
-                    columnName={getDisplayName(column)}
-                    originalColumnName={column}
-                    previewValue={getPreviewValue(column)}
-                    isSelected={selectedColumn === column}
-                    onClick={() => onColumnClick(column)}
-                    showPreview={false}
-                    showInfo={isSourceColumnList}
-                    sourceData={sourceData}
-                  />
+                  <div key={column}>
+                    <ColumnPreview
+                      columnName={getDisplayName(column)}
+                      originalColumnName={column}
+                      previewValue={getPreviewValue(column)}
+                      isSelected={selectedColumn === column}
+                      onClick={() => onColumnClick(column)}
+                      showPreview={false}
+                      showInfo={isSourceColumnList}
+                      sourceData={sourceData}
+                    />
+                  </div>
                 );
               }
             })}

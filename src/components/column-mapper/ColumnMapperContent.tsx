@@ -60,8 +60,8 @@ const ColumnMapperContent = ({
     if (state.selectedSourceColumn === column) {
       updateState({ selectedSourceColumn: null });
     } else {
-      updateState({ selectedSourceColumn: column });
       if (state.selectedTargetColumn) {
+        // If target column is already selected, connect them immediately in one update
         const uniqueKey = `${column}_${state.connectionCounter}`;
         updateState({
           mapping: {
@@ -72,6 +72,9 @@ const ColumnMapperContent = ({
           selectedSourceColumn: null,
           selectedTargetColumn: null
         });
+      } else {
+        // No target selected yet, just select this source column
+        updateState({ selectedSourceColumn: column });
       }
     }
   }, [state.selectedSourceColumn, state.selectedTargetColumn, state.connectionCounter, state.mapping, updateState]);
@@ -80,8 +83,8 @@ const ColumnMapperContent = ({
     if (state.selectedTargetColumn === targetColumn) {
       updateState({ selectedTargetColumn: null });
     } else {
-      updateState({ selectedTargetColumn: targetColumn });
       if (state.selectedSourceColumn) {
+        // If source column is already selected, connect them immediately in one update
         const uniqueKey = `${state.selectedSourceColumn}_${state.connectionCounter}`;
         updateState({
           mapping: {
@@ -92,6 +95,9 @@ const ColumnMapperContent = ({
           selectedSourceColumn: null,
           selectedTargetColumn: null
         });
+      } else {
+        // No source selected yet, just select this target column
+        updateState({ selectedTargetColumn: targetColumn });
       }
     }
   }, [state.selectedTargetColumn, state.selectedSourceColumn, state.connectionCounter, state.mapping, updateState]);

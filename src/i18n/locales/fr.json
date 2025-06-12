@@ -9,10 +9,10 @@
     "loading": "Chargement..."
   },
   "menu": {
-    "saveAsNew": "Enregistrer comme nouveau",
+    "new": "Nouveau",
     "save": "Enregistrer",
-    "exportSettings": "Exporter les paramètres",
-    "loadSettings": "Charger les paramètres",
+    "load": "Charger",
+    "delete": "Supprimer",
     "clearSettings": "Effacer les paramètres",
     "info": "Info",
     "exportLog": "Journal d'exportation"

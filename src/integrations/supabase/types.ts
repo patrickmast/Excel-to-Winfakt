@@ -60,6 +60,57 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_configurations: {
+        Row: {
+          configuration_data: Json
+          configuration_name: string
+          created_at: string
+          dossier_number: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          configuration_data: Json
+          configuration_name: string
+          created_at?: string
+          dossier_number: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          configuration_data?: Json
+          configuration_name?: string
+          created_at?: string
+          dossier_number?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       shared_configurations: {
         Row: {
           created_at: string

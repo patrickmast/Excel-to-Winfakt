@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { MappingState } from './types';
 import { CompoundFilter } from './FilterDialog';
 import { Settings, buildSettings } from '@/utils/settingsUtils';
@@ -79,11 +79,11 @@ export const useMappingState = (onMappingChange: (mapping: Record<string, string
     }
   }, [state.mapping, state.columnTransforms, state.sourceColumns, state.connectionCounter, state.sourceSearch, state.targetSearch, state.activeFilter]);
 
-  const updateState = (updates: Partial<MappingState>) => {
+  const updateState = useCallback((updates: Partial<MappingState>) => {
     setState(prevState => {
       return { ...prevState, ...updates };
     });
-  };
+  }, []);
 
   return [state, updateState] as const;
 };

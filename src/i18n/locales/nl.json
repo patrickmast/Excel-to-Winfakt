@@ -9,10 +9,10 @@
     "loading": "Laden..."
   },
   "menu": {
-    "saveAsNew": "Opslaan als nieuw",
+    "new": "Nieuw",
     "save": "Opslaan",
-    "exportSettings": "Instellingen exporteren",
-    "loadSettings": "Instellingen laden",
+    "load": "Laden",
+    "delete": "Wissen",
     "clearSettings": "Instellingen wissen",
     "info": "Info",
     "exportLog": "Export log"
