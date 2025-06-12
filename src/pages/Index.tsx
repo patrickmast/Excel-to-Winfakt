@@ -144,6 +144,11 @@ const Index = () => {
       });
     }
 
+    // Update URL to reflect the loaded configuration
+    updateConfig(configName);
+    // Update the ref to prevent reload loop
+    lastLoadedConfig.current = configName;
+
     // Trigger UI refresh to update Connected columns and other components
     setShouldResetMapper(true);
   };

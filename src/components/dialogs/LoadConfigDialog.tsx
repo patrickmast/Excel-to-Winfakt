@@ -48,11 +48,13 @@ const LoadConfigDialog = ({
   const handleLoad = async () => {
     if (!selectedConfig) return;
 
+    // Close dialog immediately for better UX
+    onOpenChange(false);
+    
     const loadedConfig = await loadConfig(selectedConfig.configuration_name);
     
     if (loadedConfig) {
       onConfigurationLoaded?.(loadedConfig.configuration_name, loadedConfig.configuration_data);
-      onOpenChange(false);
     }
   };
 

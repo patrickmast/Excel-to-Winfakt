@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useUrlParams } from '@/hooks/use-url-params';
 import {
@@ -26,7 +26,7 @@ export function useConfigurationApi() {
   /**
    * Save current configuration with given name
    */
-  const saveConfig = async (configurationName: string, configurationData: any): Promise<SavedConfiguration | null> => {
+  const saveConfig = useCallback(async (configurationName: string, configurationData: any): Promise<SavedConfiguration | null> => {
     setIsLoading(true);
     try {
       const request: SaveConfigurationRequest = {
@@ -49,12 +49,12 @@ export function useConfigurationApi() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [dossier, toast]);
 
   /**
    * Load a configuration by name
    */
-  const loadConfig = async (configurationName: string): Promise<SavedConfiguration | null> => {
+  const loadConfig = useCallback(async (configurationName: string): Promise<SavedConfiguration | null> => {
     setIsLoading(true);
     try {
       const config = await loadConfiguration({
@@ -75,7 +75,7 @@ export function useConfigurationApi() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [dossier]);
 
   /**
    * Delete a configuration by name
@@ -86,11 +86,6 @@ export function useConfigurationApi() {
       await deleteConfiguration({
         dossier_number: dossier,
         configuration_name: configurationName
-      });
-
-      toast({
-        title: "Configuratie verwijderd",
-        description: `"${configurationName}" is succesvol verwijderd.`
       });
 
       // Refresh the configurations list
@@ -113,21 +108,24 @@ export function useConfigurationApi() {
   /**
    * Refresh the list of configurations for current dossier
    */
-  const refreshConfigurations = async (): Promise<void> => {
+  const refreshConfigurations = useCallback(async (): Promise<void> => {
+    console.log('Starting refreshConfigurations for dossier:', dossier);
     setIsLoading(true);
     try {
       const configs = await listConfigurations({
         dossier_number: dossier
       });
+      console.log('Loaded configurations:', configs);
       setConfigurations(configs);
     } catch (error) {
       console.error('Error refreshing configurations:', error);
       // Don't show toast for configuration list refresh errors - not critical
       setConfigurations([]);
     } finally {
+      console.log('Finished refreshConfigurations, setting isLoading to false');
       setIsLoading(false);
     }
-  };
+  }, [dossier]);
 
   /**
    * Check if a configuration name exists
