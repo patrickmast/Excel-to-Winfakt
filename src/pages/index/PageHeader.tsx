@@ -25,10 +25,10 @@ const PageHeader = ({ onNew, onSave, onLoad, onDelete, onInfo, onClearSettings, 
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center mb-0 justify-center">
-        <div className="absolute left-0 w-32"> {/* Spacer to balance the menu width */}</div>
+      <div className="flex items-center mb-0 justify-between">
+        <div className="w-32"> {/* Left spacer */}</div>
         {showH1 && (
-          <h1 className="w-4/5 text-2xl font-extrabold text-center md:text-3xl lg:text-4xl relative">
+          <h1 className="flex-1 text-2xl font-extrabold text-center md:text-3xl lg:text-4xl relative">
             <span className="absolute inset-0 bg-[linear-gradient(to_right,#7e22ce,#ec4899,#f472b6,#fbbf24,#ef4444,#7e22ce,#ec4899,#f472b6)] animate-gradient-cycle bg-[length:200%_100%] bg-clip-text text-transparent">
               {t('header.title')}
             </span>
@@ -38,7 +38,7 @@ const PageHeader = ({ onNew, onSave, onLoad, onDelete, onInfo, onClearSettings, 
             </span>
           </h1>
         )}
-        <div className="absolute right-0 w-32 flex justify-end"> {/* Added flex justify-end */}
+        <div className="w-32 flex justify-end">
           {showMenu && (
             <ConfigurationMenu
               onNew={onNew}
