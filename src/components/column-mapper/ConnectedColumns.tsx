@@ -13,6 +13,7 @@ import { ExportButton } from '@/components/ui/export-button';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import classnames from 'classnames'; // Fix classnames import
+import { createColumnProxy, createExpressionWrapper } from '@/utils/expressionUtils';
 
 interface ConnectedColumnsProps {
   connectedColumns: [string, string, string][]; // [uniqueKey, sourceColumn, targetColumn]
@@ -165,6 +166,7 @@ const ConnectedColumns = ({
     onExport(dataToExport);
   };
 
+
   const evaluateCondition = (condition: SingleCondition, row: any) => {
     const value = row[condition.column];
     const compareValue = condition.value;
@@ -196,8 +198,12 @@ const ConnectedColumns = ({
     // Apply transform if it exists
     if (columnTransforms[uniqueKey]) {
       try {
-        const transform = new Function('value', 'row', `return ${columnTransforms[uniqueKey]}`);
-        value = transform(value, firstRow);
+        // Create a proxy object that supports different access patterns
+        const col = createColumnProxy(firstRow, sourceColumns);
+        
+        // Create wrapper function with expression preprocessing
+        const wrapper = createExpressionWrapper(columnTransforms[uniqueKey], sourceColumns);
+        value = wrapper(col, value);
       } catch (error) {
         console.error(`Error computing preview for ${sourceColumn}:`, error);
         value = 'Error in transform';

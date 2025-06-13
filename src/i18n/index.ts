@@ -35,7 +35,7 @@ i18n
     },
     lng: storedLanguage || 'nl', // Use stored language if available, default to Dutch
     fallbackLng: 'nl', // Set Dutch as fallback language
-    debug: import.meta.env.DEV,
+    debug: false,
     interpolation: {
       escapeValue: false // not needed for react as it escapes by default
     },

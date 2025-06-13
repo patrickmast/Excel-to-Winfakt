@@ -23,13 +23,14 @@ const Index = () => {
     setSourceData,
     resetState,
     updateTransforms,
-    setFilter
+    setFilter,
+    setColumnOrder
   } = useMappingReducer();
 
   const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
   const { toast } = useToast();
   const { dossier, config, updateConfig, clearConfig } = useUrlParams();
-  const { isLoading: isConfigLoading, loadConfig } = useConfigurationApi();
+  const { isLoading: isConfigLoading, loadConfig, saveConfig } = useConfigurationApi();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [showLogDialog, setShowLogDialog] = useState(false);
   const [showSaveConfigDialog, setShowSaveConfigDialog] = useState(false);
@@ -101,6 +102,18 @@ const Index = () => {
 
   const handleMappingChange = (mapping: Record<string, string>) => {
     setMapping(mapping);
+    
+    // Update columnOrder: add new keys that aren't in the current order, remove deleted ones
+    const newKeys = Object.keys(mapping).filter(key => mapping[key] !== '');
+    const currentOrder = mappingState.columnOrder || [];
+    
+    // Keep existing order for keys that are still mapped, add new keys at the end
+    const updatedOrder = [
+      ...currentOrder.filter(key => newKeys.includes(key)),
+      ...newKeys.filter(key => !currentOrder.includes(key))
+    ];
+    
+    setColumnOrder(updatedOrder);
   };
 
   // New handlers for the new configuration system
@@ -112,6 +125,29 @@ const Index = () => {
 
   const handleSave = () => {
     setShowSaveConfigDialog(true);
+  };
+
+  const handleDirectSave = async () => {
+    // Only save if there's already a configuration loaded
+    if (config) {
+      // Create configuration data from current state
+      const configurationData = {
+        mapping: mappingState.mapping,
+        transforms: mappingState.transforms,
+        filters: mappingState.filters,
+        sourceColumns: mappingState.sourceColumns,
+        sourceData: mappingState.sourceData,
+        sourceFilename: sourceFileInfo?.filename,
+        worksheetName: sourceFileInfo?.worksheetName,
+        columnOrder: mappingState.columnOrder
+      };
+
+      try {
+        await saveConfig(config, configurationData);
+      } catch (error) {
+        console.error('Error saving configuration:', error);
+      }
+    }
   };
 
   const handleLoad = () => {
@@ -182,6 +218,21 @@ const Index = () => {
     const newMapping = { ...mappingState.mapping };
     delete newMapping[uniqueKey];
     setMapping(newMapping);
+    
+    // Also remove from columnOrder
+    const newColumnOrder = (mappingState.columnOrder || []).filter(key => key !== uniqueKey);
+    setColumnOrder(newColumnOrder);
+  };
+
+  const handleReorder = (newOrder: [string, string, string][]) => {
+    const newMapping: Record<string, string> = {};
+    const newColumnOrder: string[] = [];
+    newOrder.forEach(([key, _, target]) => {
+      newMapping[key] = target;
+      newColumnOrder.push(key);
+    });
+    setMapping(newMapping);
+    setColumnOrder(newColumnOrder);
   };
 
   const handleExport = useCallback(async (data: any[], sourceFilename: string) => {
@@ -207,13 +258,6 @@ const Index = () => {
     });
   };
 
-  const handleReorder = (newOrder: [string, string, string][]) => {
-    const newMapping: Record<string, string> = {};
-    newOrder.forEach(([key, source, target]) => {
-      newMapping[key] = mappingState.mapping[key];
-    });
-    setMapping(newMapping);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -232,7 +276,8 @@ const Index = () => {
           selectedTargetColumn: mappingState.selectedTargetColumn,
           sourceSearch: mappingState.sourceSearch,
           targetSearch: mappingState.targetSearch,
-          activeFilter: mappingState.activeFilter
+          activeFilter: mappingState.activeFilter,
+          columnOrder: mappingState.columnOrder
         }}
         onConfigurationSaved={handleConfigurationSaved}
         currentConfigName={config}
@@ -274,7 +319,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8 flex-grow">
         <PageHeader
           onNew={handleNew}
-          onSave={handleSave}
+          onSave={handleDirectSave}
           onLoad={handleLoad}
           onDelete={handleDelete}
           onInfo={() => setShowInfoDialog(true)}
@@ -320,6 +365,8 @@ const Index = () => {
           activeFilter={mappingState.activeFilter}
           onTransformUpdate={handleUpdateTransform}
           onFilterUpdate={setFilter}
+          onReorder={handleReorder}
+          columnOrder={mappingState.columnOrder}
         />
       </div>
     </div>

@@ -24,6 +24,7 @@ interface ColumnMapperContentProps {
   onColumnSetChange: (columnSet: string) => void;
   onDataLoaded: (columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number, metadata?: any) => void;
   onExport: (data: any[], metadata?: any) => void;
+  onReorder?: (newOrder: [string, string, string][]) => void;
 }
 
 // Using MappingState from types.ts instead of local declaration
@@ -35,7 +36,8 @@ const ColumnMapperContent = ({
   activeColumnSet,
   onColumnSetChange,
   onDataLoaded,
-  onExport
+  onExport,
+  onReorder
 }: ColumnMapperContentProps) => {
   const [showNoFileDialog, setShowNoFileDialog] = useState(false);
   const { t } = useTranslation();
@@ -119,16 +121,43 @@ const ColumnMapperContent = ({
 
   const handleReorder = useCallback((newOrder: [string, string, string][]) => {
     const newMapping: Record<string, string> = {};
+    const newColumnOrder: string[] = [];
     newOrder.forEach(([key, _, target]) => {
       newMapping[key] = target;
+      newColumnOrder.push(key);
     });
-    updateState({ mapping: newMapping });
-  }, [updateState]);
+    updateState({ 
+      mapping: newMapping,
+      columnOrder: newColumnOrder 
+    });
+    
+    // Also call the parent onReorder callback to update the central state
+    onReorder?.(newOrder);
+  }, [updateState, onReorder]);
 
-  const connectedColumns = Object.entries(state.mapping).map(([key, target]) => {
-    const sourceColumn = key.split('_')[0];
-    return [key, sourceColumn, target] as [string, string, string];
-  }).filter(([_, __, target]) => target !== '');
+  const connectedColumns = (() => {
+    // If we have mapping but no columnOrder yet (still loading), don't show anything to prevent jumping
+    if (Object.keys(state.mapping).length > 0 && (!state.columnOrder || state.columnOrder.length === 0)) {
+      return [];
+    }
+    
+    // If we have a columnOrder, use it to preserve order
+    if (state.columnOrder && state.columnOrder.length > 0) {
+      return state.columnOrder
+        .filter(key => state.mapping[key] && state.mapping[key] !== '')
+        .map(key => {
+          const sourceColumn = key.split('_')[0];
+          const target = state.mapping[key];
+          return [key, sourceColumn, target] as [string, string, string];
+        });
+    }
+    
+    // Only use Object.entries fallback if we have no columnOrder and no mapping (new session)
+    return Object.entries(state.mapping).map(([key, target]) => {
+      const sourceColumn = key.split('_')[0];
+      return [key, sourceColumn, target] as [string, string, string];
+    }).filter(([_, __, target]) => target !== '');
+  })();
 
   const mappedTargetColumns = new Set(Object.values(state.mapping));
 

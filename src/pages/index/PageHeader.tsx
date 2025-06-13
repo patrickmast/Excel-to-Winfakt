@@ -53,7 +53,7 @@ const PageHeader = ({ onNew, onSave, onLoad, onDelete, onInfo, onClearSettings, 
           )}
         </div>
       </div>
-      <ConfigurationIndicator className="mt-0 md:mt-1 lg:mt-2 mb-6" />
+      <ConfigurationIndicator className="mt-0 md:mt-1 lg:mt-2 mb-6" onSaveConfiguration={onSave} />
     </div>
   );
 };

@@ -271,7 +271,12 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
 
       try {
         // Test the expression with Function constructor
-        const filterFn = new Function('row', `return ${expression}`);
+        const filterFn = new Function('_col', `
+          const col = _col;
+          const Col = _col;
+          const COL = _col;
+          return ${expression}
+        `);
 
         // Test with first row if available
         if (sourceData.length > 0) {

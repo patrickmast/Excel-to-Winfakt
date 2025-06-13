@@ -32,6 +32,8 @@ export interface ColumnMapperProps {
   columnTransforms?: Record<string, string>;
   isLoading?: boolean;
   activeFilter?: CompoundFilter | null;
+  onReorder?: (newOrder: [string, string, string][]) => void;
+  columnOrder?: string[];
 }
 
 import { CompoundFilter } from './FilterDialog';
@@ -52,6 +54,7 @@ export interface MappingState {
   metadata?: any;
   worksheetName?: string;
   sourceFileSize?: number; // Added to store the file size
+  columnOrder?: string[]; // Added to preserve the order of connected columns
 }
 
 export interface ConfigurationSettings {
@@ -65,4 +68,5 @@ export interface ConfigurationSettings {
   sourceSearch?: string;
   targetSearch?: string;
   activeFilter?: CompoundFilter | null;
+  columnOrder?: string[]; // Added to preserve the order of connected columns
 }

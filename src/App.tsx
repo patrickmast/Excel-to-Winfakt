@@ -30,16 +30,15 @@ const App = () => {
   // Parse URL parameters on app start
   useEffect(() => {
     const urlParams = parseUrlParams();
-    console.log('App started with URL parameters:', urlParams);
     
     // TODO: Load configuration if config parameter is present
     if (urlParams.config) {
-      console.log(`Will load configuration "${urlParams.config}" for dossier ${urlParams.dossier}`);
+      // Will load configuration for the specified dossier
     }
   }, []);
   
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/preview" element={<Preview />} />

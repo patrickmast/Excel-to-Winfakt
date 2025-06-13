@@ -104,6 +104,9 @@ const PM7ConfigurationMenu = ({
       menuItems={menuItems}
       menuAlignment="end"
       theme={theme}
+      menuTriggerBordered={true}
+      menuBackgroundColor="white"
+      menuTriggerBackgroundColor="white"
     />
   );
 };

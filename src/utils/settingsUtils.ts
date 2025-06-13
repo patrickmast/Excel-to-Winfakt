@@ -9,6 +9,8 @@ export interface Settings {
   sourceSearch: string;
   targetSearch: string;
   sourceFilename?: string;
+  worksheetName?: string;
+  columnOrder?: string[];
   activeFilter: CompoundFilter | null;
 }
 
@@ -20,6 +22,8 @@ export const buildSettings = (state: MappingState): Settings => ({
   sourceSearch: state.sourceSearch,
   targetSearch: state.targetSearch,
   sourceFilename: state.sourceFilename,
+  worksheetName: state.worksheetName,
+  columnOrder: state.columnOrder,
   activeFilter: state.activeFilter ?? null
 });
 

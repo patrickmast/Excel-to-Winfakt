@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -8,10 +8,16 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlayIcon } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import ExpressionEditor from './ExpressionEditor';
 import HelperFunctions from './HelperFunctions';
 import ColumnSelector from './ColumnSelector';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { createColumnProxy, createExpressionWrapper } from '@/utils/expressionUtils';
 
 interface ColumnSettingsDialogProps {
   isOpen: boolean;
@@ -38,29 +44,70 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
   const [testResult, setTestResult] = useState<string | null>(null);
   const [testError, setTestError] = useState<string | null>(null);
   const [referenceStyle, setReferenceStyle] = useState<'name' | 'letter' | 'number'>('name');
+  const [lastEvaluatedExpression, setLastEvaluatedExpression] = useState<string>('');
 
   const handleSave = () => {
     onSave(expressionCode);
     onClose();
   };
 
-  const testExpression = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  // Automatically evaluate when switching to result tab
+  useEffect(() => {
+    if (activeTab === 'result' && expressionCode !== lastEvaluatedExpression) {
+      evaluateExpression();
+    }
+  }, [activeTab, expressionCode, lastEvaluatedExpression]);
+
+  const evaluateExpression = () => {
+    if (!expressionCode.trim()) {
+      setTestResult(null);
+      setTestError(t('columnMapper.enterExpression'));
+      setLastEvaluatedExpression(expressionCode);
+      return;
+    }
+
     try {
       setTestResult(null);
       setTestError(null);
 
-      const row = sourceData.length > 0 ? sourceData[0] : {};
-      const value = row[columnName];
+      // Create test data if no sourceData is available
+      let rowData;
+      if (sourceData.length > 0) {
+        rowData = sourceData[0];
+      } else {
+        // Create mock data for testing when no file is loaded
+        rowData = {};
+        sourceColumns.forEach((col, index) => {
+          // Create more realistic test data
+          if (col.toLowerCase().includes('prijs') || col.toLowerCase().includes('price')) {
+            rowData[col] = `${(index + 1) * 10}.99`;
+          } else if (col.toLowerCase().includes('aantal') || col.toLowerCase().includes('qty')) {
+            rowData[col] = `${index + 1}`;
+          } else {
+            rowData[col] = `Voorbeeld ${index + 1}`;
+          }
+        });
+      }
+      
+      const value = rowData[columnName];
 
-      const result = new Function('row', 'value', `return ${expressionCode}`)(row, value);
+      // Create a proxy object that supports different access patterns
+      const col = createColumnProxy(rowData, sourceColumns);
+      
+      // Create wrapper function with expression preprocessing
+      const wrapper = createExpressionWrapper(expressionCode, sourceColumns);
+      
+      const result = wrapper(col, value);
       setTestResult(String(result));
-      setActiveTab('result');
+      setLastEvaluatedExpression(expressionCode);
     } catch (error) {
-      setTestError(error instanceof Error ? error.message : "An error occurred while evaluating the expression");
-      setActiveTab('result');
+      const errorMessage = error instanceof Error ? error.message : "An error occurred while evaluating the expression";
+      setTestError(errorMessage);
+      setLastEvaluatedExpression(expressionCode);
     }
   };
+
+
 
   // Convert number to Excel column letter (1 -> A, 2 -> B, etc.)
   const getExcelColumnLetter = (columnNumber: number): string => {
@@ -119,10 +166,55 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
       <DialogContent className="p-0 overflow-hidden border-0 max-w-[625px] h-[90vh] max-h-[700px] flex flex-col">
         <div className="bg-slate-700 p-5 rounded-t-lg flex-shrink-0">
-          <DialogTitle className="text-white m-0 text-base">{t('columnMapper.settingsFor')} {columnName}</DialogTitle>
-          <DialogDescription className="text-slate-300 mt-1">
-            {t('columnMapper.settingsDescription')}
-          </DialogDescription>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <DialogTitle className="text-white m-0 text-base">{t('columnMapper.settingsFor')} {columnName}</DialogTitle>
+              <DialogDescription className="text-slate-300 mt-1">
+                {t('columnMapper.settingsDescription')}
+              </DialogDescription>
+            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-slate-300 hover:text-white hover:bg-slate-600 ml-2"
+                >
+                  <HelpCircle className="h-5 w-5" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[500px] p-4 shadow-2xl border-2" align="end">
+                <h4 className="font-semibold mb-2">{t('columnMapper.helpTitle')}</h4>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <p className="font-medium mb-1">{t('columnMapper.helpVariables')}</p>
+                    <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                      <li><code className="bg-slate-100 px-1 rounded">value</code> - {t('columnMapper.helpValueDesc')}</li>
+                      <li><code className="bg-slate-100 px-1 rounded">col</code> - {t('columnMapper.helpColDesc')}</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="font-medium mb-1">{t('columnMapper.helpReferences')}</p>
+                    <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                      <li><code className="bg-slate-100 px-1 rounded">col["Naam"]</code> - {t('columnMapper.helpByNameExact')}</li>
+                      <li><code className="bg-slate-100 px-1 rounded">col[1]</code> - {t('columnMapper.helpByNumber')}</li>
+                      <li><code className="bg-slate-100 px-1 rounded">col[B]</code> of <code className="bg-slate-100 px-1 rounded">col[b]</code> - {t('columnMapper.helpByLetterVariable')}</li>
+                      <li><code className="bg-slate-100 px-1 rounded">col["B"]</code> - {t('columnMapper.helpByLetterString')}</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="font-medium mb-1">{t('columnMapper.helpExamples')}</p>
+                    <ul className="list-none space-y-1 text-muted-foreground">
+                      <li><code className="bg-slate-100 px-1 rounded block">value.toUpperCase()</code></li>
+                      <li><code className="bg-slate-100 px-1 rounded block">col["Prijs"] * 1.21</code></li>
+                      <li><code className="bg-slate-100 px-1 rounded block">col[0] + " - " + col[1]</code></li>
+                      <li><code className="bg-slate-100 px-1 rounded block">col[a].substring(0, 5)</code></li>
+                    </ul>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         <div className="flex-1 flex flex-col min-h-0">
@@ -130,15 +222,15 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
             defaultValue="expression"
             className="flex-1 flex flex-col min-h-0"
             value={activeTab}
-            onValueChange={(value) => setActiveTab(value as 'expression' | 'result' | 'functions' | 'Source columns')}
+            onValueChange={(value) => {
+              const newTab = value as 'expression' | 'result' | 'functions' | 'Source columns';
+              setActiveTab(newTab);
+            }}
           >
             <TabsList className="h-10 px-6 justify-start space-x-8 bg-transparent flex-shrink-0 border-b">
               <TabsTrigger value="expression">{t('columnMapper.expression')}</TabsTrigger>
-              <TabsTrigger value="result" className="flex items-center gap-2">
-                {t('columnMapper.result')} <PlayIcon
-                  className={`h-4 w-4 cursor-pointer hover:text-primary ${activeTab === 'result' ? 'text-[#048F01]' : ''}`}
-                  onClick={testExpression}
-                />
+              <TabsTrigger value="result">
+                {t('columnMapper.result')}
               </TabsTrigger>
               <TabsTrigger value="functions">{t('columnMapper.functions')}</TabsTrigger>
               <TabsTrigger value="Source columns">{t('columnMapper.sourceColumnsTab')}</TabsTrigger>
@@ -166,7 +258,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
                     </div>
                   ) : (
                     <div className="text-slate-500">
-                      {t('columnMapper.clickToTest')}
+                      {t('columnMapper.enterExpression')}
                     </div>
                   )}
                 </div>

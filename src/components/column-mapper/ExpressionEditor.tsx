@@ -13,7 +13,7 @@ const ExpressionEditor: React.FC<ExpressionEditorProps> = ({ code, onChange }) =
         value={code}
         onChange={(e) => onChange(e.target.value)}
         className="h-full font-mono resize-none"
-        placeholder="Example: value.toUpperCase() + ' ' + row['other_column']"
+        placeholder="Example: value.toUpperCase() + ' ' + col['other_column']"
       />
     </div>
   );
