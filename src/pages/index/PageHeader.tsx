@@ -1,4 +1,4 @@
-import ConfigurationMenu from './ConfigurationMenu';
+import PM7ConfigurationMenu from './PM7ConfigurationMenu';
 import BuildTimestamp from '@/components/BuildTimestamp';
 import ConfigurationIndicator from '@/components/ConfigurationIndicator';
 import { useSearchParams } from 'react-router-dom';
@@ -40,7 +40,7 @@ const PageHeader = ({ onNew, onSave, onLoad, onDelete, onInfo, onClearSettings, 
         )}
         <div className="w-32 flex justify-end">
           {showMenu && (
-            <ConfigurationMenu
+            <PM7ConfigurationMenu
               onNew={onNew}
               onSave={onSave}
               onLoad={onLoad}

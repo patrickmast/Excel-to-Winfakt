@@ -17,8 +17,12 @@ npm run build:dev           # Development mode build
 npm run preview             # Preview production build
 
 # Testing
-npm run test                # Run tests with Vitest
+npm run test                # Run tests with Vitest (auto-installs jsdom)
 npm run test:ci             # Run tests in CI mode
+
+# Code Quality
+npm run lint                # Run ESLint (if available)
+npm run typecheck           # Run TypeScript compiler check
 
 # Build info generation (runs automatically with build)
 npm run generate-build-info  # Generate build timestamp and version info
@@ -84,6 +88,12 @@ build: {
 - Use `VITE_` prefix for client-side variables
 - Supabase configuration is in `src/integrations/supabase/client.ts`
 
+### Lovable Platform Integration
+The project is integrated with Lovable.dev for rapid development:
+- Changes made via Lovable are automatically committed
+- Uses `lovable-tagger` plugin for development mode component tracking
+- Development server configured for Replit and other cloud environments
+
 ### TypeScript Configuration
 - Path aliases: `@/*` maps to `src/*`
 - Relaxed null checks and unused parameters for rapid development
@@ -92,9 +102,10 @@ build: {
 ## Testing Approach
 
 **Vitest Configuration**:
-- Uses `jsdom` environment for DOM testing
+- Uses `jsdom` environment for DOM testing (auto-installed via npm script)
 - Setup file: `src/__tests__/setup.ts` with Web Worker mocks
 - Test file: `src/__tests__/csv-processing.test.ts`
+- jsdom is installed as optional dependency to avoid build issues
 
 **Mocking Strategy**:
 - Web Workers are mocked with MessageChannel simulation

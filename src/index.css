@@ -92,15 +92,18 @@
     @apply bg-background text-foreground;
   }
 
-  *:focus {
+  /* Global focus outline removal - but EXCLUDE PM7 menu elements and their children */
+  *:focus:not([data-radix-dropdown-menu-item]):not([data-radix-dropdown-menu-content]):not([data-radix-dropdown-menu-trigger]):not([data-radix-dropdown-menu-checkbox-item]):not([data-radix-dropdown-menu-radio-item]):not([data-radix-dropdown-menu-subtrigger]):not([data-radix-dropdown-menu-subcontent]):not([data-radix-popper-content-wrapper] *) {
     outline: none !important;
     box-shadow: none !important;
   }
 
-  *:focus-visible {
+  *:focus-visible:not([data-radix-dropdown-menu-item]):not([data-radix-dropdown-menu-content]):not([data-radix-dropdown-menu-trigger]):not([data-radix-dropdown-menu-checkbox-item]):not([data-radix-dropdown-menu-radio-item]):not([data-radix-dropdown-menu-subtrigger]):not([data-radix-dropdown-menu-subcontent]):not([data-radix-popper-content-wrapper] *) {
     outline: none !important;
     box-shadow: none !important;
   }
+
+  /* PM7Menu is now protected by component-level CSS */
 }
 
 /* Site-wide max-width constraint */
@@ -109,3 +112,16 @@
   margin: 0 auto;
   width: 100%;
 }
+
+/* 🧪 TESTING: Removed local separator CSS - PM7 v1.3.13 should handle everything! */
+
+/* 🎉 PM7Menu shadows now handled by PM7 v1.3.11 component! */
+/* Beautiful menu container and menu item shadows are built-in */
+
+/* 🎉 Beautiful menu item shadows now officially part of PM7 v1.3.12! */
+/* No local workarounds needed anymore! */
+
+/* 🎉 All shadows are now handled by PM7 v1.3.13! */
+/* Beautiful menu container and menu item shadows work perfectly with inline styles */
+
+
