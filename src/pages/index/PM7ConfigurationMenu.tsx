@@ -2,7 +2,7 @@ import { PM7Menu, PM7MenuSeparator } from 'pm7-ui-style-guide';
 import { useTranslation } from 'react-i18next';
 import { Plus, Save, Download, Trash2, Info, FileText, BookOpen } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import DocumentationDialog from '@/components/dialogs/DocumentationDialog';
 
 interface PM7ConfigurationMenuProps {
   onNew: () => void;
@@ -24,8 +24,8 @@ const PM7ConfigurationMenu = ({
   isSaving 
 }: PM7ConfigurationMenuProps) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [showDocumentation, setShowDocumentation] = useState(false);
 
   useEffect(() => {
     // Check if dark mode is enabled
@@ -87,7 +87,7 @@ const PM7ConfigurationMenu = ({
     {
       id: 'documentation',
       label: 'Documentatie',
-      onClick: () => navigate('/documentation'),
+      onClick: () => setShowDocumentation(true),
       icon: <BookOpen className="h-4 w-4" />
     },
     { id: 'sep4', type: 'separator' },
@@ -100,14 +100,20 @@ const PM7ConfigurationMenu = ({
   ];
 
   return (
-    <PM7Menu 
-      menuItems={menuItems}
-      menuAlignment="end"
-      theme={theme}
-      menuTriggerBordered={true}
-      menuBackgroundColor="white"
-      menuTriggerBackgroundColor="white"
-    />
+    <>
+      <PM7Menu 
+        menuItems={menuItems}
+        menuAlignment="end"
+        theme={theme}
+        menuTriggerBordered={true}
+        menuBackgroundColor="white"
+        menuTriggerBackgroundColor="white"
+      />
+      <DocumentationDialog 
+        open={showDocumentation} 
+        onOpenChange={setShowDocumentation} 
+      />
+    </>
   );
 };
 
