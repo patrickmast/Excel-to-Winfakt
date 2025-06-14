@@ -1,7 +1,8 @@
 import { PM7Menu, PM7MenuSeparator } from 'pm7-ui-style-guide';
 import { useTranslation } from 'react-i18next';
-import { Plus, Save, Download, Trash2, Info, FileText } from 'lucide-react';
+import { Plus, Save, Download, Trash2, Info, FileText, BookOpen } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface PM7ConfigurationMenuProps {
   onNew: () => void;
@@ -9,7 +10,6 @@ interface PM7ConfigurationMenuProps {
   onLoad: () => void;
   onDelete: () => void;
   onInfo: () => void;
-  onClearSettings: () => void;
   onShowLog: () => void;
   isSaving: boolean;
 }
@@ -20,11 +20,11 @@ const PM7ConfigurationMenu = ({
   onLoad, 
   onDelete, 
   onInfo, 
-  onClearSettings, 
   onShowLog, 
   isSaving 
 }: PM7ConfigurationMenuProps) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
@@ -78,19 +78,19 @@ const PM7ConfigurationMenu = ({
     },
     { id: 'sep1', type: 'separator' },
     {
-      id: 'clearSettings',
-      label: t('menu.clearSettings'),
-      onClick: onClearSettings,
-      icon: <Trash2 className="h-4 w-4" />
-    },
-    { id: 'sep2', type: 'separator' },
-    {
       id: 'info',
       label: t('menu.info'),
       onClick: onInfo,
       icon: <Info className="h-4 w-4" />
     },
     { id: 'sep3', type: 'separator' },
+    {
+      id: 'documentation',
+      label: 'Documentatie',
+      onClick: () => navigate('/documentation'),
+      icon: <BookOpen className="h-4 w-4" />
+    },
+    { id: 'sep4', type: 'separator' },
     {
       id: 'exportLog',
       label: t('menu.exportLog'),

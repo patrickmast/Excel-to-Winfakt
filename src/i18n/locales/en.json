@@ -13,18 +13,24 @@
     "save": "Save",
     "load": "Load",
     "delete": "Delete",
-    "clearSettings": "Clear Settings",
     "info": "Info",
     "exportLog": "Export Log"
   },
-  "clearSettings": {
-    "confirmTitle": "Clear Settings",
-    "confirmDescription": "Are you sure you want to clear all settings? This action cannot be undone.",
-    "confirmButton": "Yes, clear settings",
+  "newConfig": {
+    "confirmTitle": "New Configuration",
+    "confirmDescription": "Are you sure you want to start a new configuration?",
+    "confirmButton": "Yes, new configuration",
+    "cancelButton": "Cancel"
+  },
+  "unsavedChanges": {
+    "title": "Unsaved Changes",
+    "description": "You have unsaved changes. Would you like to save them first?",
+    "saveButton": "Save",
+    "discardButton": "Don't Save",
     "cancelButton": "Cancel"
   },
   "header": {
-    "title": "CSV for Winfakt imports",
+    "title": "Excel to Winfakt",
     "sourceFile": "Source file",
     "selectFile": "Select file",
     "filePreview": "File Preview",
@@ -144,7 +150,8 @@
     "configLoaded": "The saved configuration has been loaded successfully.",
     "configLoadError": "Failed to load the saved configuration",
     "configUpdated": "Configuration updated successfully",
-    "settingsCleared": "All settings have been reset to default"
+    "settingsCleared": "All settings have been reset to default",
+    "newConfigCreated": "New configuration started"
   },
   "buttons": {
     "export": "Export",

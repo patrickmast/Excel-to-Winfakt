@@ -13,18 +13,24 @@
     "save": "Kaydet",
     "load": "Yükle",
     "delete": "Sil",
-    "clearSettings": "Ayarları Temizle",
     "info": "Bilgi",
     "exportLog": "Dışa Aktarma Günlüğü"
   },
-  "clearSettings": {
-    "confirmTitle": "Ayarları Temizle",
-    "confirmDescription": "Tüm ayarları temizlemek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
-    "confirmButton": "Evet, ayarları temizle",
+  "newConfig": {
+    "confirmTitle": "Yeni Yapılandırma",
+    "confirmDescription": "Yeni bir yapılandırma başlatmak istediğinizden emin misiniz?",
+    "confirmButton": "Evet, yeni yapılandırma",
+    "cancelButton": "İptal"
+  },
+  "unsavedChanges": {
+    "title": "Kaydedilmemiş Değişiklikler",
+    "description": "Kaydedilmemiş değişiklikleriniz var. Önce bunları kaydetmek ister misiniz?",
+    "saveButton": "Kaydet",
+    "discardButton": "Kaydetme",
     "cancelButton": "İptal"
   },
   "header": {
-    "title": "Winfakt içe aktarmaları için CSV",
+    "title": "Excel'den Winfakt'a",
     "sourceFile": "Kaynak dosya",
     "selectFile": "Dosya seç",
     "filePreview": "Dosya Önizleme",
@@ -134,7 +140,8 @@
     "configLoaded": "Kaydedilen yapılandırma başarıyla yüklendi.",
     "configLoadError": "Kaydedilen yapılandırma yüklenemedi",
     "configUpdated": "Yapılandırma başarıyla güncellendi",
-    "settingsCleared": "Tüm ayarlar varsayılana sıfırlandı"
+    "settingsCleared": "Tüm ayarlar varsayılana sıfırlandı",
+    "newConfigCreated": "Yeni yapılandırma başlatıldı"
   },
   "buttons": {
     "export": "Dışa Aktar",

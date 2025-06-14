@@ -1,71 +1,64 @@
-# Welcome to your Lovable project
+# Excel to Winfakt
 
-## Project info
+Een krachtige React/TypeScript applicatie voor het transformeren van verschillende bestandsformaten naar Winfakt-compatibele CSV bestanden.
 
-**URL**: https://lovable.dev/projects/5985f879-1a41-4e6f-96b6-fc5132d262ec
+## Overzicht
 
-## How can I edit this code?
+Excel to Winfakt is speciaal ontworpen voor Winfakt gebruikers om eenvoudig CSV, Excel, DBF en Winfakt Classic (*.soc) bestanden om te zetten naar het juiste Winfakt import formaat. De applicatie biedt een visuele kolom mapping interface met real-time preview en validatie.
 
-There are several ways of editing your application.
+## Hoofdfuncties
 
-**Use Lovable**
+- 📁 **Multi-formaat ondersteuning**: CSV, Excel (.xlsx), DBF, Winfakt Classic (.soc)
+- 🔗 **Visuele kolom mapping**: Drag & drop interface
+- ⚙️ **Data transformaties**: Expression editor met helper functies
+- 🔍 **Geavanceerde filtering**: Complexe filters met EN/OF logica
+- 💾 **Configuratie management**: Opslaan, laden en delen van instellingen
+- 🌍 **Meertalig**: Nederlands, Engels, Frans, Turks
+- 📤 **Smart export**: Automatische encoding en bestandsnaam generatie
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5985f879-1a41-4e6f-96b6-fc5132d262ec) and start prompting.
+## Technologie Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite met SWC
+- **UI Framework**: shadcn/ui + Tailwind CSS
+- **State Management**: React Hooks + Context
+- **File Processing**: Web Workers voor performance
+- **Internationalization**: i18next
+- **Database**: Supabase voor configuratie opslag
 
-**Use your preferred IDE**
+## Development
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Requirements
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js 18+ 
+- npm
 
-Follow these steps:
+### Setup
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```bash
+# Clone repository
+git clone <repository-url>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to project
+cd excel-to-winfakt
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies  
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Available Scripts
 
-
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## Using with Cascade
-
-This project includes a `.cascade-config.json` file that provides configuration for the Cascade AI assistant. When working with Cascade:
-
-- Simply type "Run" to start the development server and open a preview
-- The configuration ensures consistent behavior across different computers
-- Important validations (like file size checks in the FileUpload component) are documented
+```bash
+npm run dev          # Start development server (port 8080)
+npm run build        # Production build with build info
+npm run build:dev    # Development mode build  
+npm run preview      # Preview production build
+npm run test         # Run tests with Vitest
+npm run test:ci      # Run tests in CI mode
+```
 
 
 ## Deploy to Cloudflare

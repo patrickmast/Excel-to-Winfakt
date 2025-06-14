@@ -34,6 +34,8 @@ export interface ColumnMapperProps {
   activeFilter?: CompoundFilter | null;
   onReorder?: (newOrder: [string, string, string][]) => void;
   columnOrder?: string[];
+  connectionCounter?: number;
+  onConnectionCounterUpdate?: () => void;
 }
 
 import { CompoundFilter } from './FilterDialog';

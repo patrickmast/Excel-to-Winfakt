@@ -14,18 +14,24 @@
     "save": "Opslaan",
     "load": "Laden",
     "delete": "Wissen",
-    "clearSettings": "Instellingen wissen",
     "info": "Info",
     "exportLog": "Export log"
   },
-  "clearSettings": {
-    "confirmTitle": "Instellingen wissen",
-    "confirmDescription": "Weet je zeker dat je alle instellingen wilt wissen? Deze actie kan niet ongedaan worden gemaakt.",
-    "confirmButton": "Ja, instellingen wissen",
+  "newConfig": {
+    "confirmTitle": "Nieuwe configuratie",
+    "confirmDescription": "Weet je zeker dat je een nieuwe configuratie wilt starten?",
+    "confirmButton": "Ja, nieuwe configuratie",
+    "cancelButton": "Annuleren"
+  },
+  "unsavedChanges": {
+    "title": "Onopgeslagen wijzigingen",
+    "description": "Er zijn onopgeslagen wijzigingen. Wil je deze eerst opslaan?",
+    "saveButton": "Opslaan",
+    "discardButton": "Niet opslaan",
     "cancelButton": "Annuleren"
   },
   "header": {
-    "title": "CSV voor Winfakt imports",
+    "title": "Excel naar Winfakt",
     "sourceFile": "Bronbestand",
     "selectFile": "Bestand selecteren",
     "filePreview": "Bestandsvoorbeeld",
@@ -183,7 +189,8 @@
     "configLoaded": "De opgeslagen configuratie is succesvol geladen.",
     "configLoadError": "Kan de opgeslagen configuratie niet laden",
     "configUpdated": "Configuratie succesvol bijgewerkt",
-    "settingsCleared": "Alle instellingen zijn teruggezet naar standaard"
+    "settingsCleared": "Alle instellingen zijn teruggezet naar standaard",
+    "newConfigCreated": "Nieuwe configuratie gestart"
   },
   "buttons": {
     "export": "Exporteren",

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useConfigurationApi } from '@/hooks/use-configuration-api';
+import { useConfigurationContext } from '@/contexts/ConfigurationContext';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -28,22 +29,16 @@ const LoadConfigDialog = ({
   onConfigurationLoaded 
 }: LoadConfigDialogProps) => {
   const [selectedConfig, setSelectedConfig] = useState<ConfigurationListItem | null>(null);
-  const { 
-    configurations, 
-    isLoading, 
-    loadConfig, 
-    refreshConfigurations,
-    dossier 
-  } = useConfigurationApi();
+  const { loadConfig, dossier } = useConfigurationApi();
+  const { configurations, isLoading } = useConfigurationContext();
   const { t } = useTranslation();
 
-  // Refresh configurations when dialog opens
+  // Reset selection when dialog opens
   useEffect(() => {
     if (open) {
-      refreshConfigurations();
       setSelectedConfig(null);
     }
-  }, [open, refreshConfigurations]);
+  }, [open]);
 
   const handleLoad = async () => {
     if (!selectedConfig) return;

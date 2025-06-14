@@ -13,18 +13,24 @@
     "save": "Enregistrer",
     "load": "Charger",
     "delete": "Supprimer",
-    "clearSettings": "Effacer les paramètres",
     "info": "Info",
     "exportLog": "Journal d'exportation"
   },
-  "clearSettings": {
-    "confirmTitle": "Effacer les paramètres",
-    "confirmDescription": "Êtes-vous sûr de vouloir effacer tous les paramètres ? Cette action ne peut pas être annulée.",
-    "confirmButton": "Oui, effacer les paramètres",
+  "newConfig": {
+    "confirmTitle": "Nouvelle configuration",
+    "confirmDescription": "Êtes-vous sûr de vouloir démarrer une nouvelle configuration ?",
+    "confirmButton": "Oui, nouvelle configuration",
+    "cancelButton": "Annuler"
+  },
+  "unsavedChanges": {
+    "title": "Modifications non enregistrées",
+    "description": "Vous avez des modifications non enregistrées. Voulez-vous les enregistrer d'abord ?",
+    "saveButton": "Enregistrer",
+    "discardButton": "Ne pas enregistrer",
     "cancelButton": "Annuler"
   },
   "header": {
-    "title": "CSV pour les importations Winfakt",
+    "title": "Excel vers Winfakt",
     "sourceFile": "Fichier source",
     "selectFile": "Sélectionner un fichier",
     "filePreview": "Aperçu du fichier",
@@ -134,7 +140,8 @@
     "configLoaded": "La configuration enregistrée a été chargée avec succès.",
     "configLoadError": "Échec du chargement de la configuration enregistrée",
     "configUpdated": "Configuration mise à jour avec succès",
-    "settingsCleared": "Tous les paramètres ont été réinitialisés par défaut"
+    "settingsCleared": "Tous les paramètres ont été réinitialisés par défaut",
+    "newConfigCreated": "Nouvelle configuration démarrée"
   },
   "buttons": {
     "export": "Exporter",

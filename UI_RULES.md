@@ -1,4 +1,4 @@
-# UI Rules for CSV Transformer Hero
+# UI Rules for Excel to Winfakt
 
 ## Menu Items
 

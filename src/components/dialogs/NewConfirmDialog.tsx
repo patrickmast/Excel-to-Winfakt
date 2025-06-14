@@ -1,4 +1,4 @@
-// ClearSettingsConfirmDialog.tsx - Dialog to confirm clearing settings
+// NewConfirmDialog.tsx - Dialog to confirm creating new configuration
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -12,13 +12,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-interface ClearSettingsConfirmDialogProps {
+interface NewConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
 }
 
-const ClearSettingsConfirmDialog: React.FC<ClearSettingsConfirmDialogProps> = ({
+const NewConfirmDialog: React.FC<NewConfirmDialogProps> = ({
   open,
   onOpenChange,
   onConfirm,
@@ -34,18 +34,18 @@ const ClearSettingsConfirmDialog: React.FC<ClearSettingsConfirmDialogProps> = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="p-0 overflow-hidden border-0">
         <div className="bg-slate-700 p-5 rounded-t-lg">
-          <AlertDialogTitle className="text-white m-0 text-base">{t('clearSettings.confirmTitle')}</AlertDialogTitle>
+          <AlertDialogTitle className="text-white m-0 text-base">{t('newConfig.confirmTitle')}</AlertDialogTitle>
         </div>
         
         <div className="py-8 px-6">
           <AlertDialogDescription className="text-slate-700 mb-6">
-            {t('clearSettings.confirmDescription')}
+            {t('newConfig.confirmDescription')}
           </AlertDialogDescription>
           
           <AlertDialogFooter className="mt-6 gap-2">
-            <AlertDialogCancel className="bg-slate-100 hover:bg-slate-200 text-slate-700">{t('clearSettings.cancelButton')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirm} className="bg-red-600 hover:bg-red-700">
-              {t('clearSettings.confirmButton')}
+            <AlertDialogCancel className="bg-slate-100 hover:bg-slate-200 text-slate-700">{t('newConfig.cancelButton')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirm} className="bg-blue-600 hover:bg-blue-700">
+              {t('newConfig.confirmButton')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </div>
@@ -54,4 +54,4 @@ const ClearSettingsConfirmDialog: React.FC<ClearSettingsConfirmDialogProps> = ({
   );
 };
 
-export default ClearSettingsConfirmDialog;
+export default NewConfirmDialog;

@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useConfigurationApi } from '@/hooks/use-configuration-api';
+import { useConfigurationContext } from '@/contexts/ConfigurationContext';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -40,22 +41,16 @@ const DeleteConfigDialog = ({
 }: DeleteConfigDialogProps) => {
   const [selectedConfigs, setSelectedConfigs] = useState<Set<string>>(new Set());
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const { 
-    configurations, 
-    isLoading, 
-    deleteConfig, 
-    refreshConfigurations,
-    dossier 
-  } = useConfigurationApi();
+  const { deleteConfig, dossier } = useConfigurationApi();
+  const { configurations, isLoading, refreshConfigurations } = useConfigurationContext();
   const { t } = useTranslation();
 
-  // Refresh configurations when dialog opens
+  // Reset selection when dialog opens
   useEffect(() => {
     if (open) {
-      refreshConfigurations();
       setSelectedConfigs(new Set());
     }
-  }, [open, refreshConfigurations]);
+  }, [open]);
 
   const handleToggleConfig = (configId: string, configName: string) => {
     const newSelected = new Set(selectedConfigs);

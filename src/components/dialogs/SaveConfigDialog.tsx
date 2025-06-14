@@ -11,6 +11,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useConfigurationApi } from '@/hooks/use-configuration-api';
+import { useConfigurationContext } from '@/contexts/ConfigurationContext';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../ui/use-toast';
 
@@ -33,18 +34,13 @@ const SaveConfigDialog = ({
   const [isSaving, setIsSaving] = useState(false);
   const isInitialOpen = useRef(false);
   const { toast } = useToast();
-  const { 
-    configurations, 
-    saveConfig, 
-    refreshConfigurations,
-    dossier 
-  } = useConfigurationApi();
+  const { saveConfig, dossier } = useConfigurationApi();
+  const { configurations, refreshConfigurations } = useConfigurationContext();
   const { t } = useTranslation();
 
   // Reset when dialog opens/closes
   useEffect(() => {
     if (open) {
-      refreshConfigurations();
       // Only pre-fill on first open of the session
       if (!isInitialOpen.current) {
         setConfigName(currentConfigName || '');
@@ -55,7 +51,7 @@ const SaveConfigDialog = ({
       setConfigName('');
       isInitialOpen.current = false;
     }
-  }, [open, refreshConfigurations]);
+  }, [open, currentConfigName]);
 
   const handleSave = async () => {
     if (!configName.trim()) {

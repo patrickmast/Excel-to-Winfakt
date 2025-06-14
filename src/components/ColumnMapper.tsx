@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { ColumnMapperProps } from './column-mapper/types';
-import { useMappingReducer } from '@/hooks/use-mapping-reducer';
 import { useConfiguration } from '@/hooks/use-configuration';
 import SavedConfigDialog from './column-mapper/SavedConfigDialog';
 import ColumnMapperContent from './column-mapper/ColumnMapperContent';
@@ -29,57 +28,56 @@ const ColumnMapper = ({
   isLoading,
   activeFilter,
   onReorder,
-  columnOrder
+  columnOrder,
+  connectionCounter = 0,
+  onConnectionCounterUpdate
 }: ColumnMapperProps) => {
-  const {
-    state,
-    loadConfiguration,
-    setMapping,
-    setSourceData,
-    resetState,
-    updateTransforms,
-    setFilter,
-    setColumnOrder
-  } = useMappingReducer();
   const { saveConfiguration, isSaving } = useConfiguration();
   const [showSavedDialog, setShowSavedDialog] = useState(false);
   const [savedConfigUrl, setSavedConfigUrl] = useState('');
+  
+  // Local UI state
+  const [localUIState, setLocalUIState] = useState({
+    sourceSearch: '',
+    targetSearch: '',
+    selectedSourceColumn: null as string | null,
+    selectedTargetColumn: null as string | null
+  });
 
-  // Reset when shouldReset is true
+  // Create state object from props and local UI state
+  const state: MappingState = {
+    mapping: currentMapping || {},
+    columnTransforms: columnTransforms || {},
+    sourceColumns: sourceColumns || [],
+    sourceData: sourceData || [],
+    sourceSearch: localUIState.sourceSearch,
+    targetSearch: localUIState.targetSearch,
+    selectedSourceColumn: localUIState.selectedSourceColumn,
+    selectedTargetColumn: localUIState.selectedTargetColumn,
+    connectionCounter: connectionCounter,
+    isLoading: isLoading || false,
+    activeFilter: activeFilter || null,
+    columnOrder: columnOrder || [],
+    sourceFilename: sourceFilename,
+    worksheetName: worksheetName,
+    lastSavedState: null
+  };
+  
+  // Reset local UI state when shouldReset is true
   useEffect(() => {
     if (shouldReset) {
-      resetState();
+      setLocalUIState({
+        sourceSearch: '',
+        targetSearch: '',
+        selectedSourceColumn: null,
+        selectedTargetColumn: null
+      });
     }
-  }, [shouldReset, resetState]);
+  }, [shouldReset]);
 
-  // Sync internal state with props when they change (for loading settings)
-  useEffect(() => {
-    if (currentMapping && Object.keys(currentMapping).length > 0) {
-      setMapping(currentMapping);
-    }
-    
-    if (sourceColumns && sourceData && sourceColumns.length > 0) {
-      setSourceData(sourceColumns, sourceData, { filename: sourceFilename, worksheetName });
-    }
-    
-    if (columnTransforms && Object.keys(columnTransforms).length > 0) {
-      console.log('Updating columnTransforms from props:', columnTransforms);
-      updateTransforms(columnTransforms);
-    }
-    
-    if (activeFilter !== undefined) {
-      setFilter(activeFilter);
-    }
-    
-    if (columnOrder && columnOrder.length > 0) {
-      setColumnOrder(columnOrder);
-    }
-  }, [currentMapping, sourceColumns, sourceData, sourceFilename, columnTransforms, activeFilter, worksheetName, isLoading, columnOrder, setMapping, setSourceData, updateTransforms, setFilter, setColumnOrder]);
+  // No longer need to sync state since we're using props directly
 
   const handleFileData = useCallback((columns: string[], data: any[], sourceFilename: string, worksheetName?: string, fileSize?: number, metadata?: any) => {
-    // Update state first
-    setSourceData(columns, data, { filename: sourceFilename, worksheetName });
-
     // Notify parent about source file change
     if (onSourceFileChange) {
       onSourceFileChange({
@@ -92,7 +90,7 @@ const ColumnMapper = ({
 
     // Notify parent about data load
     onDataLoaded(columns, data, sourceFilename, worksheetName, fileSize, metadata);
-  }, [setSourceData, onSourceFileChange, onDataLoaded]);
+  }, [onSourceFileChange, onDataLoaded]);
 
 
   const handleExport = useCallback((filteredData?: any[]) => {
@@ -157,25 +155,46 @@ const ColumnMapper = ({
 
   // Create updateState wrapper for ColumnMapperContent compatibility
   const updateState = useCallback((updates: Partial<MappingState>) => {
+    // Handle local UI state updates
+    const uiUpdates: Partial<typeof localUIState> = {};
+    if (updates.sourceSearch !== undefined) uiUpdates.sourceSearch = updates.sourceSearch;
+    if (updates.targetSearch !== undefined) uiUpdates.targetSearch = updates.targetSearch;
+    if (updates.selectedSourceColumn !== undefined) uiUpdates.selectedSourceColumn = updates.selectedSourceColumn;
+    if (updates.selectedTargetColumn !== undefined) uiUpdates.selectedTargetColumn = updates.selectedTargetColumn;
+    
+    if (Object.keys(uiUpdates).length > 0) {
+      setLocalUIState(prev => ({ ...prev, ...uiUpdates }));
+    }
+    
+    // Notify parent about state changes
     if (updates.mapping !== undefined) {
-      setMapping(updates.mapping);
       onMappingChange(updates.mapping);
     }
-    if (updates.columnTransforms !== undefined) updateTransforms(updates.columnTransforms);
-    if (updates.activeFilter !== undefined) setFilter(updates.activeFilter);
-    if (updates.columnOrder !== undefined) setColumnOrder(updates.columnOrder);
-    if (updates.sourceColumns && updates.sourceData) {
-      setSourceData(updates.sourceColumns, updates.sourceData, {
-        filename: updates.sourceFilename,
-        worksheetName: updates.worksheetName
+    if (updates.connectionCounter !== undefined && onConnectionCounterUpdate) {
+      onConnectionCounterUpdate();
+    }
+    if (updates.columnTransforms !== undefined && onTransformUpdate) {
+      // Update all transforms at once
+      Object.entries(updates.columnTransforms).forEach(([key, value]) => {
+        onTransformUpdate(key, value);
       });
     }
-  }, [setMapping, updateTransforms, setFilter, setColumnOrder, setSourceData, onMappingChange]);
-
-  // Notify parent when mapping changes in the reducer
-  useEffect(() => {
-    onMappingChange(state.mapping);
-  }, [state.mapping, onMappingChange]);
+    if (updates.activeFilter !== undefined && onFilterUpdate) {
+      onFilterUpdate(updates.activeFilter);
+    }
+    if (updates.columnOrder !== undefined && onReorder) {
+      // Reconstruct the order array from the mapping
+      const newOrder = (updates.columnOrder || []).map(key => {
+        const sourceColumn = key.split('_')[0];
+        const target = updates.mapping?.[key] || state.mapping[key] || '';
+        return [key, sourceColumn, target] as [string, string, string];
+      });
+      onReorder(newOrder);
+    }
+    if (updates.sourceColumns && updates.sourceData) {
+      onDataLoaded(updates.sourceColumns, updates.sourceData, updates.sourceFilename || '', updates.worksheetName);
+    }
+  }, [onMappingChange, onTransformUpdate, onFilterUpdate, onReorder, onDataLoaded, state.mapping, localUIState]);
 
   return (
     <>

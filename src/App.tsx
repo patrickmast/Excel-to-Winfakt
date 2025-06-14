@@ -2,10 +2,12 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Preview from './pages/Preview';
+import Documentation from './pages/Documentation';
 import { useTranslation } from 'react-i18next';
 import i18n, { changeLanguage } from './i18n';
 import { useEffect } from 'react';
 import { parseUrlParams } from './utils/urlParams';
+import { ConfigurationProvider } from './contexts/ConfigurationContext';
 
 // Language switcher has been moved to the Info dialog
 
@@ -39,10 +41,13 @@ const App = () => {
   
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/preview" element={<Preview />} />
-      </Routes>
+      <ConfigurationProvider>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/preview" element={<Preview />} />
+          <Route path="/documentation" element={<Documentation />} />
+        </Routes>
+      </ConfigurationProvider>
     </Router>
   );
 };

@@ -10,10 +10,11 @@ import LogDialog from '@/components/column-mapper/LogDialog';
 import { ConfigurationSettings } from '@/components/column-mapper/types';
 import PageHeader from './index/PageHeader';
 import { useMappingReducer } from '@/hooks/use-mapping-reducer';
-import ClearSettingsConfirmDialog from '@/components/dialogs/ClearSettingsConfirmDialog';
+import NewConfirmDialog from '@/components/dialogs/NewConfirmDialog';
 import SaveConfigDialog from '@/components/dialogs/SaveConfigDialog';
 import LoadConfigDialog from '@/components/dialogs/LoadConfigDialog';
 import DeleteConfigDialog from '@/components/dialogs/DeleteConfigDialog';
+import UnsavedChangesDialog from '@/components/dialogs/UnsavedChangesDialog';
 
 const Index = () => {
   const {
@@ -26,6 +27,7 @@ const Index = () => {
     setFilter,
     setColumnOrder,
     markConfigurationSaved,
+    incrementConnectionCounter,
     hasUnsavedChanges
   } = useMappingReducer();
 
@@ -42,12 +44,23 @@ const Index = () => {
   const [exportData, setExportData] = useState<any[] | null>(null);
   const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number; worksheetName?: string; size?: number } | null>(null);
   const [shouldResetMapper, setShouldResetMapper] = useState(false);
-  const [showClearSettingsDialog, setShowClearSettingsDialog] = useState(false);
+  const [showNewConfirmDialog, setShowNewConfirmDialog] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [isLoadingConfigFromUrl, setIsLoadingConfigFromUrl] = useState(!!config);
   const lastLoadedConfig = useRef<string | null>(null);
   const errorToastShown = useRef<string | null>(null);
   
   const { t } = useTranslation();
+
+  // Use refs to maintain stable references to avoid useEffect dependency loops
+  const loadConfigRef = useRef<typeof loadConfig>(loadConfig);
+  const loadConfigurationRef = useRef<typeof loadConfiguration>(loadConfiguration);
+  const setShouldResetMapperRef = useRef<typeof setShouldResetMapper>(setShouldResetMapper);
+  
+  // Update refs on each render but don't cause re-renders
+  loadConfigRef.current = loadConfig;
+  loadConfigurationRef.current = loadConfiguration;
+  setShouldResetMapperRef.current = setShouldResetMapper;
 
   const handleLoadConfigurationFromUrl = useCallback(async (configName: string) => {
     // Prevent loading the same config multiple times
@@ -57,14 +70,14 @@ const Index = () => {
 
     setIsLoadingConfigFromUrl(true);
     try {
-      const loadedConfig = await loadConfig(configName);
+      const loadedConfig = await loadConfigRef.current(configName);
       
       if (loadedConfig) {
         lastLoadedConfig.current = configName;
         const settings = loadedConfig.configuration_data as unknown as ConfigurationSettings;
 
         // Load all state properties in a single atomic update
-        loadConfiguration(settings);
+        loadConfigurationRef.current(settings);
 
         // Update source file info if available
         if (settings.sourceColumns) {
@@ -76,7 +89,7 @@ const Index = () => {
         }
 
         // Trigger UI refresh to update Connected columns and other components
-        setShouldResetMapper(true);
+        setShouldResetMapperRef.current(true);
       } else {
         // Configuration not found - show error toast once and clear from URL
         if (errorToastShown.current !== configName) {
@@ -98,7 +111,7 @@ const Index = () => {
     } finally {
       setIsLoadingConfigFromUrl(false);
     }
-  }, [loadConfig, loadConfiguration, setShouldResetMapper]);
+  }, [dossier, toast, clearConfig]);
 
   useEffect(() => {
     if (config) {
@@ -128,9 +141,26 @@ const Index = () => {
 
   // New handlers for the new configuration system
   const handleNew = () => {
-    resetState();
-    setSourceFileInfo(null);
-    setShouldResetMapper(true);
+    // Check if there are unsaved changes
+    if (hasUnsavedChanges && config) {
+      // Show unsaved changes dialog first
+      setShowUnsavedChangesDialog(true);
+    } else {
+      // No unsaved changes or no config loaded, show new config dialog
+      setShowNewConfirmDialog(true);
+    }
+  };
+
+  const handleUnsavedChangesSave = () => {
+    // Save current configuration first
+    handleDirectSave();
+    // Then show new config dialog
+    setShowNewConfirmDialog(true);
+  };
+
+  const handleUnsavedChangesDiscard = () => {
+    // Discard changes and show new config dialog
+    setShowNewConfirmDialog(true);
   };
 
   const handleSave = () => {
@@ -138,30 +168,34 @@ const Index = () => {
   };
 
   const handleDirectSave = async () => {
-    // Only save if there's already a configuration loaded
-    if (config) {
-      // Create configuration data from current state
-      const configurationData = {
-        mapping: mappingState.mapping,
-        columnTransforms: mappingState.columnTransforms,
-        activeFilter: mappingState.activeFilter,
-        sourceColumns: mappingState.sourceColumns,
-        sourceData: mappingState.sourceData,
-        sourceFilename: mappingState.sourceFilename,
-        worksheetName: mappingState.worksheetName,
-        columnOrder: mappingState.columnOrder,
-        connectionCounter: mappingState.connectionCounter,
-        sourceSearch: mappingState.sourceSearch,
-        targetSearch: mappingState.targetSearch
-      };
+    // If no configuration loaded, show the save dialog to ask for a name
+    if (!config) {
+      setShowSaveConfigDialog(true);
+      return;
+    }
 
-      try {
-        await saveConfig(config, configurationData);
-        // Mark the configuration as saved to update the indicator
-        markConfigurationSaved();
-      } catch (error) {
-        console.error('Error saving configuration:', error);
-      }
+    // If there's already a configuration loaded, save directly
+    // Create configuration data from current state
+    const configurationData = {
+      mapping: mappingState.mapping,
+      columnTransforms: mappingState.columnTransforms,
+      activeFilter: mappingState.activeFilter,
+      sourceColumns: mappingState.sourceColumns,
+      sourceData: mappingState.sourceData,
+      sourceFilename: mappingState.sourceFilename,
+      worksheetName: mappingState.worksheetName,
+      columnOrder: mappingState.columnOrder,
+      connectionCounter: mappingState.connectionCounter,
+      sourceSearch: mappingState.sourceSearch,
+      targetSearch: mappingState.targetSearch
+    };
+
+    try {
+      await saveConfig(config, configurationData);
+      // Mark the configuration as saved to update the indicator
+      markConfigurationSaved();
+    } catch (error) {
+      console.error('Error saving configuration:', error);
     }
   };
 
@@ -206,23 +240,13 @@ const Index = () => {
     setShouldResetMapper(true);
   };
 
-  const handleClearSettings = useCallback(() => {
-    setShowClearSettingsDialog(true);
-  }, []);
-
-  const handleConfirmClearSettings = useCallback(() => {
+  const handleConfirmNew = useCallback(() => {
     // Reset all state
     resetState();
     setSourceFileInfo(null);
     setShouldResetMapper(true);
-
-    toast({
-      title: t('toast.success'),
-      description: t('toast.settingsCleared'),
-      duration: 3000,
-      variant: "default"
-    });
-  }, [resetState, toast, t]);
+    clearConfig(); // Clear URL parameter
+  }, [resetState, clearConfig]);
 
   // Reset the flag immediately after render to prevent flickering
   useEffect(() => {
@@ -327,10 +351,18 @@ const Index = () => {
         onExportComplete={handleExportComplete}
       />
 
-      <ClearSettingsConfirmDialog
-        open={showClearSettingsDialog}
-        onOpenChange={setShowClearSettingsDialog}
-        onConfirm={handleConfirmClearSettings}
+      <NewConfirmDialog
+        open={showNewConfirmDialog}
+        onOpenChange={setShowNewConfirmDialog}
+        onConfirm={handleConfirmNew}
+      />
+
+      <UnsavedChangesDialog
+        open={showUnsavedChangesDialog}
+        onOpenChange={setShowUnsavedChangesDialog}
+        onSave={handleUnsavedChangesSave}
+        onDiscard={handleUnsavedChangesDiscard}
+        onCancel={() => setShowUnsavedChangesDialog(false)}
       />
 
       <div className="container mx-auto px-4 py-8 flex-grow">
@@ -340,7 +372,6 @@ const Index = () => {
           onLoad={handleLoad}
           onDelete={handleDelete}
           onInfo={() => setShowInfoDialog(true)}
-          onClearSettings={handleClearSettings}
           onShowLog={() => {
             if (latestReport) {
               setShowLogDialog(true);
@@ -386,6 +417,8 @@ const Index = () => {
           onFilterUpdate={setFilter}
           onReorder={handleReorder}
           columnOrder={mappingState.columnOrder}
+          connectionCounter={mappingState.connectionCounter}
+          onConnectionCounterUpdate={incrementConnectionCounter}
         />
       </div>
     </div>
