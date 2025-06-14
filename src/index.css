@@ -121,8 +121,7 @@
 /* 🎉 Beautiful menu item shadows now officially part of PM7 v1.3.12! */
 /* No local workarounds needed anymore! */
 
-/* 🎉 All shadows are now handled by PM7 v1.3.14! */
-/* Beautiful menu container and menu item shadows work perfectly with inline styles */
-/* PM7 v1.3.14 now supports menuTriggerBackgroundColor and menuBackgroundColor props */
+/* 🎉 All shadows and styling handled by PM7 v1.3.15! */
+/* PM7 v1.3.15 properly supports menuTriggerBackgroundColor prop with correct CSS specificity */
 
 

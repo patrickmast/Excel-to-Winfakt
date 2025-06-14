@@ -55,6 +55,7 @@ export interface MappingState {
   worksheetName?: string;
   sourceFileSize?: number; // Added to store the file size
   columnOrder?: string[]; // Added to preserve the order of connected columns
+  lastSavedState?: ConfigurationSettings | null; // Track last saved configuration state
 }
 
 export interface ConfigurationSettings {

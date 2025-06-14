@@ -9,7 +9,8 @@ type MappingAction =
   | { type: 'RESET_STATE' }
   | { type: 'UPDATE_TRANSFORMS'; payload: Record<string, string> }
   | { type: 'SET_FILTER'; payload: CompoundFilter | null }
-  | { type: 'SET_COLUMN_ORDER'; payload: string[] };
+  | { type: 'SET_COLUMN_ORDER'; payload: string[] }
+  | { type: 'MARK_CONFIGURATION_SAVED' };
 
 const getInitialState = (): MappingState => {
   const stored = getStoredState();
@@ -28,7 +29,8 @@ const getInitialState = (): MappingState => {
     activeFilter: stored?.settings?.activeFilter || null,
     columnOrder: stored?.settings?.columnOrder || [],
     sourceFilename: stored?.settings?.sourceFilename,
-    worksheetName: stored?.settings?.worksheetName
+    worksheetName: stored?.settings?.worksheetName,
+    lastSavedState: null // No saved state initially
   };
 };
 
@@ -65,6 +67,43 @@ const storeState = (state: MappingState) => {
   }
 };
 
+// Helper function to extract the relevant configuration settings from state
+const extractConfigurationSettings = (state: MappingState): ConfigurationSettings => ({
+  mapping: state.mapping,
+  columnTransforms: state.columnTransforms,
+  sourceColumns: state.sourceColumns,
+  connectionCounter: state.connectionCounter,
+  sourceFilename: state.sourceFilename,
+  worksheetName: state.worksheetName,
+  sourceSearch: state.sourceSearch,
+  targetSearch: state.targetSearch,
+  columnOrder: state.columnOrder,
+  activeFilter: state.activeFilter
+});
+
+// Helper function to compare two configuration settings for changes
+const hasConfigurationChanged = (current: MappingState, lastSaved: ConfigurationSettings | null): boolean => {
+  // If no saved state, only show changes if there's actually some configuration present
+  if (!lastSaved) {
+    const currentConfig = extractConfigurationSettings(current);
+    return (
+      Object.keys(currentConfig.mapping).length > 0 ||
+      Object.keys(currentConfig.columnTransforms || {}).length > 0 ||
+      currentConfig.activeFilter !== null ||
+      (currentConfig.columnOrder && currentConfig.columnOrder.length > 0)
+    );
+  }
+  
+  const currentConfig = extractConfigurationSettings(current);
+  
+  return (
+    JSON.stringify(currentConfig.mapping) !== JSON.stringify(lastSaved.mapping) ||
+    JSON.stringify(currentConfig.columnTransforms) !== JSON.stringify(lastSaved.columnTransforms) ||
+    JSON.stringify(currentConfig.activeFilter) !== JSON.stringify(lastSaved.activeFilter) ||
+    JSON.stringify(currentConfig.columnOrder) !== JSON.stringify(lastSaved.columnOrder)
+  );
+};
+
 function mappingReducer(state: MappingState, action: MappingAction): MappingState {
   let newState: MappingState;
   
@@ -84,7 +123,8 @@ function mappingReducer(state: MappingState, action: MappingAction): MappingStat
         activeFilter: action.payload.activeFilter || null,
         columnOrder: action.payload.columnOrder || [],
         isLoading: false,
-        sourceData: [] // Reset source data when loading config
+        sourceData: [], // Reset source data when loading config
+        lastSavedState: action.payload // Save the loaded configuration as the last saved state
       };
       break;
 
@@ -112,7 +152,8 @@ function mappingReducer(state: MappingState, action: MappingAction): MappingStat
         sourceData: [],
         mapping: {},
         columnTransforms: {},
-        isLoading: false
+        isLoading: false,
+        lastSavedState: null
       };
       // Clear localStorage on reset
       try {
@@ -140,6 +181,14 @@ function mappingReducer(state: MappingState, action: MappingAction): MappingStat
       newState = {
         ...state,
         columnOrder: action.payload
+      };
+      break;
+
+    case 'MARK_CONFIGURATION_SAVED':
+      // Update the last saved state to current configuration
+      newState = {
+        ...state,
+        lastSavedState: extractConfigurationSettings(state)
       };
       break;
 
@@ -183,6 +232,13 @@ export function useMappingReducer() {
     dispatch({ type: 'SET_COLUMN_ORDER', payload: columnOrder });
   };
 
+  const markConfigurationSaved = () => {
+    dispatch({ type: 'MARK_CONFIGURATION_SAVED' });
+  };
+
+  // Check if current state has unsaved changes
+  const hasUnsavedChanges = hasConfigurationChanged(state, state.lastSavedState);
+
   return {
     state,
     loadConfiguration,
@@ -191,6 +247,8 @@ export function useMappingReducer() {
     resetState,
     updateTransforms,
     setFilter,
-    setColumnOrder
+    setColumnOrder,
+    markConfigurationSaved,
+    hasUnsavedChanges
   };
 }

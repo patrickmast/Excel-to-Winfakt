@@ -24,7 +24,9 @@ const Index = () => {
     resetState,
     updateTransforms,
     setFilter,
-    setColumnOrder
+    setColumnOrder,
+    markConfigurationSaved,
+    hasUnsavedChanges
   } = useMappingReducer();
 
   const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
@@ -133,17 +135,22 @@ const Index = () => {
       // Create configuration data from current state
       const configurationData = {
         mapping: mappingState.mapping,
-        transforms: mappingState.transforms,
-        filters: mappingState.filters,
+        columnTransforms: mappingState.columnTransforms,
+        activeFilter: mappingState.activeFilter,
         sourceColumns: mappingState.sourceColumns,
         sourceData: mappingState.sourceData,
-        sourceFilename: sourceFileInfo?.filename,
-        worksheetName: sourceFileInfo?.worksheetName,
-        columnOrder: mappingState.columnOrder
+        sourceFilename: mappingState.sourceFilename,
+        worksheetName: mappingState.worksheetName,
+        columnOrder: mappingState.columnOrder,
+        connectionCounter: mappingState.connectionCounter,
+        sourceSearch: mappingState.sourceSearch,
+        targetSearch: mappingState.targetSearch
       };
 
       try {
         await saveConfig(config, configurationData);
+        // Mark the configuration as saved to update the indicator
+        markConfigurationSaved();
       } catch (error) {
         console.error('Error saving configuration:', error);
       }
@@ -163,6 +170,8 @@ const Index = () => {
     updateConfig(configName);
     // Update the ref to prevent reload loop
     lastLoadedConfig.current = configName;
+    // Mark the configuration as saved to update the indicator
+    markConfigurationSaved();
   };
 
   const handleConfigurationLoaded = (configName: string, configData: any) => {
@@ -336,6 +345,7 @@ const Index = () => {
             }
           }}
           isSaving={isConfigLoading}
+          hasUnsavedChanges={hasUnsavedChanges}
         />
 
         <ColumnMapper

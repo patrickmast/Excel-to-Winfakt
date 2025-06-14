@@ -6,9 +6,10 @@ import { useState, useEffect } from 'react';
 interface ConfigurationIndicatorProps {
   className?: string;
   onSaveConfiguration?: () => void;
+  hasUnsavedChanges?: boolean;
 }
 
-const ConfigurationIndicator = ({ className = '', onSaveConfiguration }: ConfigurationIndicatorProps) => {
+const ConfigurationIndicator = ({ className = '', onSaveConfiguration, hasUnsavedChanges = false }: ConfigurationIndicatorProps) => {
   const { dossier, config } = useUrlParams();
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasClickedSave, setHasClickedSave] = useState(false);
@@ -49,11 +50,17 @@ const ConfigurationIndicator = ({ className = '', onSaveConfiguration }: Configu
           <span className="text-sm text-muted-foreground">Configuratie:</span>
           <div className="relative">
             <span 
-              className="inline-flex items-center gap-1 rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-800 border-green-200 hover:bg-green-100 hover:text-green-800 cursor-default"
+              className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-default ${
+                hasUnsavedChanges 
+                  ? 'bg-red-100 text-red-800 border-red-200 hover:bg-red-100 hover:text-red-800' 
+                  : 'bg-green-100 text-green-800 border-green-200 hover:bg-green-100 hover:text-green-800'
+              }`}
             >
               <span className="relative group">
+                {hasUnsavedChanges && <span className="text-red-600 mr-1">●</span>}
                 {truncateConfigName(config)}
                 <div className="absolute z-50 invisible group-hover:visible group-hover:delay-300 bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full left-1/2 transform -translate-x-1/2 mb-1 whitespace-nowrap pointer-events-none">
+                  {hasUnsavedChanges && "Niet opgeslagen wijzigingen - "}
                   {config}
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
                 </div>
