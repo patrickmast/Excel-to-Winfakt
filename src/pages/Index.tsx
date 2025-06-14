@@ -43,6 +43,7 @@ const Index = () => {
   const [sourceFileInfo, setSourceFileInfo] = useState<{ filename: string; rowCount: number; worksheetName?: string; size?: number } | null>(null);
   const [shouldResetMapper, setShouldResetMapper] = useState(false);
   const [showClearSettingsDialog, setShowClearSettingsDialog] = useState(false);
+  const [isLoadingConfigFromUrl, setIsLoadingConfigFromUrl] = useState(!!config);
   const lastLoadedConfig = useRef<string | null>(null);
   const errorToastShown = useRef<string | null>(null);
   
@@ -54,6 +55,7 @@ const Index = () => {
       return;
     }
 
+    setIsLoadingConfigFromUrl(true);
     try {
       const loadedConfig = await loadConfig(configName);
       
@@ -93,11 +95,17 @@ const Index = () => {
       // Error toast is already handled in the loadConfig hook for network/API errors
       lastLoadedConfig.current = null;
       clearConfig();
+    } finally {
+      setIsLoadingConfigFromUrl(false);
     }
   }, [loadConfig, loadConfiguration, setShouldResetMapper]);
 
   useEffect(() => {
     if (config) {
+      // Set loading state immediately when we detect a config parameter on mount
+      if (lastLoadedConfig.current !== config) {
+        setIsLoadingConfigFromUrl(true);
+      }
       handleLoadConfigurationFromUrl(config);
     }
   }, [config, handleLoadConfigurationFromUrl]);
@@ -346,6 +354,7 @@ const Index = () => {
           }}
           isSaving={isConfigLoading}
           hasUnsavedChanges={hasUnsavedChanges}
+          isLoadingConfig={isLoadingConfigFromUrl}
         />
 
         <ColumnMapper
