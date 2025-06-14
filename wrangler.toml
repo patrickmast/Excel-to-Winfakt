@@ -1,5 +1,5 @@
  # Wrangler configuration for Cloudflare Pages
-name = "csv-transformer-hero"
+name = "excel-to-winfakt"
 compatibility_date = "2024-02-24"
 
 # Build output directory for Pages

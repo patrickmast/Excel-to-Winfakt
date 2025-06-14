@@ -41,7 +41,7 @@ export const downloadSettingsAsJSON = (state: MappingState, filename?: string) =
   
   const defaultFilename = state.sourceFilename 
     ? `${state.sourceFilename.replace(/\.[^/.]+$/, '')}_settings.json`
-    : 'csv_transformer_settings.json';
+    : 'excel_to_winfakt_settings.json';
   
   link.download = filename || defaultFilename;
   

@@ -10,7 +10,8 @@ type MappingAction =
   | { type: 'UPDATE_TRANSFORMS'; payload: Record<string, string> }
   | { type: 'SET_FILTER'; payload: CompoundFilter | null }
   | { type: 'SET_COLUMN_ORDER'; payload: string[] }
-  | { type: 'MARK_CONFIGURATION_SAVED' };
+  | { type: 'MARK_CONFIGURATION_SAVED' }
+  | { type: 'INCREMENT_CONNECTION_COUNTER' };
 
 const getInitialState = (): MappingState => {
   const stored = getStoredState();
@@ -34,7 +35,7 @@ const getInitialState = (): MappingState => {
   };
 };
 
-const STORAGE_KEY = 'csv-transformer-state';
+const STORAGE_KEY = 'excel-to-winfakt-state';
 
 // Helper functions for localStorage - moved before getInitialState
 const getStoredState = (): any => {
@@ -146,21 +147,31 @@ function mappingReducer(state: MappingState, action: MappingAction): MappingStat
       break;
 
     case 'RESET_STATE':
-      newState = {
-        ...getInitialState(),
-        sourceColumns: [],
-        sourceData: [],
-        mapping: {},
-        columnTransforms: {},
-        isLoading: false,
-        lastSavedState: null
-      };
-      // Clear localStorage on reset
+      // Clear localStorage first before creating new state
       try {
         localStorage.removeItem(STORAGE_KEY);
       } catch (error) {
         console.error('Error clearing localStorage:', error);
       }
+      
+      // Create completely fresh state without localStorage
+      newState = {
+        mapping: {},
+        columnTransforms: {},
+        sourceSearch: '',
+        targetSearch: '',
+        selectedSourceColumn: null,
+        selectedTargetColumn: null,
+        connectionCounter: 0,
+        sourceColumns: [],
+        sourceData: [],
+        isLoading: false,
+        activeFilter: null,
+        columnOrder: [],
+        sourceFilename: undefined,
+        worksheetName: undefined,
+        lastSavedState: null
+      };
       return newState;
 
     case 'UPDATE_TRANSFORMS':
@@ -189,6 +200,13 @@ function mappingReducer(state: MappingState, action: MappingAction): MappingStat
       newState = {
         ...state,
         lastSavedState: extractConfigurationSettings(state)
+      };
+      break;
+
+    case 'INCREMENT_CONNECTION_COUNTER':
+      newState = {
+        ...state,
+        connectionCounter: state.connectionCounter + 1
       };
       break;
 
@@ -236,6 +254,10 @@ export function useMappingReducer() {
     dispatch({ type: 'MARK_CONFIGURATION_SAVED' });
   };
 
+  const incrementConnectionCounter = () => {
+    dispatch({ type: 'INCREMENT_CONNECTION_COUNTER' });
+  };
+
   // Check if current state has unsaved changes
   const hasUnsavedChanges = hasConfigurationChanged(state, state.lastSavedState);
 
@@ -249,6 +271,7 @@ export function useMappingReducer() {
     setFilter,
     setColumnOrder,
     markConfigurationSaved,
+    incrementConnectionCounter,
     hasUnsavedChanges
   };
 }

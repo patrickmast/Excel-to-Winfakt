@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-CSV Transformer Hero is a React/TypeScript application designed specifically for Winfakt users to transform CSV, Excel, and Winfakt Classic (*.soc) files into Winfakt-compatible CSV format. The app provides a visual column mapping interface with real-time preview and validation.
+Excel to Winfakt is a React/TypeScript application designed specifically for Winfakt users to transform CSV, Excel, and Winfakt Classic (*.soc) files into Winfakt-compatible CSV format. The app provides a visual column mapping interface with real-time preview and validation.
 
 ## Common Development Commands
 
@@ -51,6 +51,7 @@ npm run generate-build-info  # Generate build timestamp and version info
 - `useMappingReducer` - Centralized state management for column mappings, transforms, and filters
 - `useMappingState` - Persistent state handling with localStorage
 - `useConfiguration` - Configuration saving/loading via Supabase
+- `ConfigurationContext` - React Context for managing configuration lists and loading states
 
 **Core Components**:
 - `ColumnMapper` - Main mapping interface with drag-and-drop
@@ -124,8 +125,10 @@ The project is integrated with Lovable.dev for rapid development:
 ## UI Guidelines
 
 **Menu Items**: Must never wrap to multiple lines (see `UI_RULES.md`)
-**Component Library**: Uses shadcn/ui with custom PM7 styling
+**Component Library**: Uses shadcn/ui with PM7 UI Style Guide integration
+**PM7 Components**: Migrated to PM7 UI library for consistent branding and styling
 **Responsive Design**: Desktop-focused with mobile considerations
+**CSS Rules**: Use `white-space: nowrap` to prevent text wrapping in menu items
 
 ## Development Patterns
 
@@ -139,6 +142,9 @@ const { state, setMapping, setSourceData, resetState } = useMappingReducer();
 ```typescript
 // Save configurations to Supabase
 const { saveConfiguration, isSaving } = useConfiguration();
+
+// Access configuration context for list management
+const { configurations, isLoading, refreshConfigurations } = useConfigurationContext();
 ```
 
 ### File Processing
@@ -146,6 +152,19 @@ const { saveConfiguration, isSaving } = useConfiguration();
 // Use Web Workers for large file processing
 const worker = new Worker('/src/workers/csv-worker.ts', { type: 'module' });
 ```
+
+### URL-based Configuration Loading
+```typescript
+// Configuration can be loaded via URL parameters
+const { dossier, config } = useUrlParams();
+// Automatically loads configuration when URL params change
+```
+
+### Unsaved Changes Tracking
+The application tracks unsaved changes and displays indicators:
+- Configuration indicator shows loading states during URL config loading
+- Visual indicators for unsaved modifications
+- Automatic state persistence to localStorage
 
 ## Deployment
 
