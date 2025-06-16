@@ -19,9 +19,10 @@ npm run preview             # Preview production build
 # Testing
 npm run test                # Run tests with Vitest (auto-installs jsdom)
 npm run test:ci             # Run tests in CI mode
+npm test -- src/path/to/test.ts  # Run a single test file
 
 # Code Quality
-npm run lint                # Run ESLint (if available)
+npm run lint                # Run ESLint
 npm run typecheck           # Run TypeScript compiler check
 
 # Build info generation (runs automatically with build)
@@ -108,6 +109,14 @@ The project is integrated with Lovable.dev for rapid development:
 - Test file: `src/__tests__/csv-processing.test.ts`
 - jsdom is installed as optional dependency to avoid build issues
 
+**Running Tests**:
+```bash
+npm run test              # Run all tests in watch mode
+npm run test:ci           # Run tests once (CI mode)
+npm test -- --run         # Run tests once and exit
+npm test -- src/__tests__/csv-processing.test.ts  # Run specific test file
+```
+
 **Mocking Strategy**:
 - Web Workers are mocked with MessageChannel simulation
 - Supabase client is mocked for offline testing
@@ -174,7 +183,54 @@ The application tracks unsaved changes and displays indicators:
 - SPA redirect: `/* -> /index.html`
 - Node version: 18.18.0
 
+**Cloudflare Workers Configuration**:
+- Build command: `npm ci && npm run build`
+- Build output: `dist`
+- Environment variables: `CI=true`, `NODE_VERSION=18`
+- Important: Vite config uses `target: 'esnext'` for Workers compatibility
+
 **Build Process**:
 1. Generate build info (timestamp, version)
 2. Vite build with modern JS target
 3. Deploy to Netlify or Cloudflare Workers
+
+## Critical Implementation Details
+
+### Web Worker Architecture
+The application uses Web Workers for processing large files to prevent UI blocking:
+- Worker file: `src/workers/csv-worker.ts`
+- Processes data in chunks of 10,000 rows
+- Uses MessageChannel for real-time progress updates
+- Handles CSV, Excel, DBF, and Winfakt Classic (.soc) formats
+
+### State Persistence
+- Mapping configuration is persisted to localStorage using `useMappingReducer`
+- Key: `excel-to-winfakt-state`
+- Includes mappings, transforms, filters, and column order
+- Automatically saves after each state change
+
+### Configuration Sharing
+- Configurations can be saved to Supabase for sharing
+- Shareable via URL parameters: `?dossier=X&config=Y`
+- Automatic loading when URL parameters are present
+- Visual indicators for unsaved changes
+
+### Performance Optimizations
+- Large file processing in Web Worker
+- Chunked data processing (10,000 rows per chunk)
+- Virtual scrolling for large datasets
+- Lazy loading of components
+
+### ESLint Configuration
+- Uses TypeScript ESLint with recommended rules
+- React Hooks plugin for hook rules
+- React Refresh plugin for HMR
+- Disabled rules: `@typescript-eslint/no-unused-vars`
+
+### TypeScript Configuration
+- Relaxed settings for rapid development:
+  - `noImplicitAny: false`
+  - `strictNullChecks: false`
+  - `noUnusedParameters: false`
+- Path alias: `@/*` maps to `src/*`
+- Separate configs for app and node environments

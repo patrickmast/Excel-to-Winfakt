@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  PM7Dialog,
+  PM7DialogContent,
+  PM7DialogHeader,
+  PM7DialogTitle,
+  PM7DialogDescription,
+  PM7DialogFooter,
+  PM7DialogOverlay,
+} from 'pm7-ui-style-guide';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useConfigurationApi } from '@/hooks/use-configuration-api';
 import { useConfigurationContext } from '@/contexts/ConfigurationContext';
@@ -65,14 +66,15 @@ const LoadConfigDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{t('menu.load')}</DialogTitle>
-          <DialogDescription>
+    <PM7Dialog open={open} onOpenChange={onOpenChange}>
+      <PM7DialogOverlay className="fixed inset-0 z-50 bg-black/30 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+      <PM7DialogContent className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg">
+        <PM7DialogHeader>
+          <PM7DialogTitle>{t('menu.load')}</PM7DialogTitle>
+          <PM7DialogDescription>
             Selecteer een opgeslagen configuratie om te laden voor dossier {dossier}.
-          </DialogDescription>
-        </DialogHeader>
+          </PM7DialogDescription>
+        </PM7DialogHeader>
         
         <div className="space-y-4">
           {isLoading ? (
@@ -121,7 +123,7 @@ const LoadConfigDialog = ({
           )}
         </div>
 
-        <DialogFooter>
+        <PM7DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
           <Button
             type="button"
             variant="outline"
@@ -135,9 +137,9 @@ const LoadConfigDialog = ({
           >
             {isLoading ? 'Bezig...' : 'Laden'}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </PM7DialogFooter>
+      </PM7DialogContent>
+    </PM7Dialog>
   );
 };
 

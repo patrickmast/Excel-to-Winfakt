@@ -10,8 +10,8 @@ const Star = ({ index }: { index: number }) => (
   <svg xmlns="http://www.w3.org/2000/svg" xmlSpace="preserve" version="1.1" style={{shapeRendering: 'geometricPrecision', textRendering: 'geometricPrecision', imageRendering: 'auto', fillRule: 'evenodd', clipRule: 'evenodd'}} viewBox="0 0 784.11 815.53" xmlnsXlink="http://www.w3.org/1999/xlink">
     <defs>
       <linearGradient id={`starGradient${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style={{ stopColor: '#2663EC' }} />
-        <stop offset="100%" style={{ stopColor: '#7C3AED' }} />
+        <stop offset="0%" style={{ stopColor: '#1B86EF' }} />
+        <stop offset="100%" style={{ stopColor: '#1B86EF' }} />
       </linearGradient>
     </defs>
     <g id="Layer_x0020_1">
@@ -26,10 +26,15 @@ const ExportButton = ({ className, children, disabled, ...props }: ExportButtonP
   return (
     <button
       className={cn(
-        "group relative px-3 py-2 bg-[#2663EC] text-white text-sm font-medium border border-[#2663EC] rounded-md transition-all duration-300 ease-in-out hover:bg-transparent hover:text-[#2663EC] hover:shadow-[0_0_25px_rgba(38,99,236,0.55)]",
-        "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#2663EC] disabled:hover:text-white disabled:hover:shadow-none",
+        "group relative px-3 py-2 text-sm font-medium border rounded-md transition-all duration-300 ease-in-out hover:bg-transparent hover:shadow-[0_0_25px_rgba(27,134,239,0.55)]",
+        "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none",
         className
       )}
+      style={{ 
+        backgroundColor: disabled ? '#e5e7eb' : '#1B86EF', 
+        color: disabled ? '#9ca3af' : 'white',
+        borderColor: '#1B86EF'
+      }}
       disabled={disabled}
       {...props}
     >
