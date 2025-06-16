@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { PM7Dialog, PM7DialogContent, PM7DialogDescription, PM7DialogHeader, PM7DialogTitle } from 'pm7-ui-style-guide';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,24 +11,16 @@ interface DocumentationDialogProps {
 
 const DocumentationDialog = ({ open, onOpenChange }: DocumentationDialogProps) => {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="flex-shrink-0 px-6 py-4 border-b relative">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-4 top-4 h-6 w-6"
-            onClick={() => onOpenChange(false)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-          <DialogTitle className="text-2xl pr-8">Excel naar Winfakt - Documentatie</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
+    <PM7Dialog open={open} onOpenChange={onOpenChange}>
+      <PM7DialogContent className="!max-w-[750px]">
+        <PM7DialogHeader className="flex-shrink-0 px-6 py-4 border-b relative">
+          <PM7DialogTitle className="text-2xl pr-8">Excel naar Winfakt - Documentatie</PM7DialogTitle>
+          <PM7DialogDescription className="text-muted-foreground">
             Uitgebreide handleiding en mogelijkheden
-          </DialogDescription>
-        </DialogHeader>
+          </PM7DialogDescription>
+        </PM7DialogHeader>
         
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="flex-1 overflow-y-auto px-6 py-4" style={{ maxHeight: 'calc(90vh - 120px)' }}>
           <div className="space-y-8">
             {/* Overview */}
             <Card>
@@ -380,8 +372,8 @@ const DocumentationDialog = ({ open, onOpenChange }: DocumentationDialogProps) =
             </Card>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </PM7DialogContent>
+    </PM7Dialog>
   );
 };
 
