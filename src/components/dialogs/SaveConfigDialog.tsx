@@ -13,7 +13,7 @@ import {
 import { useConfigurationApi } from '@/hooks/use-configuration-api';
 import { useConfigurationContext } from '@/contexts/ConfigurationContext';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '../ui/use-toast';
+import { useToast } from 'pm7-ui-style-guide';
 
 interface SaveConfigDialogProps {
   open: boolean;

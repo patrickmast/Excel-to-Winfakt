@@ -13,7 +13,7 @@ import { downloadCSV, addTimestampToFilename } from '@/utils/csvUtils';
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
-import { Toaster } from '../../components/ui/toaster';
+import { Toaster } from 'pm7-ui-style-guide';
 import { useTranslation } from 'react-i18next';
 
 interface ColumnMapperContentProps {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from './use-toast';
+import { toast } from 'pm7-ui-style-guide';
 import { MappingState } from '@/components/column-mapper/types';
 import { buildSettings } from '@/utils/settingsUtils';
 

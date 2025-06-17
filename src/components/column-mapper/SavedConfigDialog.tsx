@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'pm7-ui-style-guide';
 
 interface SavedConfigDialogProps {
   open: boolean;

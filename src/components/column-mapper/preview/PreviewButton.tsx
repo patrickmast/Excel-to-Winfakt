@@ -1,6 +1,6 @@
 import { Eye } from 'lucide-react';
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from 'pm7-ui-style-guide';
 
 interface PreviewButtonProps {
   hasFile: boolean;

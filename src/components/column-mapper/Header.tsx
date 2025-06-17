@@ -5,8 +5,7 @@ import { VanillaCard } from '../vanilla/react/VanillaCard';
 import { VanillaDialog } from '../vanilla/react/VanillaDialog';
 import { useTranslation } from 'react-i18next';
 import Papa from 'papaparse';
-import { toast } from '@/components/ui/use-toast';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from 'pm7-ui-style-guide';
 import { parseDBF } from '@/utils/dbfParser';
 
 // Add XLSX to window type
@@ -47,6 +46,7 @@ const Header = ({
   isLoading,
   onLoadingChange
 }: HeaderProps) => {
+  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Preview file state has been removed
   const [showPreview, setShowPreview] = useState(false);
@@ -54,7 +54,6 @@ const Header = ({
   const [availableSheets, setAvailableSheets] = useState<string[]>([]);
   const [currentWorkbook, setCurrentWorkbook] = useState<WorkbookState | null>(null);
   const [currentWorksheet, setCurrentWorksheet] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const processExcelWorksheet = (workbook: any, sheetName: string, fileName: string, fileSize: number) => {
     try {
@@ -577,6 +576,19 @@ const Header = ({
                 <path d="M3 18h18" />
               </svg>
             )
+          },
+          {
+            label: "Test toast",
+            onClick: () => {
+              console.log('Test toast clicked!');
+              console.log('toast function:', toast);
+              const result = toast({
+                title: "Test Toast",
+                description: "Dit is een test toast notificatie",
+                variant: "destructive"
+              });
+              console.log('toast result:', result);
+            }
           }
         ]}
       >

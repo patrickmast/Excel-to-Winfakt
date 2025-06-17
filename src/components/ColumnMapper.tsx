@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'pm7-ui-style-guide';
 import { ColumnMapperProps } from './column-mapper/types';
 import { useConfiguration } from '@/hooks/use-configuration';
 import SavedConfigDialog from './column-mapper/SavedConfigDialog';

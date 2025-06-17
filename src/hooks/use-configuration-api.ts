@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from 'pm7-ui-style-guide';
 import { useUrlParams } from '@/hooks/use-url-params';
 import {
   saveConfiguration,
