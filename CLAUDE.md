@@ -10,7 +10,7 @@ Excel to Winfakt is a React/TypeScript application designed specifically for Win
 
 ```bash
 # Development
-npm install                  # Install dependencies
+npm install                  # Install dependencies (requires Node.js >=20.0.0)
 npm run dev                 # Start development server (port 8080)
 npm run build               # Production build with build info generation
 npm run build:dev           # Development mode build
@@ -96,6 +96,13 @@ The project is integrated with Lovable.dev for rapid development:
 - Uses `lovable-tagger` plugin for development mode component tracking
 - Development server configured for Replit and other cloud environments
 
+### Performance Boundaries
+The application is designed to handle:
+- Excel files up to 100MB
+- CSV files with 100,000+ rows
+- Browser memory limitations may affect larger files
+- Web Worker architecture prevents UI blocking during processing
+
 ### TypeScript Configuration
 - Path aliases: `@/*` maps to `src/*`
 - Relaxed null checks and unused parameters for rapid development
@@ -133,7 +140,14 @@ npm test -- src/__tests__/csv-processing.test.ts  # Run specific test file
 
 ## UI Guidelines
 
-**Menu Items**: Must never wrap to multiple lines (see `UI_RULES.md`)
+### Critical UI Rules
+**Menu Items**: Must NEVER wrap to multiple lines
+- Apply `white-space: nowrap` to all menu text
+- Keep menu item text concise and clear
+- Test all translations to ensure they don't wrap
+- See `UI_RULES.md` for detailed examples
+
+### Component Guidelines
 **Component Library**: Uses shadcn/ui with PM7 UI Style Guide integration
 **PM7 Components**: Migrated to PM7 UI library for consistent branding and styling
 **Responsive Design**: Desktop-focused with mobile considerations
@@ -190,7 +204,7 @@ The application tracks unsaved changes and displays indicators:
 - Important: Vite config uses `target: 'esnext'` for Workers compatibility
 
 **Build Process**:
-1. Generate build info (timestamp, version)
+1. Generate build info (timestamp, version) - runs automatically via `prebuild` script
 2. Vite build with modern JS target
 3. Deploy to Netlify or Cloudflare Workers
 
@@ -220,6 +234,12 @@ The application uses Web Workers for processing large files to prevent UI blocki
 - Chunked data processing (10,000 rows per chunk)
 - Virtual scrolling for large datasets
 - Lazy loading of components
+
+### Data Validation
+- Automatic detection of decimal and thousand separators
+- Header row validation and duplicate detection
+- Empty row filtering
+- Data type inference for columns
 
 ### ESLint Configuration
 - Uses TypeScript ESLint with recommended rules
