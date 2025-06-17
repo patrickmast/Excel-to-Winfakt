@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import ColumnMapper from '../components/ColumnMapper';
-import { useToast, PM7Toaster, PM7ToastProvider } from 'pm7-ui-style-guide';
+import { showToast } from '@/components/ui/SimpleToast';
 import { useUrlParams } from '@/hooks/use-url-params';
 import { useConfigurationApi } from '@/hooks/use-configuration-api';
 import InfoDialog from '@/components/column-mapper/InfoDialog';
@@ -15,8 +15,6 @@ import SaveConfigDialog from '@/components/dialogs/SaveConfigDialog';
 import LoadConfigDialog from '@/components/dialogs/LoadConfigDialog';
 import DeleteConfigDialog from '@/components/dialogs/DeleteConfigDialog';
 import UnsavedChangesDialog from '@/components/dialogs/UnsavedChangesDialog';
-import { TestToast } from '@/components/TestToast';
-import { DebugToaster } from '@/components/DebugToaster';
 
 const Index = () => {
   const {
@@ -34,13 +32,7 @@ const Index = () => {
   } = useMappingReducer();
 
   const [activeColumnSet, setActiveColumnSet] = useState<'artikelen' | 'klanten'>('artikelen');
-  const { toast, toasts } = useToast();
   const { dossier, config, updateConfig, clearConfig } = useUrlParams();
-  
-  // Debug: Log toasts array changes
-  useEffect(() => {
-    console.log('[DEBUG] Toasts array:', toasts);
-  }, [toasts]);
   const { isLoading: isConfigLoading, loadConfig, saveConfig } = useConfigurationApi();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [showLogDialog, setShowLogDialog] = useState(false);
@@ -58,45 +50,6 @@ const Index = () => {
   const errorToastShown = useRef<string | null>(null);
   
   const { t } = useTranslation();
-  
-  // Debug: Test toast functionality
-  useEffect(() => {
-    // Test toast after 2 seconds
-    const timer = setTimeout(() => {
-      console.log('[DEBUG] Attempting to show test toast...');
-      const toastId = toast({
-        title: "Test Toast",
-        description: "This is a debug test toast",
-        variant: "default",
-      });
-      console.log('[DEBUG] Toast function returned:', toastId);
-      
-      // Check all toast-related elements after a short delay
-      setTimeout(() => {
-        const toastElements = document.querySelectorAll('[data-sonner-toast], [data-radix-toast-viewport], .sonner-toaster, .toast');
-        console.log('[DEBUG] Found toast-related elements:', toastElements.length);
-        toastElements.forEach((el, index) => {
-          const styles = window.getComputedStyle(el);
-          console.log(`[DEBUG] Toast element ${index}:`, {
-            tagName: el.tagName,
-            className: el.className,
-            dataAttributes: Array.from(el.attributes).filter(attr => attr.name.startsWith('data-')).map(attr => `${attr.name}=${attr.value}`),
-            position: styles.position,
-            zIndex: styles.zIndex,
-            display: styles.display,
-            visibility: styles.visibility,
-            opacity: styles.opacity,
-            top: styles.top,
-            right: styles.right,
-            bottom: styles.bottom,
-            left: styles.left,
-          });
-        });
-      }, 500);
-    }, 2000);
-    
-    return () => clearTimeout(timer);
-  }, []); // Run only once on mount
 
   // Use refs to maintain stable references to avoid useEffect dependency loops
   const loadConfigRef = useRef<typeof loadConfig>(loadConfig);
@@ -139,7 +92,7 @@ const Index = () => {
       } else {
         // Configuration not found - show error toast once and clear from URL
         if (errorToastShown.current !== configName) {
-          toast({
+          showToast({
             title: "Configuratie niet gevonden",
             description: `Configuratie "${configName}" bestaat niet voor dossier ${dossier}.`,
             variant: "destructive",
@@ -157,7 +110,7 @@ const Index = () => {
     } finally {
       setIsLoadingConfigFromUrl(false);
     }
-  }, [dossier, toast, clearConfig]);
+  }, [dossier, clearConfig]);
 
   useEffect(() => {
     if (config) {
@@ -348,7 +301,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <TestToast />
       {/* New configuration dialogs */}
       <SaveConfigDialog
         open={showSaveConfigDialog}
@@ -423,7 +375,7 @@ const Index = () => {
             if (latestReport) {
               setShowLogDialog(true);
             } else {
-              toast({
+              showToast({
                 title: "No Export Report",
                 description: "Export a file first to generate a report.",
                 variant: "default"
@@ -434,24 +386,6 @@ const Index = () => {
           hasUnsavedChanges={hasUnsavedChanges}
           isLoadingConfig={isLoadingConfigFromUrl}
         />
-        
-        {/* Debug: Manual toast trigger button */}
-        <div className="fixed bottom-4 left-4 z-50">
-          <button
-            onClick={() => {
-              console.log('[DEBUG] Manual toast triggered');
-              const toastResult = toast({
-                title: "Manual Test Toast",
-                description: "This toast was triggered manually for debugging",
-                variant: "default",
-              });
-              console.log('[DEBUG] Toast result:', toastResult);
-            }}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow-lg"
-          >
-            Debug: Trigger Toast
-          </button>
-        </div>
 
         <ColumnMapper
           onMappingChange={handleMappingChange}
@@ -486,44 +420,6 @@ const Index = () => {
           onConnectionCounterUpdate={incrementConnectionCounter}
         />
       </div>
-      <PM7Toaster />
-      <DebugToaster />
-      {/* Debug: Check if PM7Toaster is rendering */}
-      <div 
-        ref={el => {
-          if (el) {
-            console.log('[DEBUG] PM7Toaster container rendered');
-            // Check for toast viewport in DOM
-            setTimeout(() => {
-              // Check for Radix Toast viewport
-              const radixToastViewport = document.querySelector('[data-radix-toast-viewport]');
-              console.log('[DEBUG] Radix Toast viewport found:', !!radixToastViewport);
-              
-              // Check for Sonner toast container
-              const sonnerContainer = document.querySelector('.sonner-toaster');
-              console.log('[DEBUG] Sonner toaster container found:', !!sonnerContainer);
-              
-              // Check all sections of the page
-              const sections = document.querySelectorAll('section');
-              console.log('[DEBUG] Number of sections:', sections.length);
-              
-              // Check body for any toast-related elements
-              const body = document.body;
-              const allToastRelated = body.querySelectorAll('[class*="toast"], [data-sonner], [data-radix-toast]');
-              console.log('[DEBUG] All toast-related elements in body:', allToastRelated.length);
-              
-              // Check if PM7Toaster added any elements to body
-              const directBodyChildren = Array.from(body.children);
-              console.log('[DEBUG] Direct body children:', directBodyChildren.map(el => ({
-                tagName: el.tagName,
-                className: el.className,
-                id: el.id
-              })));
-            }, 100);
-          }
-        }}
-        style={{ display: 'none' }}
-      />
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { VanillaCard } from '../vanilla/react/VanillaCard';
 import { VanillaDialog } from '../vanilla/react/VanillaDialog';
 import { useTranslation } from 'react-i18next';
 import Papa from 'papaparse';
-import { useToast } from 'pm7-ui-style-guide';
+import { showToast } from '../ui/SimpleToast';
 import { parseDBF } from '@/utils/dbfParser';
 
 // Add XLSX to window type
@@ -46,7 +46,6 @@ const Header = ({
   isLoading,
   onLoadingChange
 }: HeaderProps) => {
-  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Preview file state has been removed
   const [showPreview, setShowPreview] = useState(false);
@@ -78,7 +77,7 @@ const Header = ({
       onDataLoaded(headers, jsonData, fileName, sheetName, fileSize);
     } catch (error) {
       console.error('Error processing worksheet:', error);
-      toast({
+      showToast({
         title: "Error",
         description: "Failed to process the selected worksheet.",
         variant: "destructive"
@@ -101,7 +100,7 @@ const Header = ({
   const handleFileSelect = async (file: File) => {
     if (!file || file.size === 0) {
       console.error('Invalid file: File is empty or does not exist');
-      toast({
+      showToast({
         title: "Invalid File",
         description: "The selected file is empty. Please choose a valid file.",
         variant: "destructive"
@@ -160,7 +159,7 @@ const Header = ({
               };
               onDataLoaded(headers, allData, file.name, undefined, file.size, metadata);
             } else {
-              toast({
+              showToast({
                 title: "Error",
                 description: "The CSV file appears to be empty or missing headers.",
                 variant: "destructive"
@@ -168,7 +167,7 @@ const Header = ({
             }
           } catch (error) {
             console.error('Error processing CSV:', error);
-            toast({
+            showToast({
               title: "Error",
               description: "Failed to parse CSV file. Please check the file format.",
               variant: "destructive"
@@ -179,7 +178,7 @@ const Header = ({
         },
         error: (error) => {
           console.error('Papa Parse error:', error);
-          toast({
+          showToast({
             title: "Error",
             description: "Error processing CSV file: " + error.message,
             variant: "destructive"
@@ -189,7 +188,7 @@ const Header = ({
       });
     } else if (lowerFileName.endsWith('.xlsx') || lowerFileName.endsWith('.xls')) {
       if (!isXLSXLoaded()) {
-        toast({
+        showToast({
           title: "Loading Excel Support",
           description: "Please wait while Excel support is being loaded...",
         });
@@ -198,7 +197,7 @@ const Header = ({
 
         if (!isXLSXLoaded()) {
           console.log('XLSX still not loaded after waiting');
-          toast({
+          showToast({
             title: "Error",
             description: "Excel support could not be loaded. Please try refreshing the page or use CSV files instead.",
             variant: "destructive"
@@ -230,7 +229,7 @@ const Header = ({
             }
           } catch (error) {
             console.error('Error parsing Excel:', error);
-            toast({
+            showToast({
               title: "Error",
               description: "Failed to parse Excel file. Please check the file format.",
               variant: "destructive"
@@ -243,7 +242,7 @@ const Header = ({
         reader.readAsArrayBuffer(file);
       } catch (error) {
         console.error('Error loading Excel file:', error);
-        toast({
+        showToast({
           title: "Error",
           description: "Failed to load Excel file. Please try again.",
           variant: "destructive"
@@ -265,7 +264,7 @@ const Header = ({
               const headers = Object.keys(records[0]);
               onDataLoaded(headers, records, file.name, undefined, file.size);
             } else {
-              toast({
+              showToast({
                 title: "Error",
                 description: "The DBF file appears to be empty or invalid.",
                 variant: "destructive"
@@ -273,7 +272,7 @@ const Header = ({
             }
           } catch (error) {
             console.error('Error parsing DBF:', error);
-            toast({
+            showToast({
               title: "Error",
               description: "Failed to parse DBF file. Please check the file format.",
               variant: "destructive"
@@ -285,7 +284,7 @@ const Header = ({
 
         reader.onerror = () => {
           console.error('Error reading file');
-          toast({
+          showToast({
             title: "Error",
             description: "Failed to read DBF file.",
             variant: "destructive"
@@ -296,7 +295,7 @@ const Header = ({
         reader.readAsArrayBuffer(file);
       } catch (error) {
         console.error('Error handling DBF file:', error);
-        toast({
+        showToast({
           title: "Error",
           description: "Failed to process DBF file.",
           variant: "destructive"
@@ -359,7 +358,7 @@ const Header = ({
                     console.log('Headers found:', headers);
                     onDataLoaded(headers, records, file.name, undefined, file.size);
                   } else {
-                    toast({
+                    showToast({
                       title: "Error",
                       description: "The SOC file appears to be empty or invalid.",
                       variant: "destructive"
@@ -367,7 +366,7 @@ const Header = ({
                   }
                 } catch (error) {
                   console.error('Error parsing SOC with SMT:', error);
-                  toast({
+                  showToast({
                     title: "Error",
                     description: "Failed to parse SOC file with SMT memo file. Please check the file format.",
                     variant: "destructive"
@@ -379,7 +378,7 @@ const Header = ({
               
               smtReader.onerror = () => {
                 console.error('Error reading SMT file');
-                toast({
+                showToast({
                   title: "Error",
                   description: "Failed to read SMT memo file.",
                   variant: "destructive"
@@ -399,7 +398,7 @@ const Header = ({
                 console.log('Headers found:', headers);
                 onDataLoaded(headers, records, file.name, undefined, file.size);
               } else {
-                toast({
+                showToast({
                   title: "Error",
                   description: "The SOC file appears to be empty or invalid.",
                   variant: "destructive"
@@ -409,7 +408,7 @@ const Header = ({
             }
           } catch (error) {
             console.error('Error parsing SOC:', error);
-            toast({
+            showToast({
               title: "Error",
               description: "Failed to parse SOC file. Please check the file format.",
               variant: "destructive"
@@ -420,7 +419,7 @@ const Header = ({
         
         socReader.onerror = () => {
           console.error('Error reading SOC file');
-          toast({
+          showToast({
             title: "Error",
             description: "Failed to read SOC file.",
             variant: "destructive"
@@ -431,7 +430,7 @@ const Header = ({
         socReader.readAsArrayBuffer(file);
       } catch (error) {
         console.error('Error handling SOC file:', error);
-        toast({
+        showToast({
           title: "Error",
           description: "Failed to process SOC file.",
           variant: "destructive"
@@ -439,7 +438,7 @@ const Header = ({
         onLoadingChange(false);
       }
     } else {
-      toast({
+      showToast({
         title: "Error",
         description: "Please select a CSV, Excel, DBF, or SOC file.",
         variant: "destructive"
@@ -468,7 +467,7 @@ const Header = ({
           lowerFileName.endsWith('.xls')) {
         // If we already found a main file, we can only process one at a time
         if (mainFile) {
-          toast({
+          showToast({
             title: "Multiple Main Files",
             description: "Please select only one main data file at a time.",
             variant: "destructive"
@@ -482,7 +481,7 @@ const Header = ({
     }
     
     if (!mainFile) {
-      toast({
+      showToast({
         title: "No Valid File",
         description: "Please select a valid data file (CSV, Excel, DBF, or SOC).",
         variant: "destructive"
@@ -508,6 +507,20 @@ const Header = ({
   return (
     <div className="flex items-center justify-between">
       <span>{t('columnMapper.sourceColumns')}</span>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            showToast({
+              title: "Test Toast",
+              description: "Dit is een test toast notificatie",
+              variant: "destructive"
+            });
+          }}
+          className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Test Toast
+        </button>
       <input
         ref={fileInputRef}
         type="file"
@@ -576,24 +589,12 @@ const Header = ({
                 <path d="M3 18h18" />
               </svg>
             )
-          },
-          {
-            label: "Test toast",
-            onClick: () => {
-              console.log('Test toast clicked!');
-              console.log('toast function:', toast);
-              const result = toast({
-                title: "Test Toast",
-                description: "Dit is een test toast notificatie",
-                variant: "destructive"
-              });
-              console.log('toast result:', result);
-            }
           }
         ]}
       >
         {isLoading ? t('common.loading') : t('header.sourceFile')}
       </VanillaMenu>
+      </div>
 
       {/* File preview dialog has been removed */}
 

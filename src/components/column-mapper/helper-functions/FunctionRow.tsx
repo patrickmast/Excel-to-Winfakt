@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { toast } from "pm7-ui-style-guide";
+import { showToast } from "@/components/ui/SimpleToast";
 
 interface FunctionRowProps {
   name: string;
@@ -17,9 +17,8 @@ interface FunctionRowProps {
 const FunctionRow = ({ name, description }: FunctionRowProps) => {
   const copyToClipboard = () => {
     navigator.clipboard.writeText(name).then(() => {
-      toast({
-        description: "Function copied to clipboard",
-        duration: 2000,
+      showToast({
+        title: "Function copied to clipboard"
       });
     }).catch(console.error);
   };

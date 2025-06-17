@@ -1,19 +1,18 @@
 import { Eye } from 'lucide-react';
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { useToast } from 'pm7-ui-style-guide';
+import { showToast } from '@/components/ui/SimpleToast';
 
 interface PreviewButtonProps {
   hasFile: boolean;
 }
 
 const PreviewButton = ({ hasFile }: PreviewButtonProps) => {
-  const { toast } = useToast();
 
   const handlePreview = async () => {
     const currentFile = window.currentUploadedFile;
     
     if (!currentFile) {
-      toast({
+      showToast({
         title: "No file selected",
         description: "Please select a file first before previewing",
         variant: "destructive",
@@ -44,7 +43,7 @@ const PreviewButton = ({ hasFile }: PreviewButtonProps) => {
       
       reader.readAsText(currentFile);
     } catch (error) {
-      toast({
+      showToast({
         title: "Error",
         description: "Failed to generate preview link",
         variant: "destructive",

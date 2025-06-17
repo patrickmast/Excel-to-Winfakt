@@ -7,6 +7,7 @@ import i18n, { changeLanguage } from './i18n';
 import { useEffect } from 'react';
 import { parseUrlParams } from './utils/urlParams';
 import { ConfigurationProvider } from './contexts/ConfigurationContext';
+import { SimpleToast } from './components/ui/SimpleToast';
 
 // Language switcher has been moved to the Info dialog
 
@@ -45,6 +46,7 @@ const App = () => {
           <Route path="/" element={<Index />} />
           <Route path="/preview" element={<Preview />} />
         </Routes>
+        <SimpleToast />
       </ConfigurationProvider>
     </Router>
   );

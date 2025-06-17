@@ -13,7 +13,7 @@ import {
 import { useConfigurationApi } from '@/hooks/use-configuration-api';
 import { useConfigurationContext } from '@/contexts/ConfigurationContext';
 import { useTranslation } from 'react-i18next';
-import { useToast } from 'pm7-ui-style-guide';
+import { showToast } from '@/components/ui/SimpleToast';
 
 interface SaveConfigDialogProps {
   open: boolean;
@@ -33,7 +33,6 @@ const SaveConfigDialog = ({
   const [configName, setConfigName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const isInitialOpen = useRef(false);
-  const { toast } = useToast();
   const { saveConfig, dossier } = useConfigurationApi();
   const { configurations, refreshConfigurations } = useConfigurationContext();
   const { t } = useTranslation();
@@ -55,11 +54,13 @@ const SaveConfigDialog = ({
 
   const handleSave = async () => {
     if (!configName.trim()) {
-      toast({
+      console.log('SaveConfigDialog: Showing toast for empty name');
+      const result = showToast({
         title: "Naam vereist",
         description: "Gelieve eerst een naam te geven om de instellingen op te slaan.",
         variant: "destructive",
       });
+      console.log('SaveConfigDialog: Toast result:', result);
       return;
     }
 
@@ -75,7 +76,7 @@ const SaveConfigDialog = ({
         refreshConfigurations();
       }
     } catch (error) {
-      toast({
+      showToast({
         title: "Fout bij opslaan",
         description: "Er is een fout opgetreden bij het opslaan van de configuratie.",
         variant: "destructive",

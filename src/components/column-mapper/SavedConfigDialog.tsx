@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { toast } from 'pm7-ui-style-guide';
+import { showToast } from '@/components/ui/SimpleToast';
 
 interface SavedConfigDialogProps {
   open: boolean;
@@ -19,12 +19,12 @@ const SavedConfigDialog = ({ open, onOpenChange, configUrl }: SavedConfigDialogP
   const handleCopyUrl = async () => {
     try {
       await navigator.clipboard.writeText(configUrl);
-      toast({
+      showToast({
         title: "URL copied",
         description: "Configuration URL has been copied to clipboard",
       });
     } catch (err) {
-      toast({
+      showToast({
         title: "Failed to copy",
         description: "Please copy the URL manually",
         variant: "destructive",

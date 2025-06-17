@@ -191,11 +191,11 @@ The application tracks unsaved changes and displays indicators:
 
 ## Deployment
 
-**Netlify Configuration**:
+**Vercel Configuration**:
 - Build command: `npm run build`
-- Publish directory: `dist`
-- SPA redirect: `/* -> /index.html`
-- Node version: 18.18.0
+- Output directory: `dist`
+- Framework: Vite
+- Node version: 18.x
 
 **Cloudflare Workers Configuration**:
 - Build command: `npm ci && npm run build`
@@ -206,7 +206,7 @@ The application tracks unsaved changes and displays indicators:
 **Build Process**:
 1. Generate build info (timestamp, version) - runs automatically via `prebuild` script
 2. Vite build with modern JS target
-3. Deploy to Netlify or Cloudflare Workers
+3. Deploy to Vercel or Cloudflare Workers
 
 ## Critical Implementation Details
 
