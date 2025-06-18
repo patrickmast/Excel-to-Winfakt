@@ -105,10 +105,16 @@ const PM7ConfigurationMenu = ({
         menuItems={menuItems}
         menuAlignment="end"
         theme={theme}
+        menuTriggerBackground={true}
+        menuTriggerBackgroundColor="#FFFFFF"
+        menuTriggerBackgroundColorDark="#FFFFFF"
         menuTriggerBorder={true}
         menuTriggerBorderColor="#d1d5db"
+        menuTriggerBorderColorDark="#d1d5db"
+        menuTriggerIconColor="#000000"
+        menuTriggerIconColorDark="#000000"
+        menuTriggerOnHover={false}
         menuBackgroundColor="white"
-        menuTriggerBackgroundColor="white"
       />
       <DocumentationDialog 
         open={showDocumentation} 

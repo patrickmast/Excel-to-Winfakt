@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+  PM7Dialog,
+  PM7DialogContent,
+  PM7DialogHeader,
+  PM7DialogTitle,
+  PM7DialogDescription,
+  PM7DialogFooter,
+  PM7Button
+} from 'pm7-ui-style-guide';
+import 'pm7-ui-style-guide/src/components/dialog/pm7-dialog.css';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HelpCircle } from 'lucide-react';
 import ExpressionEditor from './ExpressionEditor';
@@ -163,25 +166,25 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="p-0 overflow-hidden border-0 max-w-[625px] h-[90vh] max-h-[700px] flex flex-col">
-        <div className="bg-slate-700 p-5 rounded-t-lg flex-shrink-0">
+    <PM7Dialog open={isOpen} onOpenChange={() => onClose()}>
+      <PM7DialogContent maxWidth="md" showCloseButton={false} className="max-w-[625px] h-[90vh] max-h-[700px] flex flex-col">
+        <PM7DialogHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <DialogTitle className="text-white m-0 text-base">{t('columnMapper.settingsFor')} {columnName}</DialogTitle>
-              <DialogDescription className="text-slate-300 mt-1">
+              <PM7DialogTitle>{t('columnMapper.settingsFor')} {columnName}</PM7DialogTitle>
+              <PM7DialogDescription>
                 {t('columnMapper.settingsDescription')}
-              </DialogDescription>
+              </PM7DialogDescription>
             </div>
             <Popover>
               <PopoverTrigger asChild>
-                <Button
+                <PM7Button
                   size="sm"
                   variant="ghost"
-                  className="text-slate-300 hover:text-white hover:bg-slate-600 ml-2"
+                  className="ml-2"
                 >
                   <HelpCircle className="h-5 w-5" />
-                </Button>
+                </PM7Button>
               </PopoverTrigger>
               <PopoverContent className="w-[500px] p-4 shadow-2xl border-2" align="end">
                 <h4 className="font-semibold mb-2">{t('columnMapper.helpTitle')}</h4>
@@ -215,7 +218,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
               </PopoverContent>
             </Popover>
           </div>
-        </div>
+        </PM7DialogHeader>
 
         <div className="flex-1 flex flex-col min-h-0">
           <Tabs
@@ -292,24 +295,22 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
           </Tabs>
         </div>
 
-        <div className="p-5 bg-gray-50 flex justify-end gap-3">
-          <Button
+        <PM7DialogFooter>
+          <PM7Button
             variant="outline"
             onClick={onClose}
-            className="border-slate-200"
           >
             {t('columnMapper.cancel')}
-          </Button>
-          <Button 
-            className="bg-[#3b82f6] hover:bg-[#2563eb] text-white border-0 
-                      shadow-none rounded-md px-6"
+          </PM7Button>
+          <PM7Button 
+            variant="primary"
             onClick={handleSave}
           >
             {t('columnMapper.save')}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+          </PM7Button>
+        </PM7DialogFooter>
+      </PM7DialogContent>
+    </PM7Dialog>
   );
 };
 

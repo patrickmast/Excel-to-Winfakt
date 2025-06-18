@@ -1,12 +1,14 @@
-// Updated to add language switcher in the info dialog
+// Updated to use PM7Dialog components
 import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+  PM7Dialog,
+  PM7DialogContent,
+  PM7DialogHeader,
+  PM7DialogTitle,
+  PM7DialogFooter,
+  PM7DialogSeparator
+} from 'pm7-ui-style-guide';
+import 'pm7-ui-style-guide/src/components/dialog/pm7-dialog.css';
+import { PM7Button } from 'pm7-ui-style-guide';
 import { formatRelativeDate } from '@/utils/dateFormat';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -82,13 +84,17 @@ const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCou
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 overflow-hidden border-0 min-w-[500px]">
-        <div className="bg-slate-700 p-5 rounded-t-lg">
-          <DialogTitle className="text-white m-0 text-base">CSV for Winfakt imports</DialogTitle>
-        </div>
+    <PM7Dialog open={open} onOpenChange={onOpenChange}>
+      <PM7DialogContent 
+        maxWidth="xs" 
+        showCloseButton={false} 
+        className="max-w-[500px]"
+      >
+        <PM7DialogHeader>
+          <PM7DialogTitle>CSV for Winfakt imports</PM7DialogTitle>
+        </PM7DialogHeader>
 
-        <div className="py-8 px-6">
+        <div className="space-y-6">
           <div className="space-y-3">
             <div className="flex items-center">
               <span className="font-medium min-w-[140px] text-slate-600">{t('header.sourceFile')}:</span>
@@ -112,7 +118,9 @@ const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCou
             )}
           </div>
 
-          <div className="text-xs mt-8 pt-4 border-t space-y-2">
+          <PM7DialogSeparator />
+
+          <div className="text-xs space-y-2">
             <div className="flex items-center">
               <span className="min-w-[140px] text-slate-500">{t('common.version')}:</span>
               <span className="text-slate-600">{getVersionNumber()}</span>
@@ -121,12 +129,11 @@ const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCou
               <span className="min-w-[140px] text-slate-500">{import.meta.env.DEV ? t('common.lastModified') : t('common.deployedOn')}:</span>
               <span className="text-slate-600">{formattedDate}</span>
             </div>
-
           </div>
         </div>
 
-        <div className="p-5 bg-gray-50">
-          <div className="flex justify-between items-center">
+        <PM7DialogFooter>
+          <div className="flex justify-between items-center w-full">
             <div className="flex items-center">
               <span className="text-slate-500 text-xs mr-2">Language:</span>
               <select 
@@ -140,17 +147,16 @@ const InfoDialog = ({ open, onOpenChange, configId, sourceFileName, sourceRowCou
                 <option value="tr">Türkçe</option>
               </select>
             </div>
-            <Button 
-              className="bg-[#3b82f6] hover:bg-[#2563eb] text-white border-0 
-                        shadow-none rounded-md px-6"
+            <PM7Button 
+              variant="primary"
               onClick={() => onOpenChange(false)}
             >
               {t('dialogs.close')}
-            </Button>
+            </PM7Button>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </PM7DialogFooter>
+      </PM7DialogContent>
+    </PM7Dialog>
   );
 };
 

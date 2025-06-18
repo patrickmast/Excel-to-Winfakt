@@ -10,8 +10,17 @@ import VersionDisplay from '../VersionDisplay';
 import { VanillaMenu } from '../vanilla/react/VanillaMenu';
 import '@/components/vanilla/Menu.css';
 import { downloadCSV, addTimestampToFilename } from '@/utils/csvUtils';
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import {
+  PM7Dialog,
+  PM7DialogContent,
+  PM7DialogHeader,
+  PM7DialogTitle,
+  PM7DialogDescription,
+  PM7DialogFooter,
+  PM7DialogIcon,
+  PM7Button
+} from 'pm7-ui-style-guide';
+import 'pm7-ui-style-guide/src/components/dialog/pm7-dialog.css';
 import { AlertCircle } from 'lucide-react';
 import { Toaster } from 'pm7-ui-style-guide';
 import { useTranslation } from 'react-i18next';
@@ -313,30 +322,27 @@ const ColumnMapperContent = ({
       <div className="text-xs text-gray-300 ml-[0.4rem] mt-[0.2rem]">
         <VersionDisplay />
       </div>
-      <Dialog open={showNoFileDialog} onOpenChange={setShowNoFileDialog}>
-        <DialogContent className="p-0 overflow-hidden border-0">
-          <div className="bg-slate-700 p-5 rounded-t-lg">
-            <DialogTitle className="text-white m-0">{t('fileUpload.noFileSelected')}</DialogTitle>
-          </div>
-          <div className="py-10 px-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-500" />
-              <DialogDescription className="text-slate-600 m-0">
-                {t('fileUpload.selectFileBeforeExport')}
-              </DialogDescription>
-            </div>
-          </div>
-          <DialogFooter className="p-5 bg-gray-50">
-            <Button 
-              className="bg-[#3b82f6] hover:bg-[#2563eb] text-white border-0 
-                        shadow-none rounded-md px-6"
+      <PM7Dialog open={showNoFileDialog} onOpenChange={setShowNoFileDialog}>
+        <PM7DialogContent maxWidth="xs" showCloseButton={false}>
+          <PM7DialogHeader>
+            <PM7DialogIcon>
+              <AlertCircle className="h-6 w-6 text-amber-500" />
+            </PM7DialogIcon>
+            <PM7DialogTitle>{t('fileUpload.noFileSelected')}</PM7DialogTitle>
+            <PM7DialogDescription>
+              {t('fileUpload.selectFileBeforeExport')}
+            </PM7DialogDescription>
+          </PM7DialogHeader>
+          <PM7DialogFooter>
+            <PM7Button 
+              variant="primary"
               onClick={() => setShowNoFileDialog(false)}
             >
               {t('common.close')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </PM7Button>
+          </PM7DialogFooter>
+        </PM7DialogContent>
+      </PM7Dialog>
       <Toaster />
     </div>
   );

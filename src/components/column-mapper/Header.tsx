@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 import { VanillaMenu } from '../vanilla/react/VanillaMenu';
 import '@/components/vanilla/Menu.css';
 import { VanillaCard } from '../vanilla/react/VanillaCard';
-import { VanillaDialog } from '../vanilla/react/VanillaDialog';
 import { useTranslation } from 'react-i18next';
 import Papa from 'papaparse';
 import { showToast } from '../ui/SimpleToast';

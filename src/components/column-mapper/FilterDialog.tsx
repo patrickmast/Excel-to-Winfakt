@@ -1,15 +1,17 @@
-// Updated to add i18n translations
+// Updated to use PM7Dialog components
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+  PM7Dialog,
+  PM7DialogContent,
+  PM7DialogHeader,
+  PM7DialogTitle,
+  PM7DialogFooter,
+  PM7DialogDescription,
+  PM7DialogSeparator,
+  PM7Button
+} from 'pm7-ui-style-guide';
+import 'pm7-ui-style-guide/src/components/dialog/pm7-dialog.css';
 import { Input } from "@/components/ui/input";
 import { Plus, X, Code, Play, HelpCircle, Trash2 } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea";
@@ -108,14 +110,14 @@ const FilterCondition = ({ condition, onChange, onRemove, sourceColumns, showRem
         )}
       </div>
       {showRemove && (
-        <Button
+        <PM7Button
           variant="ghost"
           size="icon"
           onClick={onRemove}
           className="h-10 w-10 shrink-0"
         >
           <X className="h-4 w-4" />
-        </Button>
+        </PM7Button>
       )}
     </div>
   );
@@ -389,27 +391,27 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="sm:max-w-[600px] border-none">
-        <DialogHeader className="bg-[#1e2838] -mx-6 -mt-6 px-6 py-4 rounded-t-lg">
-          <DialogTitle className="flex items-center justify-between text-white text-lg font-semibold">
+    <PM7Dialog open={isOpen} onOpenChange={() => onClose()}>
+      <PM7DialogContent maxWidth="md" showCloseButton={false} className="max-w-[600px]">
+        <PM7DialogHeader>
+          <PM7DialogTitle className="flex items-center justify-between">
             <span>{t('columnMapper.filter.title')}</span>
-            <Button
-              variant="outline"
+            <PM7Button
+              variant="secondary"
               size="sm"
               onClick={() => setIsAdvancedMode(!isAdvancedMode)}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white hover:text-white border-0 transition-colors"
+              className="flex items-center gap-2"
             >
               <Code className="h-4 w-4" />
               {isAdvancedMode ? t('columnMapper.filter.switchToBasic') : t('columnMapper.filter.switchToAdvanced')}
-            </Button>
-          </DialogTitle>
-          <DialogDescription className="text-gray-300 mt-1">
+            </PM7Button>
+          </PM7DialogTitle>
+          <PM7DialogDescription>
             {isAdvancedMode
               ? t('columnMapper.filter.advancedDescription')
               : t('columnMapper.filter.basicDescription')}
-          </DialogDescription>
-        </DialogHeader>
+          </PM7DialogDescription>
+        </PM7DialogHeader>
         {isAdvancedMode ? (
           <div className="flex-1 flex flex-col min-h-0 -mt-1">
             <Tabs
@@ -585,21 +587,21 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
             {groups.map((group, groupIndex) => (
               <div key={groupIndex} className="space-y-4 p-4 border rounded-lg">
                 <div className="flex items-center justify-between">
-                  <Button
+                  <PM7Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleToggleGroupType(groupIndex)}
                   >
                     {group.type === 'AND' ? t('columnMapper.filter.andGroup') : t('columnMapper.filter.orGroup')}
-                  </Button>
+                  </PM7Button>
                   {groupIndex > 0 && (
-                    <Button
+                    <PM7Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleRemoveCondition(groupIndex, 0)}
                     >
                       <X className="h-4 w-4" />
-                    </Button>
+                    </PM7Button>
                   )}
                 </div>
                 <div className="space-y-4">
@@ -614,7 +616,7 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                     />
                   ))}
                 </div>
-                <Button
+                <PM7Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleAddCondition(groupIndex)}
@@ -622,93 +624,97 @@ export const FilterDialog = ({ isOpen, onClose, sourceColumns, onApplyFilter, so
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   {t('columnMapper.filter.addCondition')}
-                </Button>
+                </PM7Button>
               </div>
             ))}
-            <Button
+            <PM7Button
               variant="outline"
               onClick={handleAddGroup}
               className="w-full"
             >
               <Plus className="h-4 w-4 mr-2" />
               {t('columnMapper.filter.addOrGroup')}
-            </Button>
+            </PM7Button>
           </div>
         )}
-        <DialogFooter className="p-5 bg-gray-50 flex justify-end gap-3 -mx-6 -mb-6 rounded-b-lg">
-          <Button
-            type="button"
-            variant="outline"
-            disabled={isFilterEmpty}
-            onClick={() => {
-              if (!showClearConfirm) {
-                setShowClearConfirm(true);
-                return;
-              }
-            }}
-            className="border-slate-200 mr-auto hover:text-red-600 relative disabled:opacity-50"
-          >
+        <PM7DialogFooter>
+          <div className="flex justify-between items-center w-full">
             <div className="flex items-center gap-2">
-              <span>{t('columnMapper.filter.clearFilter')}</span>
-              {showClearConfirm && (
-                <div className="flex gap-1 border-l pl-2 ml-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-6 px-2 hover:bg-red-100 hover:text-red-600"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      resetToDefault();
-                      onApplyFilter(null);
-                      onClose();
-                    }}
-                  >
-                    {t('columnMapper.filter.yes')}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-6 px-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowClearConfirm(false);
-                    }}
-                  >
-                    {t('columnMapper.filter.no')}
-                  </Button>
+              <PM7Button
+                type="button"
+                variant="outline"
+                disabled={isFilterEmpty}
+                onClick={() => {
+                  if (!showClearConfirm) {
+                    setShowClearConfirm(true);
+                    return;
+                  }
+                }}
+                className="hover:text-red-600 relative disabled:opacity-50"
+              >
+                <div className="flex items-center gap-2">
+                  <span>{t('columnMapper.filter.clearFilter')}</span>
+                  {showClearConfirm && (
+                    <div className="flex gap-1 border-l pl-2 ml-2">
+                      <PM7Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 px-2 hover:bg-red-100 hover:text-red-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          resetToDefault();
+                          onApplyFilter(null);
+                          onClose();
+                        }}
+                      >
+                        {t('columnMapper.filter.yes')}
+                      </PM7Button>
+                      <PM7Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 px-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowClearConfirm(false);
+                        }}
+                      >
+                        {t('columnMapper.filter.no')}
+                      </PM7Button>
+                    </div>
+                  )}
                 </div>
+              </PM7Button>
+              {isAdvancedMode && (
+                <PM7Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleTest}
+                >
+                  <Play className="h-4 w-4 mr-2" />
+                  {t('columnMapper.filter.testExpression')}
+                </PM7Button>
               )}
             </div>
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            className="border-slate-200"
-          >
-            {t('dialogs.cancel')}
-          </Button>
-          <Button
-            type="submit"
-            onClick={handleApply}
-            disabled={!isValid}
-            className="bg-blue-500 hover:bg-blue-600 text-white"
-          >
-            {t('columnMapper.filter.applyFilter')}
-          </Button>
-          {isAdvancedMode && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleTest}
-              className="absolute left-6"
-            >
-              <Play className="h-4 w-4 mr-2" />
-              {t('columnMapper.filter.testExpression')}
-            </Button>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            <div className="flex items-center gap-2">
+              <PM7Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+              >
+                {t('dialogs.cancel')}
+              </PM7Button>
+              <PM7Button
+                type="submit"
+                onClick={handleApply}
+                disabled={!isValid}
+                variant="primary"
+              >
+                {t('columnMapper.filter.applyFilter')}
+              </PM7Button>
+            </div>
+          </div>
+        </PM7DialogFooter>
+      </PM7DialogContent>
+    </PM7Dialog>
   );
 };

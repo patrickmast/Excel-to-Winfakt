@@ -2,7 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Settings, Info } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  PM7Dialog,
+  PM7DialogContent,
+  PM7DialogHeader,
+  PM7DialogTitle,
+  PM7DialogFooter,
+  PM7Button
+} from 'pm7-ui-style-guide';
+import 'pm7-ui-style-guide/src/components/dialog/pm7-dialog.css';
 import { useTranslation } from 'react-i18next';
 
 interface ColumnPreviewProps {
@@ -96,12 +104,12 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
       
       {/* Column Data Preview Dialog */}
       {showDataPreview && (
-        <Dialog open={showDataPreview} onOpenChange={setShowDataPreview}>
-          <DialogContent className="min-w-[500px] max-w-md border-0 overflow-hidden p-0">
-            <DialogHeader className="bg-slate-700 p-5 rounded-t-lg">
-              <DialogTitle className="text-white m-0 text-base">{t('columnMapper.dataPreview')}: {columnName}</DialogTitle>
-            </DialogHeader>
-            <div className="py-8 px-6">
+        <PM7Dialog open={showDataPreview} onOpenChange={setShowDataPreview}>
+          <PM7DialogContent maxWidth="sm" showCloseButton={false} className="max-w-[500px]">
+            <PM7DialogHeader>
+              <PM7DialogTitle>{t('columnMapper.dataPreview')}: {columnName}</PM7DialogTitle>
+            </PM7DialogHeader>
+            <div className="py-4">
               <p className="text-sm text-slate-500 mb-4">{t('columnMapper.firstFiveRows')}</p>
               <div className="border rounded-md overflow-hidden">
                 <table className="w-full">
@@ -126,17 +134,17 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
                   </tbody>
                 </table>
               </div>
-              <DialogFooter className="mt-6 gap-2">
-                <button 
-                  onClick={() => setShowDataPreview(false)}
-                  className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {t('dialogs.close')}
-                </button>
-              </DialogFooter>
             </div>
-          </DialogContent>
-        </Dialog>
+            <PM7DialogFooter>
+              <PM7Button 
+                onClick={() => setShowDataPreview(false)}
+                variant="primary"
+              >
+                {t('dialogs.close')}
+              </PM7Button>
+            </PM7DialogFooter>
+          </PM7DialogContent>
+        </PM7Dialog>
       )}
     </div>
   );

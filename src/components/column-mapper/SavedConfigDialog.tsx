@@ -1,12 +1,13 @@
-import { Button } from '../ui/button';
 import { Copy } from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+  PM7Dialog,
+  PM7DialogContent,
+  PM7DialogHeader,
+  PM7DialogTitle,
+  PM7DialogDescription,
+  PM7Button
+} from 'pm7-ui-style-guide';
+import 'pm7-ui-style-guide/src/components/dialog/pm7-dialog.css';
 import { showToast } from '@/components/ui/SimpleToast';
 
 interface SavedConfigDialogProps {
@@ -33,27 +34,29 @@ const SavedConfigDialog = ({ open, onOpenChange, configUrl }: SavedConfigDialogP
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Settings saved successfully</DialogTitle>
-          <DialogDescription className="space-y-4">
-            <p>Your configuration has been saved. You can access it using the URL below:</p>
-            <div className="flex items-center gap-2 p-2 bg-muted rounded-md">
-              <span className="flex-1 text-sm break-all">{configUrl}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleCopyUrl}
-                className="h-8 w-8"
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
+    <PM7Dialog open={open} onOpenChange={onOpenChange}>
+      <PM7DialogContent maxWidth="sm" showCloseButton={true}>
+        <PM7DialogHeader>
+          <PM7DialogTitle>Settings saved successfully</PM7DialogTitle>
+          <PM7DialogDescription>
+            <div className="space-y-4">
+              <p>Your configuration has been saved. You can access it using the URL below:</p>
+              <div className="flex items-center gap-2 p-2 bg-muted rounded-md">
+                <span className="flex-1 text-sm break-all">{configUrl}</span>
+                <PM7Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCopyUrl}
+                  className="h-8 w-8"
+                >
+                  <Copy className="h-4 w-4" />
+                </PM7Button>
+              </div>
             </div>
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
+          </PM7DialogDescription>
+        </PM7DialogHeader>
+      </PM7DialogContent>
+    </PM7Dialog>
   );
 };
 
