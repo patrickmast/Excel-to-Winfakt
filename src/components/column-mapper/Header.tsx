@@ -507,20 +507,6 @@ const Header = ({
   return (
     <div className="flex items-center justify-between">
       <span>{t('columnMapper.sourceColumns')}</span>
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            showToast({
-              title: "Test Toast",
-              description: "Dit is een test toast notificatie",
-              variant: "destructive"
-            });
-          }}
-          className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Test Toast
-        </button>
       <input
         ref={fileInputRef}
         type="file"
@@ -594,7 +580,6 @@ const Header = ({
       >
         {isLoading ? t('common.loading') : t('header.sourceFile')}
       </VanillaMenu>
-      </div>
 
       {/* File preview dialog has been removed */}
 

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Checkbox } from '../ui/checkbox';
 import {
@@ -9,6 +8,7 @@ import {
   PM7DialogTitle,
   PM7DialogDescription,
   PM7DialogFooter,
+  PM7Button,
 } from 'pm7-ui-style-guide';
 import {
   AlertDialog,
@@ -192,20 +192,20 @@ const DeleteConfigDialog = ({
           </div>
 
           <PM7DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-            <Button
+            <PM7Button
               type="button"
-              variant="outline"
+              className="pm7-button-ghost"
               onClick={() => onOpenChange(false)}
             >
               Annuleren
-            </Button>
-            <Button
-              variant="destructive"
+            </PM7Button>
+            <PM7Button
+              className="pm7-button-destructive"
               onClick={() => setShowConfirmDialog(true)}
               disabled={selectedCount === 0 || isLoading}
             >
               {selectedCount === 0 ? 'Verwijderen' : `${selectedCount} verwijderen`}
-            </Button>
+            </PM7Button>
           </PM7DialogFooter>
         </PM7DialogContent>
       </PM7Dialog>

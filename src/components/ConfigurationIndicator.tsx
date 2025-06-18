@@ -40,9 +40,9 @@ const ConfigurationIndicator = ({ className = '', onSaveConfiguration, hasUnsave
     <div className={`flex items-center justify-center gap-2 ${className}`}>
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground">Dossier:</span>
-        <Badge variant="secondary" className="font-mono">
+        <span className="inline-flex items-center gap-1 rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-default bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100 hover:text-blue-800 font-mono">
           {dossier}
-        </Badge>
+        </span>
       </div>
       
       {config && (

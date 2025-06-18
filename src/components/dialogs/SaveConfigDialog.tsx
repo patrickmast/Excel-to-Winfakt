@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import {
@@ -9,6 +8,7 @@ import {
   PM7DialogTitle,
   PM7DialogDescription,
   PM7DialogFooter,
+  PM7Button,
 } from 'pm7-ui-style-guide';
 import { useConfigurationApi } from '@/hooks/use-configuration-api';
 import { useConfigurationContext } from '@/contexts/ConfigurationContext';
@@ -133,18 +133,18 @@ const SaveConfigDialog = ({
         </div>
 
         <PM7DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-          <Button
-            variant="outline"
+          <PM7Button
+            className="pm7-button-ghost"
             onClick={() => onOpenChange(false)}
           >
             Annuleren
-          </Button>
-          <Button
+          </PM7Button>
+          <PM7Button
             onClick={handleSave}
             disabled={isSaving}
           >
             Opslaan
-          </Button>
+          </PM7Button>
         </PM7DialogFooter>
       </PM7DialogContent>
     </PM7Dialog>

@@ -1,16 +1,13 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Resizable } from 're-resizable';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { addTimestampToFilename } from '@/utils/csvUtils';
-import './LogDialog.css';
+  PM7Dialog,
+  PM7DialogContent,
+  PM7DialogHeader,
+  PM7DialogTitle,
+  PM7DialogDescription,
+  PM7DialogFooter,
+  PM7Button,
+} from 'pm7-ui-style-guide';
 
 interface LogDialogProps {
   open: boolean;
@@ -32,7 +29,6 @@ const LogDialog = ({
   onExportComplete
 }: LogDialogProps) => {
   const [processing, setProcessing] = useState(false);
-  const [dialogWidth, setDialogWidth] = useState(700);
   const [progress, setProgress] = useState<{
     totalRows: number;
     exportedRows: number;
@@ -45,13 +41,6 @@ const LogDialog = ({
   const streamRef = useRef<ReadableStream | null>(null);
   const portRef = useRef<MessagePort | null>(null);
   const csvDataRef = useRef<{ data: string | null; filename: string | null }>({ data: null, filename: null });
-
-  // Reset width when dialog opens
-  useEffect(() => {
-    if (open) {
-      setDialogWidth(700);
-    }
-  }, [open]);
 
   // Format numbers with thousand separator
   const formatNumber = (num: number): string => {
@@ -207,76 +196,42 @@ const LogDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!p-0 !m-0 !max-w-none !border-0 !bg-transparent flex items-center justify-center !shadow-none">
-        <Resizable
-          size={{ width: dialogWidth, height: 'auto' }}
-          minWidth={400}
-          maxWidth={2000}
-          enable={{
-            top: false,
-            right: true,
-            bottom: false,
-            left: false,
-            topRight: false,
-            bottomRight: false,
-            bottomLeft: false,
-            topLeft: false
-          }}
-          handleStyles={{
-            right: {
-              width: '8px',
-              right: '-4px'
+    <PM7Dialog open={open} onOpenChange={onOpenChange}>
+      <PM7DialogContent className="sm:max-w-[700px]">
+        <PM7DialogHeader>
+          <PM7DialogTitle>Export report</PM7DialogTitle>
+          <PM7DialogDescription>
+            {processing 
+              ? "Please wait while the export is being processed..."
+              : downloadReady 
+                ? "Export complete! You can now download your CSV file."
+                : "Export report"
             }
-          }}
-          handleClasses={{
-            right: 'hover:bg-blue-100 transition-colors'
-          }}
-          onResizeStop={(_e, _direction, ref) => {
-            setDialogWidth(ref.offsetWidth);
-          }}
-          className="!bg-white rounded-lg overflow-hidden !shadow-none"
-          style={{ position: 'relative', margin: '0 auto' }}
-        >
-          <div className="bg-slate-700 p-6 rounded-t-lg">
-            <DialogTitle className="text-white m-0 text-xl font-semibold">Export report</DialogTitle>
-            <DialogDescription className="text-white/70 text-sm mt-1">
-              {processing 
-                ? "Please wait while the export is being processed..."
-                : downloadReady 
-                  ? "Export complete! You can now download your CSV file."
-                  : "Export report"
-              }
-            </DialogDescription>
-          </div>
+          </PM7DialogDescription>
+        </PM7DialogHeader>
 
-          <div className="py-3 px-6">
-            <pre id="export-report-content" className="font-mono text-sm text-slate-700 whitespace-pre-wrap bg-gray-50 p-6 rounded-md">
-              {report}
-            </pre>
-          </div>
+        <div className="py-3">
+          <pre id="export-report-content" className="font-mono text-sm text-slate-700 whitespace-pre-wrap bg-gray-50 p-6 rounded-md">
+            {report}
+          </pre>
+        </div>
 
-          <DialogFooter className="p-6 bg-gray-50">
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={onOpenChange.bind(null, false)}
-                className="!shadow-none rounded-md px-6"
-              >
-                Close
-              </Button>
-              <Button
-                onClick={handleDownload}
-                disabled={processing || !workerRef.current || !downloadReady}
-                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white border-0 !shadow-none rounded-md px-6"
-              >
-                Download CSV
-              </Button>
-            </div>
-          </DialogFooter>
-        </Resizable>
-      </DialogContent>
-    </Dialog>
+        <PM7DialogFooter>
+          <PM7Button
+            className="pm7-button-ghost"
+            onClick={() => onOpenChange(false)}
+          >
+            Close
+          </PM7Button>
+          <PM7Button
+            onClick={handleDownload}
+            disabled={processing || !workerRef.current || !downloadReady}
+          >
+            Download CSV
+          </PM7Button>
+        </PM7DialogFooter>
+      </PM7DialogContent>
+    </PM7Dialog>
   );
 };
 

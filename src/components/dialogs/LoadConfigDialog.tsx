@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import {
   PM7Dialog,
@@ -8,6 +7,7 @@ import {
   PM7DialogTitle,
   PM7DialogDescription,
   PM7DialogFooter,
+  PM7Button,
 } from 'pm7-ui-style-guide';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useConfigurationApi } from '@/hooks/use-configuration-api';
@@ -122,19 +122,19 @@ const LoadConfigDialog = ({
         </div>
 
         <PM7DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-          <Button
+          <PM7Button
             type="button"
-            variant="outline"
+            className="pm7-button-ghost"
             onClick={() => onOpenChange(false)}
           >
             Annuleren
-          </Button>
-          <Button
+          </PM7Button>
+          <PM7Button
             onClick={handleLoad}
             disabled={!selectedConfig || isLoading}
           >
             {isLoading ? 'Bezig...' : 'Laden'}
-          </Button>
+          </PM7Button>
         </PM7DialogFooter>
       </PM7DialogContent>
     </PM7Dialog>

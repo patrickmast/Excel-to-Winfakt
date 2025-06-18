@@ -105,7 +105,8 @@ const PM7ConfigurationMenu = ({
         menuItems={menuItems}
         menuAlignment="end"
         theme={theme}
-        menuTriggerBordered={true}
+        menuTriggerBorder={true}
+        menuTriggerBorderColor="#d1d5db"
         menuBackgroundColor="white"
         menuTriggerBackgroundColor="white"
       />

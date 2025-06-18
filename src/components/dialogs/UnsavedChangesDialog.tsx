@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from "@/components/ui/button";
 import {
   PM7Dialog,
   PM7DialogContent,
@@ -8,6 +7,7 @@ import {
   PM7DialogTitle,
   PM7DialogDescription,
   PM7DialogFooter,
+  PM7Button,
 } from 'pm7-ui-style-guide';
 
 interface UnsavedChangesDialogProps {
@@ -53,24 +53,23 @@ const UnsavedChangesDialog: React.FC<UnsavedChangesDialogProps> = ({
         </PM7DialogHeader>
         
         <PM7DialogFooter className="flex flex-row justify-end space-x-2 bg-gray-50 px-6 py-4 border-t">
-          <Button 
-            variant="outline"
+          <PM7Button 
+            className="pm7-button-ghost mr-auto"
             onClick={handleCancel}
-            className="mr-auto"
           >
             {t('unsavedChanges.cancelButton')}
-          </Button>
-          <Button 
+          </PM7Button>
+          <PM7Button 
             onClick={handleDiscard} 
-            variant="destructive"
+            className="pm7-button-destructive"
           >
             {t('unsavedChanges.discardButton')}
-          </Button>
-          <Button 
+          </PM7Button>
+          <PM7Button 
             onClick={handleSave}
           >
             {t('unsavedChanges.saveButton')}
-          </Button>
+          </PM7Button>
         </PM7DialogFooter>
       </PM7DialogContent>
     </PM7Dialog>

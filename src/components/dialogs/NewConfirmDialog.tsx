@@ -1,7 +1,6 @@
 // NewConfirmDialog.tsx - Dialog to confirm creating new configuration
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../ui/button';
 import {
   PM7Dialog,
   PM7DialogContent,
@@ -10,6 +9,7 @@ import {
   PM7DialogDescription,
   PM7DialogFooter,
   PM7DialogOverlay,
+  PM7Button,
 } from 'pm7-ui-style-guide';
 
 interface NewConfirmDialogProps {
@@ -41,18 +41,17 @@ const NewConfirmDialog: React.FC<NewConfirmDialogProps> = ({
         </PM7DialogHeader>
         
         <PM7DialogFooter>
-          <Button 
-            variant="outline" 
+          <PM7Button 
+            className="pm7-button-ghost" 
             onClick={() => onOpenChange(false)}
           >
             {t('newConfig.cancelButton')}
-          </Button>
-          <Button 
+          </PM7Button>
+          <PM7Button 
             onClick={handleConfirm}
-            style={{ backgroundColor: '#1B86EF', color: 'white' }}
           >
             {t('newConfig.confirmButton')}
-          </Button>
+          </PM7Button>
         </PM7DialogFooter>
       </PM7DialogContent>
     </PM7Dialog>
