@@ -32,3 +32,4 @@ dist-ssr
 
 # Windsurf IDE files
 # .windsurfrules - now tracked in repository
+.vercel

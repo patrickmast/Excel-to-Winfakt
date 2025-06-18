@@ -75,12 +75,12 @@ The app uses a Web Worker architecture for handling large files:
 
 ## Important Configuration
 
-### Cloudflare Workers Deployment
-The Vite config includes `target: 'esnext'` specifically for Cloudflare Workers compatibility:
+### Vite Build Configuration
+The Vite config is optimized for modern browsers:
 
 ```typescript
 build: {
-  target: 'esnext',  // Required for Cloudflare Workers
+  target: 'esnext',  // Modern JS target for optimal performance
   outDir: 'dist',
   chunkSizeWarningLimit: 1000
 }
@@ -197,16 +197,10 @@ The application tracks unsaved changes and displays indicators:
 - Framework: Vite
 - Node version: 18.x
 
-**Cloudflare Workers Configuration**:
-- Build command: `npm ci && npm run build`
-- Build output: `dist`
-- Environment variables: `CI=true`, `NODE_VERSION=18`
-- Important: Vite config uses `target: 'esnext'` for Workers compatibility
-
 **Build Process**:
 1. Generate build info (timestamp, version) - runs automatically via `prebuild` script
 2. Vite build with modern JS target
-3. Deploy to Vercel or Cloudflare Workers
+3. Deploy to Vercel
 
 ## Critical Implementation Details
 
