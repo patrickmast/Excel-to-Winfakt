@@ -33,7 +33,6 @@ const FunctionRow = ({ name, description }: FunctionRowProps) => {
                 variant="ghost"
                 size="icon"
                 onClick={copyToClipboard}
-                className="h-6 w-6"
               >
                 <Copy className="h-3 w-3" />
               </Button>

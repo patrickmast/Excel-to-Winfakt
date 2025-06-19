@@ -7,8 +7,7 @@ import Header from './Header';
 import { MappingState } from './types';
 import { CompoundFilter } from './FilterDialog';
 import VersionDisplay from '../VersionDisplay';
-import { VanillaMenu } from '../vanilla/react/VanillaMenu';
-import '@/components/vanilla/Menu.css';
+import { PM7Menu } from 'pm7-ui-style-guide';
 import { downloadCSV, addTimestampToFilename } from '@/utils/csvUtils';
 import {
   PM7Dialog,
@@ -296,7 +295,7 @@ const ColumnMapperContent = ({
               title={
                 <div className="flex items-center justify-between">
                   <span>{t('columnMapper.targetColumns')}</span>
-                  <VanillaMenu
+                  <PM7Menu
                     items={columnSetItems.map(item => ({
                       label: item.label,
                       icon: item.icon,
@@ -304,7 +303,7 @@ const ColumnMapperContent = ({
                     }))}
                   >
                     {activeColumnSet === 'artikelen' ? t('columnMapper.artikelen') : t('columnMapper.klanten')}
-                  </VanillaMenu>
+                  </PM7Menu>
                 </div>
               }
               columns={targetColumns}

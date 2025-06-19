@@ -1,5 +1,4 @@
 import { useRef } from 'react';
-import { VanillaMenu } from './vanilla/react/VanillaMenu';
 import { showToast } from './ui/SimpleToast';
 
 interface FileUploadProps {

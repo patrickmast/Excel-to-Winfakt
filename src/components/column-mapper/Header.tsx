@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
-import { VanillaMenu } from '../vanilla/react/VanillaMenu';
-import '@/components/vanilla/Menu.css';
+import { PM7Menu } from 'pm7-ui-style-guide';
 import { VanillaCard } from '../vanilla/react/VanillaCard';
 import { useTranslation } from 'react-i18next';
 import Papa from 'papaparse';
@@ -515,7 +514,7 @@ const Header = ({
         data-testid="file-input"
         multiple
       />
-      <VanillaMenu
+      <PM7Menu
         items={[
           {
             label: isLoading ? t('common.loading') : t('header.selectFile'),
@@ -578,7 +577,7 @@ const Header = ({
         ]}
       >
         {isLoading ? t('common.loading') : t('header.sourceFile')}
-      </VanillaMenu>
+      </PM7Menu>
 
       {/* File preview dialog has been removed */}
 

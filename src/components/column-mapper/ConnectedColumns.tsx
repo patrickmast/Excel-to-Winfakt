@@ -226,8 +226,8 @@ const ConnectedColumns = ({
                 className={classnames({
                   'bg-blue-100 border-blue-500 text-blue-700 hover:bg-blue-200 hover:text-blue-800': activeFilter,
                 })}
+                icon={<Filter />}
               >
-                <Filter className="h-4 w-4 mr-2" />
                 {activeFilter ? t('columnMapper.filterActive') : t('columnMapper.filterButton')}
               </Button>
             )}
