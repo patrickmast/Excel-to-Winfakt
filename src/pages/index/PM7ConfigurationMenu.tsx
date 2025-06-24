@@ -1,8 +1,9 @@
 import { PM7Menu, PM7MenuSeparator } from 'pm7-ui-style-guide';
 import { useTranslation } from 'react-i18next';
-import { Plus, Save, Download, Trash2, Info, FileText, BookOpen } from 'lucide-react';
+import { Plus, Save, Download, Trash2, Info, FileText, BookOpen, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import DocumentationDialog from '@/components/dialogs/DocumentationDialog';
+import { WhatsNewDialog } from '@/components/column-mapper/WhatsNewDialog';
 
 interface PM7ConfigurationMenuProps {
   onNew: () => void;
@@ -26,6 +27,7 @@ const PM7ConfigurationMenu = ({
   const { t } = useTranslation();
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [showDocumentation, setShowDocumentation] = useState(false);
+  const [showWhatsNew, setShowWhatsNew] = useState(false);
 
   useEffect(() => {
     // Check if dark mode is enabled
@@ -85,6 +87,12 @@ const PM7ConfigurationMenu = ({
     },
     { id: 'sep3', type: 'separator' },
     {
+      id: 'whatsNew',
+      label: "What's New",
+      onClick: () => setShowWhatsNew(true),
+      icon: <Sparkles className="h-4 w-4" />
+    },
+    {
       id: 'documentation',
       label: 'Documentatie',
       onClick: () => setShowDocumentation(true),
@@ -119,6 +127,10 @@ const PM7ConfigurationMenu = ({
       <DocumentationDialog 
         open={showDocumentation} 
         onOpenChange={setShowDocumentation} 
+      />
+      <WhatsNewDialog 
+        isOpen={showWhatsNew} 
+        onOpenChange={setShowWhatsNew} 
       />
     </>
   );

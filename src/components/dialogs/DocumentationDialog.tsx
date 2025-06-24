@@ -41,7 +41,7 @@ const DocumentationDialog = ({ open, onOpenChange }: DocumentationDialogProps) =
                       <li>CSV bestanden</li>
                       <li>Excel (.xlsx) bestanden</li>
                       <li>Winfakt Classic (.soc) bestanden</li>
-                      <li>DBF database bestanden</li>
+                      <li>DBF database bestanden (.dbf)</li>
                     </ul>
                   </div>
                   <div>
