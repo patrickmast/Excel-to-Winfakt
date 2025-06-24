@@ -24,7 +24,8 @@ export function identifyColumnGroups(columns: string[]): ColumnGroup[] {
     "Bebat",
     "Reprobel",
     "Accijnzen",
-    "Ecoboni"
+    "Ecoboni",
+    "Fostplus"
   ];
   
   // Stock fields (should appear after Hoofdgroep and Subgroep)

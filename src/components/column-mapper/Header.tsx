@@ -515,8 +515,9 @@ const Header = ({
         multiple
       />
       <PM7Menu
-        items={[
+        menuItems={[
           {
+            id: 'select-file',
             label: isLoading ? t('common.loading') : t('header.selectFile'),
             onClick: isLoading ? undefined : handleSelectFile,
             disabled: isLoading,
@@ -553,6 +554,7 @@ const Header = ({
             )
           },
           {
+            id: 'select-worksheet',
             label: t('header.selectWorksheet'),
             onClick: () => setShowSheetSelector(true),
             disabled: !currentWorkbook || currentWorkbook.workbook.SheetNames.length <= 1,
@@ -575,9 +577,15 @@ const Header = ({
             )
           }
         ]}
-      >
-        {isLoading ? t('common.loading') : t('header.sourceFile')}
-      </PM7Menu>
+        menuLabel={isLoading ? t('common.loading') : t('header.sourceFile')}
+        theme="light"
+        menuTriggerBorder={true}
+        menuTriggerBorderColor="rgba(0, 0, 0, 0.1)"
+        menuTriggerHoverBorderColor="rgba(0, 0, 0, 0.2)"
+        menuTriggerBackground={true}
+        menuTriggerBackgroundColor="white"
+        menuTriggerHoverBackgroundColor="rgba(0, 0, 0, 0.05)"
+      />
 
       {/* File preview dialog has been removed */}
 

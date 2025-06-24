@@ -430,7 +430,7 @@ const ARTIKEL_COLUMNS = [
   "Netto verkoopprijs 1", "BTW-percentage",
   
   // Tax fields
-  "Recupel", "Auvibel", "Bebat", "Reprobel", "Accijnzen", "Ecoboni",
+  "Recupel", "Auvibel", "Bebat", "Reprobel", "Accijnzen", "Ecoboni", "Fostplus",
   "Leeggoed",
   
   // Product details
@@ -479,6 +479,7 @@ const KLANTEN_COLUMNS = [
   "Contactnummer",
   "Info",
   "Btw-nummer",
+  "Btw-regime",
   "Standaard betalingstermijn",
   "Ondernemingsnummer",
   "Maximum herinnering",

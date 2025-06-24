@@ -296,14 +296,21 @@ const ColumnMapperContent = ({
                 <div className="flex items-center justify-between">
                   <span>{t('columnMapper.targetColumns')}</span>
                   <PM7Menu
-                    items={columnSetItems.map(item => ({
+                    menuItems={columnSetItems.map(item => ({
+                      id: item.value,
                       label: item.label,
                       icon: item.icon,
                       onClick: () => onColumnSetChange(item.value as 'artikelen' | 'klanten')
                     }))}
-                  >
-                    {activeColumnSet === 'artikelen' ? t('columnMapper.artikelen') : t('columnMapper.klanten')}
-                  </PM7Menu>
+                    menuLabel={activeColumnSet === 'artikelen' ? t('columnMapper.artikelen') : t('columnMapper.klanten')}
+                    theme="light"
+                    menuTriggerBorder={true}
+                    menuTriggerBorderColor="rgba(0, 0, 0, 0.1)"
+                    menuTriggerHoverBorderColor="rgba(0, 0, 0, 0.2)"
+                    menuTriggerBackground={true}
+                    menuTriggerBackgroundColor="white"
+                    menuTriggerHoverBackgroundColor="rgba(0, 0, 0, 0.05)"
+                  />
                 </div>
               }
               columns={targetColumns}

@@ -35,6 +35,7 @@ npm run generate-build-info  # Generate build timestamp and version info
 - **React 18** with TypeScript for the frontend
 - **Vite** as build tool with SWC plugin for fast compilation
 - **Tailwind CSS** + **shadcn/ui** for styling and components
+- **PM7 UI Style Guide** for consistent branding components
 - **Radix UI** primitives for accessible components
 - **Supabase** for configuration storage and sharing
 - **i18next** for internationalization (EN, NL, FR, TR)
