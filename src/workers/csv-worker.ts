@@ -74,8 +74,8 @@ self.onmessage = async (e) => {
           stats.skippedRows = 0;
         }
         
-        // Process each row
-        processedChunks = rows;  // Store all rows for CSV conversion
+        // Process each row - make sure we only get array data, not objects
+        processedChunks = Array.isArray(rows) ? rows.filter(row => typeof row === 'object' && row !== null && !Array.isArray(row)) : [];
         
         // Send progress every 10k rows
         for (let i = 0; i < rows.length; i += 10000) {
@@ -93,7 +93,6 @@ self.onmessage = async (e) => {
           skipEmptyLines: true,
           quotes: false,
           delimiter: ';',
-          escapeChar: '\\',
           encoding: 'UTF-8'
         });
         

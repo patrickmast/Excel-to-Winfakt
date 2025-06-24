@@ -7,6 +7,7 @@ import {
   PM7DialogContent,
   PM7DialogHeader,
   PM7DialogTitle,
+  PM7DialogDescription,
   PM7DialogFooter,
   PM7Button
 } from 'pm7-ui-style-guide';
@@ -108,9 +109,11 @@ const ColumnPreview: React.FC<ColumnPreviewProps> = ({
           <PM7DialogContent maxWidth="sm" showCloseButton={false} className="max-w-[500px]">
             <PM7DialogHeader>
               <PM7DialogTitle>{t('columnMapper.dataPreview')}: {columnName}</PM7DialogTitle>
+              <PM7DialogDescription>
+                {t('columnMapper.firstFiveRows')}
+              </PM7DialogDescription>
             </PM7DialogHeader>
             <div className="py-4">
-              <p className="text-sm text-slate-500 mb-4">{t('columnMapper.firstFiveRows')}</p>
               <div className="border rounded-md overflow-hidden">
                 <table className="w-full">
                   <thead>

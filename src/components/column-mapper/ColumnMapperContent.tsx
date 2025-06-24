@@ -154,7 +154,9 @@ const ColumnMapperContent = ({
       return state.columnOrder
         .filter(key => state.mapping[key] && state.mapping[key] !== '')
         .map(key => {
-          const sourceColumn = key.split('_')[0];
+          // Extract source column by removing the connection counter suffix (_N)
+          const lastUnderscoreIndex = key.lastIndexOf('_');
+          const sourceColumn = key.substring(0, lastUnderscoreIndex);
           const target = state.mapping[key];
           return [key, sourceColumn, target] as [string, string, string];
         });
@@ -162,7 +164,9 @@ const ColumnMapperContent = ({
     
     // Only use Object.entries fallback if we have no columnOrder and no mapping (new session)
     return Object.entries(state.mapping).map(([key, target]) => {
-      const sourceColumn = key.split('_')[0];
+      // Extract source column by removing the connection counter suffix (_N)
+      const lastUnderscoreIndex = key.lastIndexOf('_');
+      const sourceColumn = key.substring(0, lastUnderscoreIndex);
       return [key, sourceColumn, target] as [string, string, string];
     }).filter(([_, __, target]) => target !== '');
   })();
@@ -222,25 +226,8 @@ const ColumnMapperContent = ({
       return;
     }
 
-    const transformedData = state.sourceData.map(row => {
-      const newRow: Record<string, any> = {};
-      state.sourceColumns.forEach(sourceColumn => {
-        const targetColumn = state.mapping[sourceColumn] || sourceColumn;
-        let value = row[sourceColumn];
-        if (state.columnTransforms[sourceColumn]) {
-          try {
-            const transform = new Function('value', 'row', `return ${state.columnTransforms[sourceColumn]}`);
-            value = transform(value, row);
-          } catch (error) {
-            console.error(`Error transforming column ${sourceColumn}:`, error);
-          }
-        }
-        newRow[targetColumn] = value;
-      });
-      return newRow;
-    });
-
-    onExport(transformedData, state.metadata);
+    // Just pass the raw data - parent component (ColumnMapper) handles transformation
+    onExport(state.sourceData);
   };
 
   return (

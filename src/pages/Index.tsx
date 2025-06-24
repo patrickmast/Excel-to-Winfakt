@@ -275,8 +275,8 @@ const Index = () => {
     setColumnOrder(newColumnOrder);
   };
 
-  const handleExport = useCallback(async (data: any[], sourceFilename: string) => {
-    if (!sourceFilename) {
+  const handleExport = useCallback(async (data: any[], metadata?: any) => {
+    if (!mappingState.sourceFilename) {
       return;
     }
     
@@ -285,7 +285,7 @@ const Index = () => {
     
     // Pass the data to LogDialog for processing
     setExportData(data);
-  }, []);
+  }, [mappingState.sourceFilename]);
 
   const handleExportComplete = useCallback((report: string, exportedData: any[]) => {
     setLatestReport(report);

@@ -159,5 +159,20 @@
     "saveAs": "Save as",
     "clear": "Clear",
     "info": "Info"
+  },
+  "export": {
+    "reportTitle": "Export report",
+    "processing": "Please wait while the export is being processed...",
+    "complete": "Export complete! You can now download your CSV file.",
+    "reportDescription": "Export report",
+    "downloadCSV": "Download CSV",
+    "processingExport": "Processing export...",
+    "reportFrom": "Export report from",
+    "sourceFile": "Source file",
+    "worksheet": "Worksheet",
+    "totalRowsProcessed": "Total rows processed",
+    "successfullyExported": "Successfully exported rows",
+    "skippedEmptyRows": "Skipped empty rows",
+    "exportFilename": "Export filename"
   }
 }

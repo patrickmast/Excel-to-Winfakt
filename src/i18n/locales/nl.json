@@ -198,5 +198,20 @@
     "saveAs": "Opslaan als",
     "clear": "Wissen",
     "info": "Info"
+  },
+  "export": {
+    "reportTitle": "Export rapport",
+    "processing": "Even geduld terwijl de export wordt verwerkt...",
+    "complete": "Export voltooid! Je kunt nu je CSV-bestand downloaden.",
+    "reportDescription": "Export rapport",
+    "downloadCSV": "Download CSV",
+    "processingExport": "Export wordt verwerkt...",
+    "reportFrom": "Export rapport van",
+    "sourceFile": "Bronbestand",
+    "worksheet": "Werkblad",
+    "totalRowsProcessed": "Totaal aantal verwerkte rijen",
+    "successfullyExported": "Succesvol geëxporteerde rijen",
+    "skippedEmptyRows": "Overgeslagen lege rijen",
+    "exportFilename": "Export bestandsnaam"
   }
 }

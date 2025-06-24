@@ -103,7 +103,9 @@ const ColumnMapper = ({
     const transformedData = dataToTransform.map(row => {
       const newRow: Record<string, any> = {};
       Object.entries(state.mapping).forEach(([uniqueKey, target]) => {
-        const sourceColumn = uniqueKey.split('_')[0];
+        // Extract source column by removing the connection counter suffix (_N)
+        const lastUnderscoreIndex = uniqueKey.lastIndexOf('_');
+        const sourceColumn = uniqueKey.substring(0, lastUnderscoreIndex);
         let value = row[sourceColumn];
 
         if (state.columnTransforms[uniqueKey]) {
@@ -185,7 +187,9 @@ const ColumnMapper = ({
     if (updates.columnOrder !== undefined && onReorder) {
       // Reconstruct the order array from the mapping
       const newOrder = (updates.columnOrder || []).map(key => {
-        const sourceColumn = key.split('_')[0];
+        // Extract source column by removing the connection counter suffix (_N)
+        const lastUnderscoreIndex = key.lastIndexOf('_');
+        const sourceColumn = key.substring(0, lastUnderscoreIndex);
         const target = updates.mapping?.[key] || state.mapping[key] || '';
         return [key, sourceColumn, target] as [string, string, string];
       });

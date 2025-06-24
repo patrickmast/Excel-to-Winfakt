@@ -8,6 +8,7 @@ import {
   PM7DialogFooter,
   PM7Button,
 } from 'pm7-ui-style-guide';
+import { useTranslation } from 'react-i18next';
 
 interface LogDialogProps {
   open: boolean;
@@ -34,13 +35,14 @@ const LogDialog = ({
     exportedRows: number;
     skippedRows: number;
   } | null>(null);
-  const [report, setReport] = useState<string>('Processing export...');
+  const [report, setReport] = useState<string>('');
   const [downloadReady, setDownloadReady] = useState(false);
   const processedRef = useRef(false);
   const workerRef = useRef<Worker | null>(null);
   const streamRef = useRef<ReadableStream | null>(null);
   const portRef = useRef<MessagePort | null>(null);
   const csvDataRef = useRef<{ data: string | null; filename: string | null }>({ data: null, filename: null });
+  const { t } = useTranslation();
 
   // Format numbers with thousand separator
   const formatNumber = (num: number): string => {
@@ -85,6 +87,7 @@ const LogDialog = ({
   const processExport = async (data: any[], sourceFilename: string, metadata?: any) => {
     setProcessing(true);
     setDownloadReady(false);
+    setReport(t('export.processingExport'));
     
     // Create new worker
     if (workerRef.current) {
@@ -117,12 +120,12 @@ const LogDialog = ({
         case 'REPORT': {
           // Get current date/time at completion
           const now = new Date();
-          const dateTimeStr = now.toLocaleDateString('en-US', {
-            weekday: 'short',
-            month: 'short',
+          const dateTimeStr = now.toLocaleDateString('nl-NL', {
+            weekday: 'long',
             day: 'numeric',
+            month: 'long',
             year: 'numeric'
-          }) + ', ' + now.toLocaleTimeString('en-US', {
+          }) + ', ' + now.toLocaleTimeString('nl-NL', {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
@@ -131,14 +134,14 @@ const LogDialog = ({
 
           // Generate final report
           const finalReport = [
-            `Export report from ${dateTimeStr}`,
+            `${t('export.reportFrom')} ${dateTimeStr}`,
             '',
-            `Source file: ${sourceFilename}`,
-            worksheetName ? `Worksheet: ${worksheetName}` : null,
-            `Total rows processed: ${formatNumber(payload.totalRows)}`,
-            `Successfully exported rows: ${formatNumber(payload.exportedRows)}`,
-            `Skipped empty rows: ${formatNumber(payload.skippedRows)}`,
-            `Export filename: ${payload.filename}`
+            `${t('export.sourceFile')}: ${sourceFilename}`,
+            worksheetName ? `${t('export.worksheet')}: ${worksheetName}` : null,
+            `${t('export.totalRowsProcessed')}: ${formatNumber(payload.totalRows)}`,
+            `${t('export.successfullyExported')}: ${formatNumber(payload.exportedRows)}`,
+            `${t('export.skippedEmptyRows')}: ${formatNumber(payload.skippedRows)}`,
+            `${t('export.exportFilename')}: ${payload.filename}`
           ].filter(line => line !== null).join('\n');
 
           setReport(finalReport);
@@ -199,35 +202,36 @@ const LogDialog = ({
     <PM7Dialog open={open} onOpenChange={onOpenChange}>
       <PM7DialogContent className="sm:max-w-[700px]">
         <PM7DialogHeader>
-          <PM7DialogTitle>Export report</PM7DialogTitle>
+          <PM7DialogTitle>{t('export.reportTitle')}</PM7DialogTitle>
           <PM7DialogDescription>
             {processing 
-              ? "Please wait while the export is being processed..."
+              ? t('export.processing')
               : downloadReady 
-                ? "Export complete! You can now download your CSV file."
-                : "Export report"
+                ? t('export.complete')
+                : t('export.reportDescription')
             }
           </PM7DialogDescription>
         </PM7DialogHeader>
 
-        <div className="py-3">
-          <pre id="export-report-content" className="font-mono text-sm text-slate-700 whitespace-pre-wrap bg-gray-50 p-6 rounded-md">
+        <div className="py-4">
+          <pre id="export-report-content" className="font-mono text-sm text-slate-700 whitespace-pre-wrap bg-gray-50 p-6 rounded-md overflow-x-auto">
             {report}
           </pre>
         </div>
 
         <PM7DialogFooter>
           <PM7Button
-            className="pm7-button-ghost"
+            variant="ghost"
             onClick={() => onOpenChange(false)}
           >
-            Close
+            {t('dialogs.close')}
           </PM7Button>
           <PM7Button
+            variant="primary"
             onClick={handleDownload}
             disabled={processing || !workerRef.current || !downloadReady}
           >
-            Download CSV
+            {t('export.downloadCSV')}
           </PM7Button>
         </PM7DialogFooter>
       </PM7DialogContent>

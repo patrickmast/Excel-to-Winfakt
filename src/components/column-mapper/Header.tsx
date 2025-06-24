@@ -257,10 +257,21 @@ const Header = ({
               throw new Error('Failed to read file');
             }
 
-            const records = await parseDBF(arrayBuffer);
-            if (records && records.length > 0) {
-              const headers = Object.keys(records[0]);
-              onDataLoaded(headers, records, file.name, undefined, file.size);
+            // Create a File object from ArrayBuffer for parseDBF
+            const blob = new Blob([arrayBuffer]);
+            const dbfFile = new File([blob], file.name, { type: file.type });
+            
+            const result = await parseDBF(dbfFile);
+            if (result && result.data && result.data.length > 0) {
+              // Convert data array to objects with headers
+              const records = result.data.map(row => {
+                const obj: Record<string, string> = {};
+                result.headers.forEach((header, index) => {
+                  obj[header] = row[index] || '';
+                });
+                return obj;
+              });
+              onDataLoaded(result.headers, records, file.name, undefined, file.size);
             } else {
               showToast({
                 title: "Error",
@@ -348,13 +359,20 @@ const Header = ({
                   
                   // Parse the SOC file with the SMT memo file
                   console.log('Parsing SOC with SMT memo file...');
-                  const records = await parseDBF(socBuffer, smtBuffer);
-                  console.log('Parsed records:', records ? records.length : 0);
+                  const result = await parseDBF(socBuffer, smtBuffer);
+                  console.log('Parsed records:', result ? result.data.length : 0);
                   
-                  if (records && records.length > 0) {
-                    const headers = Object.keys(records[0]);
-                    console.log('Headers found:', headers);
-                    onDataLoaded(headers, records, file.name, undefined, file.size);
+                  if (result && result.data && result.data.length > 0) {
+                    // Convert data array to objects with headers
+                    const records = result.data.map(row => {
+                      const obj: Record<string, string> = {};
+                      result.headers.forEach((header, index) => {
+                        obj[header] = row[index] || '';
+                      });
+                      return obj;
+                    });
+                    console.log('Headers found:', result.headers);
+                    onDataLoaded(result.headers, records, file.name, undefined, file.size);
                   } else {
                     showToast({
                       title: "Error",
@@ -388,13 +406,20 @@ const Header = ({
             } else {
               // If no SMT file, just parse the SOC file as a regular DBF
               console.log('No SMT file found, parsing SOC as regular DBF');
-              const records = await parseDBF(socBuffer);
-              console.log('Parsed records:', records ? records.length : 0);
+              const result = await parseDBF(socBuffer);
+              console.log('Parsed records:', result ? result.data.length : 0);
               
-              if (records && records.length > 0) {
-                const headers = Object.keys(records[0]);
-                console.log('Headers found:', headers);
-                onDataLoaded(headers, records, file.name, undefined, file.size);
+              if (result && result.data && result.data.length > 0) {
+                // Convert data array to objects with headers
+                const records = result.data.map(row => {
+                  const obj: Record<string, string> = {};
+                  result.headers.forEach((header, index) => {
+                    obj[header] = row[index] || '';
+                  });
+                  return obj;
+                });
+                console.log('Headers found:', result.headers);
+                onDataLoaded(result.headers, records, file.name, undefined, file.size);
               } else {
                 showToast({
                   title: "Error",

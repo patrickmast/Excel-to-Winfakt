@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { PM7Menu, PM7Dialog, PM7DialogContent, PM7DialogHeader, PM7DialogTitle } from 'pm7-ui-style-guide';
+import { PM7Menu, PM7Dialog, PM7DialogContent, PM7DialogHeader, PM7DialogTitle, PM7DialogDescription } from 'pm7-ui-style-guide';
 import { Upload, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -67,6 +67,9 @@ export function Header({ onFileSelect }: HeaderProps) {
         <PM7DialogContent>
           <PM7DialogHeader>
             <PM7DialogTitle>{t('header.filePreview')}</PM7DialogTitle>
+            <PM7DialogDescription>
+              {t('header.filePreviewDescription', 'Preview of the uploaded file content')}
+            </PM7DialogDescription>
           </PM7DialogHeader>
           <pre style={{
             whiteSpace: 'pre-wrap',
