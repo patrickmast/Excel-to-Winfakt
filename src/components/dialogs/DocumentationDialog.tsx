@@ -84,9 +84,11 @@ const DocumentationDialog = ({ open, onOpenChange }: DocumentationDialogProps) =
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-2">Bestandsgrootte Limiet</h4>
+                  <h4 className="font-semibold mb-2">Bestandsgrootte</h4>
                   <p className="text-sm text-muted-foreground">
-                    Maximum bestandsgrootte is 50MB. Grotere bestanden worden automatisch afgewezen.
+                    De applicatie kan grote bestanden verwerken dankzij Web Worker technologie. 
+                    Excel bestanden tot 100MB en CSV bestanden met 100.000+ rijen worden ondersteund. 
+                    Voor zeer grote bestanden kunnen browser geheugenlimieten een rol spelen.
                   </p>
                 </div>
               </CardContent>
