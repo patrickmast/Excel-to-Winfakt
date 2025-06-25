@@ -1,5 +1,6 @@
 import { MappingState } from '@/components/column-mapper/types';
 import { CompoundFilter } from '@/components/column-mapper/FilterDialog';
+import { safeBlobDownload, safeFileRead } from './blobUtils';
 
 export interface Settings {
   mapping: Record<string, string>;
@@ -27,29 +28,22 @@ export const buildSettings = (state: MappingState): Settings => ({
   activeFilter: state.activeFilter ?? null
 });
 
-export const downloadSettingsAsJSON = (state: MappingState, filename?: string) => {
-  const settings = buildSettings(state);
-  
-  const jsonString = JSON.stringify(settings, null, 2);
-  
-  const blob = new Blob([jsonString], { type: 'application/json' });
-  
-  const url = URL.createObjectURL(blob);
-  
-  const link = document.createElement('a');
-  link.href = url;
-  
-  const defaultFilename = state.sourceFilename 
-    ? `${state.sourceFilename.replace(/\.[^/.]+$/, '')}_settings.json`
-    : 'excel_to_winfakt_settings.json';
-  
-  link.download = filename || defaultFilename;
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  
-  URL.revokeObjectURL(url);
+export const downloadSettingsAsJSON = async (state: MappingState, filename?: string) => {
+  try {
+    const settings = buildSettings(state);
+    const jsonString = JSON.stringify(settings, null, 2);
+    
+    const defaultFilename = state.sourceFilename 
+      ? `${state.sourceFilename.replace(/\.[^/.]+$/, '')}_settings.json`
+      : 'excel_to_winfakt_settings.json';
+    
+    await safeBlobDownload(jsonString, {
+      filename: filename || defaultFilename,
+      mimeType: 'application/json'
+    });
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const validateSettings = (data: any): data is Settings => {
@@ -80,40 +74,28 @@ export const validateSettings = (data: any): data is Settings => {
   return true;
 };
 
-export const loadSettingsFromJSON = (file: File): Promise<Settings> => {
-  return new Promise((resolve, reject) => {
-    if (!file) {
-      reject(new Error('No file provided'));
-      return;
-    }
+export const loadSettingsFromJSON = async (file: File): Promise<Settings> => {
+  if (!file) {
+    throw new Error('No file provided');
+  }
 
-    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
-      reject(new Error('File must be a JSON file'));
-      return;
-    }
+  if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+    throw new Error('File must be a JSON file');
+  }
 
-    const reader = new FileReader();
+  try {
+    const content = await safeFileRead<string>(file, 'readAsText');
+    const data = JSON.parse(content);
     
-    reader.onload = (event) => {
-      try {
-        const content = event.target?.result as string;
-        const data = JSON.parse(content);
-        
-        if (!validateSettings(data)) {
-          reject(new Error('Invalid settings file format'));
-          return;
-        }
-        
-        resolve(data as Settings);
-      } catch (error) {
-        reject(new Error('Failed to parse JSON file: ' + (error as Error).message));
-      }
-    };
+    if (!validateSettings(data)) {
+      throw new Error('Invalid settings file format');
+    }
     
-    reader.onerror = () => {
-      reject(new Error('Failed to read file'));
-    };
-    
-    reader.readAsText(file);
-  });
+    return data as Settings;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to load settings: ${error.message}`);
+    }
+    throw new Error('Failed to load settings file');
+  }
 };

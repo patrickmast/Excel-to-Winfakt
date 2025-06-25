@@ -1,4 +1,5 @@
 import Papa from 'papaparse';
+import { safeBlobDownload } from './blobUtils';
 
 export const addTimestampToFilename = (filename: string | undefined): string => {
   if (!filename) {
@@ -13,8 +14,17 @@ export const addTimestampToFilename = (filename: string | undefined): string => 
   return `${cleanBaseName}-${timestamp}${extension}`;
 };
 
-export const isRowEmpty = (row: Record<string, any>): boolean => {
-  // Only check values that will be in the exported CSV (those that are not null/undefined)
+export const isRowEmpty = (row: Record<string, any> | any[]): boolean => {
+  // Handle array format (for array-based rows)
+  if (Array.isArray(row)) {
+    return !row.some(cell => {
+      if (cell === null || cell === undefined) return false;
+      if (typeof cell === 'string') return cell.trim().length > 0;
+      return true;
+    });
+  }
+  
+  // Handle object format (for key-value rows)
   const exportedValues = Object.entries(row)
     .filter(([_, value]) => value !== null && value !== undefined)
     .map(([_, value]) => value);
@@ -35,7 +45,12 @@ export const formatFileSize = (bytes: number): string => {
     : `${value.toFixed(1)} ${sizes[i]}`;
 };
 
-export const downloadCSV = (data: any[], filename: string) => {
+export const downloadCSV = async (
+  data: any[], 
+  filename: string, 
+  headers?: string[], 
+  onError?: (error: Error) => void
+) => {
   // Configure Papa Parse for unparse
   const config = {
     quotes: false, // Never use quotes around fields
@@ -47,60 +62,24 @@ export const downloadCSV = (data: any[], filename: string) => {
   };
 
   try {
-    const csv = Papa.unparse(data, config);
+    // Support both formats: array of objects (default) or separate headers/data
+    const csv = headers 
+      ? Papa.unparse({ fields: headers, data })
+      : Papa.unparse(data, config);
 
-    // Create blob and download
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', addTimestampToFilename(filename));
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }
-  } catch (error) {
-    throw error;
-  }
-};
-
-export function isEmptyRow(row: any[]): boolean {
-  const hasValues = row.some(cell => {
-    if (cell === null || cell === undefined) return false;
-    if (typeof cell === 'string') return cell.trim().length > 0;
-    return true;
-  });
-  return !hasValues;
-}
-
-export async function downloadCSV(
-  data: any[],
-  filename: string,
-  headers: string[],
-  onError?: (error: Error) => void
-): Promise<void> {
-  try {
-    const csv = Papa.unparse({
-      fields: headers,
-      data: data
-    });
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-
-    if (navigator.msSaveBlob) {
-      navigator.msSaveBlob(blob, filename);
+    // Handle IE/Edge legacy
+    if ((navigator as any).msSaveBlob) {
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      (navigator as any).msSaveBlob(blob, addTimestampToFilename(filename));
       return;
     }
-
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    
+    // Use safe blob download utility
+    await safeBlobDownload(csv, {
+      filename: addTimestampToFilename(filename),
+      mimeType: 'text/csv;charset=utf-8;'
+    });
+    
   } catch (error) {
     if (onError) {
       onError(error as Error);
@@ -108,4 +87,5 @@ export async function downloadCSV(
       throw error;
     }
   }
-}
+};
+
